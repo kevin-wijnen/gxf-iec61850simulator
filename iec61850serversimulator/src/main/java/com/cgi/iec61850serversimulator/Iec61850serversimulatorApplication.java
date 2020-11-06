@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import ch.qos.logback.*;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -32,7 +34,8 @@ import com.beanit.openiec61850.internal.cli.StringCliParameter;
 @SpringBootApplication
 public class Iec61850serversimulatorApplication {
 	
-	private static final Logger logger = LogManager.getLogger(Iec61850serversimulatorApplication.class);
+	private static final Logger logger = LoggerFactory.getLogger(Iec61850serversimulatorApplication.class);
+	//private static final Logger logger = LogManager.getLogger(Iec61850serversimulatorApplication.class);
 	
 	private static final String PRINT_SERVER_MODEL_KEY = "p";
 	private static final String PRINT_SERVER_MODEL_KEY_DESCRIPTION = "print server's model";
@@ -98,7 +101,6 @@ public class Iec61850serversimulatorApplication {
 	public static void main(String[] args) throws IOException{
 		
 		SpringApplication.run(Iec61850serversimulatorApplication.class, args);
-		//PropertyConfigurator.configure("log4j.properties");
 		logger.info("Applicatie starten...");
 		
 	    List<CliParameter> cliParameters = new ArrayList<>();
