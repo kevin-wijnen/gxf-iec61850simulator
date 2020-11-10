@@ -52,7 +52,7 @@ public class Iec61850serversimulatorApplication {
 	          .setMandatory()
 	          .buildStringParameter("model-file");
 	
-    static class ActionExecutor implements ActionListener {
+    public static class ActionExecutor implements ActionListener {
 
         @Override
         public void actionCalled(String actionKey) throws ActionException {
@@ -60,8 +60,8 @@ public class Iec61850serversimulatorApplication {
             switch (actionKey) {
               case PRINT_SERVER_MODEL_KEY:
                 System.out.println("** Printing model.");
-                logger.info("Server model:" + serverModel);
-                System.out.println(serverModel);
+                //logger.info("Server model:" + serverModel);
+                //System.out.println(serverModel);
 
                 break;
             }
@@ -129,7 +129,7 @@ public class Iec61850serversimulatorApplication {
 	    logger.info("ServerSap aanmaken...");
 	    serverSap = new ServerSap(102, 0, null, serverModels.get(0), null);
 	    serverSap.setPort(portParam.getValue());
-	    logger.info("ServerSap aangemaakt met als poort: " + portParam.getValue());
+	    //logger.info("ServerSap aangemaakt met als poort: " + portParam.getValue());
 	    Runtime.getRuntime()
 	        .addShutdownHook(
 	            new Thread() {
@@ -141,11 +141,11 @@ public class Iec61850serversimulatorApplication {
 	                System.out.println("Server was stopped.");
 	              }
 	            });
-	    logger.info("Model copy gestart");
+	    //logger.info("Model copy gestart");
 	    serverModel = serverSap.getModelCopy();
-	    logger.info("Model copy done!");
+	    //logger.info("Model copy done!");
 	    
-	    logger.info("SERVER START LISTENING");
+	    //logger.info("SERVER START LISTENING");
 	    serverSap.startListening(new EventListener());
 
 	    actionProcessor.addAction(
