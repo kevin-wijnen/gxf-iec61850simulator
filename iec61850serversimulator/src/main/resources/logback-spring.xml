@@ -8,9 +8,9 @@
   </appender>
 
   <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-    <file>/home/dev/git/iec61850simulator/iec61850serversimulator/logs/gxf-simulator.log</file>
+    <file>/var/log/osp/logs/iec61850-simulator.log</file>
     <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
-      <fileNamePattern>/home/dev/git/iec61850simulator/iec61850serversimulator/logs/gxf-simulator.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+      <fileNamePattern>/var/log/osp/logs/iec61850-simulator.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
       <maxFileSize>100MB</maxFileSize>
       <maxHistory>10</maxHistory>
     </rollingPolicy>
