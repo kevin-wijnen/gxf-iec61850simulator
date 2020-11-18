@@ -4,23 +4,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import ch.qos.logback.*;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import com.beanit.openiec61850.BasicDataAttribute;
 import com.beanit.openiec61850.SclParseException;
 import com.beanit.openiec61850.SclParser;
-import com.beanit.openiec61850.ServerEventListener;
 import com.beanit.openiec61850.ServerModel;
 import com.beanit.openiec61850.ServerSap;
-import com.beanit.openiec61850.ServiceError;
 import com.beanit.openiec61850.internal.cli.Action;
-import com.beanit.openiec61850.internal.cli.ActionException;
-import com.beanit.openiec61850.internal.cli.ActionListener;
 import com.beanit.openiec61850.internal.cli.ActionProcessor;
 import com.beanit.openiec61850.internal.cli.CliParameter;
 import com.beanit.openiec61850.internal.cli.CliParameterBuilder;
@@ -28,10 +21,6 @@ import com.beanit.openiec61850.internal.cli.CliParseException;
 import com.beanit.openiec61850.internal.cli.CliParser;
 import com.beanit.openiec61850.internal.cli.IntCliParameter;
 import com.beanit.openiec61850.internal.cli.StringCliParameter;
-
-import com.cgi.iec61850serversimulator.ActionExecutor;
-import com.cgi.iec61850serversimulator.EventListener;
-// Code integrated from the OpenIEC61850 application from BeanIt, licensed under Apache 2.0.
 
 @SpringBootApplication
 public class ServerSimulator {
