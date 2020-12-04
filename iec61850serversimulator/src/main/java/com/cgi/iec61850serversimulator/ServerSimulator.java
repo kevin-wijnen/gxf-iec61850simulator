@@ -30,12 +30,14 @@ public class ServerSimulator {
 	
 	private static final String PRINT_SERVER_MODEL_KEY = "p";
 	private static final String PRINT_SERVER_MODEL_KEY_DESCRIPTION = "print server's model";
+	private static final String DEVICE_SHOW_MODEL = "d";
+	private static final String DEVICE_SHOW_MODEL_DESCRIPTION = "print device object";
 	
 	private static final IntCliParameter portParam =
 	    new CliParameterBuilder("-p")
 	        .setDescription(
 	            "The port to listen on. On unix based systems you need root privilages for ports < 1000. Default: 102")
-	        .buildIntParameter("port", 10000);
+	        .buildIntParameter("port", 10102);
 	
 	private static final StringCliParameter modelFileParam =
 	      new CliParameterBuilder("-m")
@@ -92,14 +94,22 @@ public class ServerSimulator {
 	    logger.info("Model copy gestart");
 	    serverModel = serverSap.getModelCopy();
 	    logger.info("Model copy done!");
+	    
+	    // Device intialization by copying from serverModel
+	    Device device = new Device();
+	    //Device.deviceInit(enbDst);
+	    //Functie toevoegen om details van serverModel naar Device te doen
+	    
 	    //ActionExecutor actionExecutor = new ActionExecutor(PRINT_SERVER_MODEL_KEY, serverSap, serverModel);
 	    
 	    logger.info("SERVER START LISTENING");
-	    serverSap.startListening(new EventListener());
+	    //serverSap.startListening(new EventListener());
+	    serverSap.startListening(new LightMeasurementDeviceListener(device));
 	    
-		final ActionProcessor actionProcessor = new ActionProcessor(new ActionExecutor(serverSap, serverModel));
+		final ActionProcessor actionProcessor = new ActionProcessor(new ActionExecutor(serverSap, serverModel, device));
 	    actionProcessor.addAction(
 	        new Action(PRINT_SERVER_MODEL_KEY, PRINT_SERVER_MODEL_KEY_DESCRIPTION));
+	    actionProcessor.addAction(new Action(DEVICE_SHOW_MODEL, DEVICE_SHOW_MODEL_DESCRIPTION));
 	    //actionProcessor.addAction(new Action(WRITE_VALUE_KEY, WRITE_VALUE_KEY_DESCRIPTION));
 
 	    actionProcessor.start();

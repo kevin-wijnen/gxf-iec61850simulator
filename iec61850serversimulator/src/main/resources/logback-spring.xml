@@ -24,4 +24,8 @@
     <appender-ref ref="FILE"/>
   </root>
 
+<!-- <root level="DEBUG" additivty="false">
+<appender-ref ref="FILE"/>
+</root>
+-->
 </configuration>
