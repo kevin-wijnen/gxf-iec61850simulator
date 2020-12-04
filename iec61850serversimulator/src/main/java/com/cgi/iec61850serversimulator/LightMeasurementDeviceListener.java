@@ -35,7 +35,8 @@ class LightMeasurementDeviceListener implements ServerEventListener{
 				logger.info("DST STATUS FOUND!");
 				logger.info(bda.getValueString());
 				boolean daylightActive = Boolean.parseBoolean(bda.getValueString());
-				//device.updateDst(daylightActive);
+				// TODO: Convert current SwitchDST function to one that actually accepts input instead of just switching!
+				device.enableDST = daylightActive;
 			}
 			
 			else if (updatedNodeName.equals("curT")){

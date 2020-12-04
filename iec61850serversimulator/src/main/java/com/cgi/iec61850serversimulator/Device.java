@@ -1,19 +1,30 @@
 package com.cgi.iec61850serversimulator;
 
+import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.ZoneOffset;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.beanit.openiec61850.BasicDataAttribute;
+import com.beanit.openiec61850.BdaBoolean;
+import com.beanit.openiec61850.BdaTimestamp;
+import com.beanit.openiec61850.Fc;
+import com.beanit.openiec61850.FcDataObject;
+import com.beanit.openiec61850.ModelNode;
 import com.beanit.openiec61850.ServerModel;
+import com.beanit.openiec61850.internal.scl.Bda;
 
 
 
 class Device {
-	
+	//TODO: Split the class up into several classes
 	private static final Logger logger = LoggerFactory.getLogger(Device.class);
 	
-	String switchType1;
+	/*String switchType1;
 	String switchType2;
 	String switchType3;
 	String switchType4;
@@ -26,10 +37,13 @@ class Device {
 	int offsetAstronomRise;
 	String sensorTransition;
 	String dstBeginT;
-	String dstEndT;
+	String dstEndT;*/
 	boolean enableDST;
+	LocalDateTime currentTime;
 	
-	String eventFilterBitmask;
+	
+	
+	/*String eventFilterBitmask;
 	boolean enableEventBuffered;
 	
 	// Schedule array?
@@ -45,11 +59,11 @@ class Device {
 	boolean enableDHCP;
 	String ipAddressDHCP;
 	String netmaskDHCP;
-	String gatewayDHCP;
+	String gatewayDHCP;*/
 	
 	public void displayDevice() {
 		logger.info("** Printing device.\n");
-		logger.info("Switch 1 type: " + switchType1);
+		/*logger.info("Switch 1 type: " + switchType1);
 		logger.info("Switch 2 type: " + switchType2);
 		logger.info("Switch 3 type: " + switchType3);
 		logger.info("Switch 4 type: " + switchType4 + "\n");
@@ -63,9 +77,11 @@ class Device {
 		logger.info("Offset astronomical time at sunrise: " + offsetAstronomRise);
 		logger.info("Light sensor transition: Day > Night" + sensorTransition);
 		logger.info("Start date Daylight Saving Time: " + dstBeginT);
-		logger.info("End date Daylight Saving Time: " + dstEndT);
+		logger.info("End date Daylight Saving Time: " + dstEndT);*/
 		logger.info("Daylight Saving Time currently active: " + enableDST + "\n");
+		logger.info("Current time: " + currentTime + "\n");
 		
+		/*
 		// Change to showcase which types of events are actually enabled!
 		logger.info("Event Notification filter bitmask: " + eventFilterBitmask);
 		logger.info("Buffered Event Notification reports enbaled: " + enableEventBuffered + "\n");
@@ -82,12 +98,44 @@ class Device {
 		logger.info("Static IP address when DHCP is disabled: " + ipAddressDHCP);
 		logger.info("Netmask when DHCP is disabled: " + netmaskDHCP);
 		logger.info("Gateway when DHCP is disabled: " + gatewayDHCP);
-		
+		*/
 	}
 	
 	public void InitalizeDevice(ServerModel serverModel) {
 		// Using serverModel to copy the simulated device's details at boot up.
+		/*serverModel.getChild("Clock", FC cf);
+		serverModel.getDataSet(reference)*/
+		//System.out.println(serverModel.getDataSet("SWDeviceGenericIO/CSLC.Clock.enbDst"));
 		
+		// For time-related attributes
+		
+		//System.out.println(serverModel.findModelNode("SWDeviceGenericIO/CSLC.Clock", Fc.CF));
+		ModelNode enbDst = serverModel.findModelNode("SWDeviceGenericIO/CSLC.Clock", Fc.CF);
+		List<BasicDataAttribute> bdas = enbDst.getBasicDataAttributes();
+		
+		System.out.println(bdas);
+		for (BasicDataAttribute bda : bdas ) {
+			String dataAttribute = bda.getName();
+			
+			if (dataAttribute.equals("curT")) {
+				System.out.println("Found Current Time!");
+				
+				// For native timestamp: Epoch/UNIX timestamp format is used, from second on. Convert to native timestamp!. 
+				byte[] bytesEpochTime = ((BdaTimestamp) bda).getValue();
+				ByteBuffer wrappedTime = ByteBuffer.wrap(bytesEpochTime);
+				long longTime = wrappedTime.getLong();	
+				this.currentTime = LocalDateTime.ofEpochSecond(longTime, 0, ZoneOffset.ofHours(1));
+				
+				
+			}
+			
+			else if (dataAttribute.equals("enbDst")){
+				System.out.println("Found Daylight Saving Time status!");
+				boolean enableDST = ((BdaBoolean) bda).getValue();
+				this.enableDST = enableDST;
+			}
+			
+		}
 	}
 	
 	public void rebootDevice() {

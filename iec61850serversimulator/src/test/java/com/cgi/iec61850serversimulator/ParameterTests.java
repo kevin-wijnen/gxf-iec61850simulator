@@ -1,20 +1,16 @@
 package com.cgi.iec61850serversimulator;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.beanit.openiec61850.internal.cli.CliParameter;
 import com.beanit.openiec61850.internal.cli.CliParameterBuilder;
-import com.beanit.openiec61850.internal.cli.CliParseException;
 import com.beanit.openiec61850.internal.cli.CliParser;
 import com.beanit.openiec61850.internal.cli.IntCliParameter;
 import com.beanit.openiec61850.internal.cli.StringCliParameter;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
 
 @SpringBootTest
 class ParameterTests {

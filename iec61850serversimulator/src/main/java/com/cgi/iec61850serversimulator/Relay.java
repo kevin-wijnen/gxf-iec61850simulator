@@ -9,5 +9,6 @@ class Relay {
 	// Relay 1, 2, 3, 4
 	int indexNumber;
 	
+	
 
 }

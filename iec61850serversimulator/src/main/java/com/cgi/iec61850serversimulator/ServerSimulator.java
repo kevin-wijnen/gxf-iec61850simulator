@@ -97,9 +97,10 @@ public class ServerSimulator {
 	    
 	    // Device intialization by copying from serverModel
 	    Device device = new Device();
-	    //Device.deviceInit(enbDst);
+	    device.InitalizeDevice(serverModel);
+	    System.out.println(device.enableDST);
 	    //Functie toevoegen om details van serverModel naar Device te doen
-	    
+	    	
 	    //ActionExecutor actionExecutor = new ActionExecutor(PRINT_SERVER_MODEL_KEY, serverSap, serverModel);
 	    
 	    logger.info("SERVER START LISTENING");
