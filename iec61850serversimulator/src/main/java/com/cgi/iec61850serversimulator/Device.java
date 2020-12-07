@@ -35,11 +35,8 @@ class Device {
 	
 	int offsetAstronomSet;
 	int offsetAstronomRise;
-	String sensorTransition;
-	String dstBeginT;
-	String dstEndT;*/
-	boolean enableDST;
-	LocalDateTime currentTime;
+	String sensorTransition;*/
+	Clock clock;
 	Relay relay1;
 	Relay relay2;
 	Relay relay3;
@@ -66,77 +63,21 @@ class Device {
 	String gatewayDHCP;*/
 	
 	public void displayDevice() {
-		logger.info("** Printing device.\n");
-		/*logger.info("Switch 1 type: " + switchType1);
-		logger.info("Switch 2 type: " + switchType2);
-		logger.info("Switch 3 type: " + switchType3);
-		logger.info("Switch 4 type: " + switchType4 + "\n");
+		logger.info("** Printing device:");
+		logger.info("** Printing clock.\n");
+		clock.displayClock();
 		
-		logger.info("Relay 2 light on: " + relayLight2);
-		logger.info("Relay 3 light on: " + relayLight3);
-		logger.info("Relay 4 light on: " + relayLight4);
-		logger.info("Relay light type: " + lightType + "\n");
-		
-		logger.info("Offset astronomical time at sunset: " + offsetAstronomSet);
-		logger.info("Offset astronomical time at sunrise: " + offsetAstronomRise);
-		logger.info("Light sensor transition: Day > Night" + sensorTransition);
-		logger.info("Start date Daylight Saving Time: " + dstBeginT);
-		logger.info("End date Daylight Saving Time: " + dstEndT);*/
-		logger.info("Daylight Saving Time currently active: " + enableDST + "\n");
-		logger.info("Current time: " + currentTime + "\n");
-		
-		/*
-		// Change to showcase which types of events are actually enabled!
-		logger.info("Event Notification filter bitmask: " + eventFilterBitmask);
-		logger.info("Buffered Event Notification reports enbaled: " + enableEventBuffered + "\n");
-	
-		logger.info("Current functional firmware version: " + functionalFirmwareVer);
-		logger.info("Current security firmware version: " + securityFirmwareVer + "\n");
-		
-		logger.info("IP address for device registration to the GXF platform: " + ipAddressGXF);
-		logger.info("Port for device registration to the GXF platform: " + portGXF);
-		logger.info("IP address for the Network Time Protocol: " + ipAddressNTP);
-		logger.info("Time sync interval in minutes: " + timeSyncInterval + "\n");
-		
-		logger.info("DHCP server enabled: " + enableDHCP);
-		logger.info("Static IP address when DHCP is disabled: " + ipAddressDHCP);
-		logger.info("Netmask when DHCP is disabled: " + netmaskDHCP);
-		logger.info("Gateway when DHCP is disabled: " + gatewayDHCP);
-		*/
+		logger.info("** Printing relays.\n");
+		relay1.displayRelay();
+		relay2.displayRelay();
+		relay3.displayRelay();
+		relay4.displayRelay();
 	}
 	
-	public void InitalizeDevice(ServerModel serverModel) {
-		// Using serverModel to copy the simulated device's details at boot up.
-		/*serverModel.getChild("Clock", FC cf);
-		serverModel.getDataSet(reference)*/
-		//System.out.println(serverModel.getDataSet("SWDeviceGenericIO/CSLC.Clock.enbDst"));
-		
-		// For time-related attributes
-		
-		//System.out.println(serverModel.findModelNode("SWDeviceGenericIO/CSLC.Clock", Fc.CF));
-		ModelNode enbDst = serverModel.findModelNode("SWDeviceGenericIO/CSLC.Clock", Fc.CF);
-		List<BasicDataAttribute> bdas = enbDst.getBasicDataAttributes();
-		
-		for (BasicDataAttribute bda : bdas ) {
-			String dataAttribute = bda.getName();
-			
-			switch(dataAttribute) {
-			case "curT":
-				logger.info("Current Time value found.");
-				
-				// For native timestamp: Epoch/UNIX timestamp format is used, from second on. Convert to native timestamp!. 
-				byte[] bytesEpochTime = ((BdaTimestamp) bda).getValue();
-				ByteBuffer wrappedTime = ByteBuffer.wrap(bytesEpochTime);
-				long longTime = wrappedTime.getLong();	
-				this.currentTime = LocalDateTime.ofEpochSecond(longTime, 0, ZoneOffset.ofHours(1));
-				break;
-				
-			case "enbDst":
-				logger.info("Daylight Saving Time Status value found.");
-				boolean enableDST = ((BdaBoolean) bda).getValue();
-				this.enableDST = enableDST;
-				break;
-			}
+	public void initalizeDevice(ServerModel serverModel) {
+
+		this.clock = new Clock();
+		clock.initializeClock(serverModel);
 		this.relay1 = new Relay();
 		relay1.initializeRelay(serverModel, 1);
 		this.relay2 = new Relay();
@@ -145,14 +86,6 @@ class Device {
 		relay3.initializeRelay(serverModel, 3);
 		this.relay4 = new Relay();
 		relay4.initializeRelay(serverModel, 4);
-		}
-	}
-	
-	public void showRelays() {
-		relay1.displayRelay();
-		relay2.displayRelay();
-		relay3.displayRelay();
-		relay4.displayRelay();
 	}
 	
 	public void rebootDevice() {
