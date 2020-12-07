@@ -40,6 +40,10 @@ class Device {
 	String dstEndT;*/
 	boolean enableDST;
 	LocalDateTime currentTime;
+	Relay relay1;
+	Relay relay2;
+	Relay relay3;
+	Relay relay4;
 	
 	
 	
@@ -113,7 +117,6 @@ class Device {
 		ModelNode enbDst = serverModel.findModelNode("SWDeviceGenericIO/CSLC.Clock", Fc.CF);
 		List<BasicDataAttribute> bdas = enbDst.getBasicDataAttributes();
 		
-		System.out.println(bdas);
 		for (BasicDataAttribute bda : bdas ) {
 			String dataAttribute = bda.getName();
 			
@@ -134,7 +137,22 @@ class Device {
 				this.enableDST = enableDST;
 				break;
 			}
+		this.relay1 = new Relay();
+		relay1.initializeRelay(serverModel, 1);
+		this.relay2 = new Relay();
+		relay2.initializeRelay(serverModel, 2);
+		this.relay3 = new Relay();
+		relay3.initializeRelay(serverModel, 3);
+		this.relay4 = new Relay();
+		relay4.initializeRelay(serverModel, 4);
 		}
+	}
+	
+	public void showRelays() {
+		relay1.displayRelay();
+		relay2.displayRelay();
+		relay3.displayRelay();
+		relay4.displayRelay();
 	}
 	
 	public void rebootDevice() {
