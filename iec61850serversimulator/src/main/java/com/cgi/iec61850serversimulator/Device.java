@@ -117,24 +117,23 @@ class Device {
 		for (BasicDataAttribute bda : bdas ) {
 			String dataAttribute = bda.getName();
 			
-			if (dataAttribute.equals("curT")) {
-				System.out.println("Found Current Time!");
+			switch(dataAttribute) {
+			case "curT":
+				logger.info("Current Time value found.");
 				
 				// For native timestamp: Epoch/UNIX timestamp format is used, from second on. Convert to native timestamp!. 
 				byte[] bytesEpochTime = ((BdaTimestamp) bda).getValue();
 				ByteBuffer wrappedTime = ByteBuffer.wrap(bytesEpochTime);
 				long longTime = wrappedTime.getLong();	
 				this.currentTime = LocalDateTime.ofEpochSecond(longTime, 0, ZoneOffset.ofHours(1));
+				break;
 				
-				
-			}
-			
-			else if (dataAttribute.equals("enbDst")){
-				System.out.println("Found Daylight Saving Time status!");
+			case "enbDst":
+				logger.info("Daylight Saving Time Status value found.");
 				boolean enableDST = ((BdaBoolean) bda).getValue();
 				this.enableDST = enableDST;
+				break;
 			}
-			
 		}
 	}
 	
