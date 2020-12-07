@@ -106,5 +106,15 @@ public class Clock {
 		logger.info("NTP server IP address(es): " + this.ipAddressNTP);
 		
 	}
+	
+	public void changeDST(boolean enableDST) {
+		this.enableDST = enableDST;
+	}
+	
+	public void configNTP(boolean enableNTP, String ipAddressNTP, short timeSyncInterval) {
+		this.enableNTP = enableNTP;
+		this.ipAddressNTP = ipAddressNTP;
+		this.timeSyncInterval = timeSyncInterval;
+	}
 }
 
