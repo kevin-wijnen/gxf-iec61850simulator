@@ -39,4 +39,6 @@ class Relay {
 		logger.info("**Printing relay " + Integer.toString(indexNumber) + "**");
 		logger.info("Light status:  " + Boolean.toString(lightStatus) + "\n");
 	}
+	
+	
 }

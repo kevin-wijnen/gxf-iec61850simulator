@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import com.beanit.openiec61850.BasicDataAttribute;
 import com.beanit.openiec61850.BdaBoolean;
 import com.beanit.openiec61850.BdaInt16;
+import com.beanit.openiec61850.BdaInt16U;
 import com.beanit.openiec61850.BdaTimestamp;
 import com.beanit.openiec61850.BdaVisibleString;
 import com.beanit.openiec61850.Fc;
@@ -28,7 +29,7 @@ public class Clock {
 	boolean enableDST;
 	boolean enableNTP;
 	String ipAddressNTP; // if multiple are in use, use ; to separate them
-	short timeSyncInterval; // in minutes, regarding synchronizing time with the NTP server
+	int timeSyncInterval; // in minutes, regarding synchronizing time with the NTP server
 	
 	public void initializeClock(ServerModel serverModel){
 		ModelNode clockInfo = serverModel.findModelNode("SWDeviceGenericIO/CSLC.Clock", Fc.CF);
@@ -85,7 +86,7 @@ public class Clock {
 				
 			case "syncPer":
 				logger.info("Time Sync Interval (in minutes) value found.");
-				this.timeSyncInterval = ((BdaInt16) bda).getValue();
+				this.timeSyncInterval = ((BdaInt16U) bda).getValue();
 				break;
 				
 			default:
