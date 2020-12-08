@@ -31,8 +31,7 @@ public class Clock {
 	String ipAddressNTP; // if multiple are in use, use ; to separate them
 	int timeSyncInterval; // in minutes, regarding synchronizing time with the NTP server
 	
-	public void initializeClock(ServerModel serverModel){
-		ModelNode clockInfo = serverModel.findModelNode("SWDeviceGenericIO/CSLC.Clock", Fc.CF);
+	public void initializeClock(ModelNode clockInfo){
 		List<BasicDataAttribute> bdas = clockInfo.getBasicDataAttributes();
 		
 		for (BasicDataAttribute bda : bdas ) {

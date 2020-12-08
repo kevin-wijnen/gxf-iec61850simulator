@@ -23,7 +23,6 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
 		</dependency>
-
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
@@ -49,6 +48,7 @@
 			<version>1.8.0</version>
 		</dependency>
 		
+		<!-- TEST -->
 		<!-- https://mvnrepository.com/artifact/com.beanit/asn1bean -->
 		<dependency>
 		    <groupId>com.beanit</groupId>

@@ -77,7 +77,7 @@ class Device {
 	public void initalizeDevice(ServerModel serverModel) {
 
 		this.clock = new Clock();
-		clock.initializeClock(serverModel);
+		clock.initializeClock(serverModel.findModelNode("SWDeviceGenericIO/CSLC.Clock", Fc.CF));
 		this.relay1 = new Relay();
 		relay1.initializeRelay(serverModel, 1);
 		this.relay2 = new Relay();

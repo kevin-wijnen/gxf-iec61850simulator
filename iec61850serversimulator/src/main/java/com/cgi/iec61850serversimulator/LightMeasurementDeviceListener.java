@@ -31,12 +31,12 @@ class LightMeasurementDeviceListener implements ServerEventListener{
 		for (BasicDataAttribute bda : bdas) {
 			String updatedNodeName = bda.getName();
 			System.out.println(updatedNodeName);
+			System.out.println(bda.getValueString());
 			try {
 			if (updatedNodeName.equals("enbDst")){	
 				logger.info("DST STATUS FOUND!");
 				logger.info(bda.getValueString());
 				boolean daylightActive = Boolean.parseBoolean(bda.getValueString());
-				// TODO: Convert current SwitchDST function to one that actually accepts input instead of just switching!
 				device.clock.changeDST(daylightActive);
 			}
 			
@@ -73,7 +73,7 @@ class LightMeasurementDeviceListener implements ServerEventListener{
 			
 			/*if (bda.getParent().toString().contains("SWDeviceGenericIO/CSLC.Clock.enbDst:")) {
 				logger.info(bda.getName());
-			}*/
+			}*/	
 			
 			/*if (bda.getParent().toString().contains("SWDeviceGenericIO/XSWC") && bda.getParent().toString().contains("Sche.sche"))
 				logger.info("Switch schedule data.");
