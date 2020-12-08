@@ -48,7 +48,6 @@
 			<version>1.8.0</version>
 		</dependency>
 		
-		<!-- TEST -->
 		<!-- https://mvnrepository.com/artifact/com.beanit/asn1bean -->
 		<dependency>
 		    <groupId>com.beanit</groupId>
