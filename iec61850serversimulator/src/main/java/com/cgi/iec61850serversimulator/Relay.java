@@ -17,11 +17,20 @@ class Relay {
 	// Relay 1, 2, 3, 4
 	int indexNumber;
 	boolean lightStatus;
-
-	public void initializeRelay(ServerModel serverModel, int indexNumber) {
-	this.indexNumber = indexNumber;
 	
-	ModelNode relayInfo = serverModel.findModelNode("SWDeviceGenericIO/XSWC*.SwType.Oper".replace("*", Integer.toString(this.indexNumber)), Fc.CO);
+	Schedule schedule1;
+	Schedule schedule2;
+	Schedule schedule3;
+	//..
+	Schedule schedule50;
+	//filling up to 50 of them
+
+	public void initializeRelay(ModelNode relayInfo){
+	
+	this.indexNumber = Integer.parseInt(relayInfo.getReference().toString().substring(22,23));
+	
+	
+	//ModelNode relayInfo = serverModel.findModelNode("SWDeviceGenericIO/XSWC*.SwType.Oper".replace("*", Integer.toString(this.indexNumber)), Fc.CO);
 	List<BasicDataAttribute> bdas = relayInfo.getBasicDataAttributes();
 	
 	for (BasicDataAttribute bda : bdas ) {
@@ -34,11 +43,32 @@ class Relay {
 			break;
 			}
 		}
+	// Initalize Schedules!
 	}
 	public void displayRelay() {
 		logger.info("**Printing relay " + Integer.toString(indexNumber) + "**");
 		logger.info("Light status:  " + Boolean.toString(lightStatus) + "\n");
 	}
 	
-	
-}
+	public void initializeSchedules(ModelNode scheduleInfo) {
+		/*for (int scheduleNumber = 1; scheduleNumber < 51; scheduleNumber++) {
+			// Schedule initialization up to 50
+			String scheduleReference = "SWDeviceGenericIO/XSWC*.Sche.sche~".replace("*", Integer.toString(this.indexNumber)).replace("~", Integer.toString(scheduleNumber));
+			
+			return scheduleReference;*/
+		this.schedule1 = new Schedule();
+		this.schedule1.initializeSchedule(scheduleInfo);
+		this.schedule2 = new Schedule();
+		this.schedule2.initializeSchedule(scheduleInfo);
+		this.schedule3 = new Schedule();
+		this.schedule3.initializeSchedule(scheduleInfo);
+		this.schedule50 = new Schedule();
+		this.schedule50.initializeSchedule(scheduleInfo);
+		}
+		//TODO: Initializing all 50 schedules to be accepted by the platform
+		// Using a for-loop to get all 50 initialized per device?
+		// Using .toString generator to get the information
+		
+		// Giving proper ModelNode per schedule by constructing the reference:
+		// SWDeviceGenericIP/XSWC<indexNumber>.Sche.sche<scheduleNumber>
+	}

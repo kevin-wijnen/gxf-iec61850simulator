@@ -29,6 +29,8 @@ class LightMeasurementDeviceListener implements ServerEventListener{
 		logger.info("BDA write request scanning...");
 		
 		for (BasicDataAttribute bda : bdas) {
+			System.out.println(bda.getReference());
+			System.out.println(bda.getFc());
 			String updatedNodeName = bda.getName();
 			System.out.println(updatedNodeName);
 			System.out.println(bda.getValueString());

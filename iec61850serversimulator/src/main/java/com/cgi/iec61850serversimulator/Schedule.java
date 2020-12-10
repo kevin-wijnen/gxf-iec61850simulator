@@ -2,12 +2,17 @@ package com.cgi.iec61850serversimulator;
 
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.beanit.openiec61850.BasicDataAttribute;
+import com.beanit.openiec61850.BdaBoolean;
 import com.beanit.openiec61850.Fc;
 import com.beanit.openiec61850.ModelNode;
 import com.beanit.openiec61850.ServerModel;
 
 class Schedule {
+	private static final Logger logger = LoggerFactory.getLogger(Schedule.class);
 	//TODO: SwitchingMoment related attributes and functions here.
 	
 	// Enum as prescribed in the GXF documentation for SetSchedule
@@ -20,7 +25,7 @@ class Schedule {
 	enum TIMETYPE{
 		FIXED, SENSOR, ASTRONOMIC;
 	}
-	
+	// serverModel.findModelNode("SWDeviceGenericIO/CSLC.Clock", Fc.CF)
 	int indexNumber;
 	boolean enabled;
 	String description;
@@ -33,11 +38,58 @@ class Schedule {
 	short beforeOffset; // Maximum of 150?
 	short afterOffset; // Maximum of 150?
 	
-	public void initializeSchedule(ServerModel serverModel, int indexNumber, int relayIndexNumber) {
-		String scheduleReference = "SWDeviceGenericIO/XSWC*.Sche.sch~".replace("*", Integer.toString(relayIndexNumber)).replace("~", Integer.toString(indexNumber));
-		ModelNode clockInfo = serverModel.findModelNode(scheduleReference, Fc.CF);
-		List<BasicDataAttribute> bdas = clockInfo.getBasicDataAttributes();
+	public void initializeSchedule(ModelNode scheduleInfo) {
+	
+		List<BasicDataAttribute> bdas = scheduleInfo.getBasicDataAttributes();
+		
+		for (BasicDataAttribute bda : bdas ) {
+			String dataAttribute = bda.getName();
+			
+			switch(dataAttribute) {
+			case "enable":
+				logger.info("Schedule Enabled Status found.");
+				
+				break;
+				
+			case "day":
+				logger.info("Day found.");
+				break;
+			
+			case "tOn":
+				logger.info("Time On found.");
+				break;
+				
+			case "tOnT":
+				logger.info("Time On Type found.");
+				break;
+				
+			case "tOff":
+				logger.info("Time Off found.");
+				break;
+				
+			case "tOffT":
+				logger.info("Time Off Type found.");
+				break;
+				
+			case "minOnPer":
+				logger.info("Burning Minutes found.");
+				break;
+				
+			case "srBefWd":
+				logger.info("Before Astrological Time Offset found.");
+				break;
+				
+			case "srAftWd":
+				logger.info("After Astrological Time Offset found.");
+				break;
+				
+			case "Descr":
+				logger.info(" found.");
+				break;
+				
+			default:
+				logger.info("Unimplemented value found: " + bda.getName() + ", skipped.");
+			}
+		}
 	}
-	
-	
 }

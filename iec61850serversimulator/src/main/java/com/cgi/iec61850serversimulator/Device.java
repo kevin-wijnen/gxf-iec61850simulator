@@ -79,13 +79,13 @@ class Device {
 		this.clock = new Clock();
 		clock.initializeClock(serverModel.findModelNode("SWDeviceGenericIO/CSLC.Clock", Fc.CF));
 		this.relay1 = new Relay();
-		relay1.initializeRelay(serverModel, 1);
+		relay1.initializeRelay(serverModel.findModelNode("SWDeviceGenericIO/XSWC1.Pos", Fc.CO));
 		this.relay2 = new Relay();
-		relay2.initializeRelay(serverModel, 2);
+		relay2.initializeRelay(serverModel.findModelNode("SWDeviceGenericIO/XSWC2.Pos", Fc.CO));
 		this.relay3 = new Relay();
-		relay3.initializeRelay(serverModel, 3);
+		relay3.initializeRelay(serverModel.findModelNode("SWDeviceGenericIO/XSWC3.Pos", Fc.CO));
 		this.relay4 = new Relay();
-		relay4.initializeRelay(serverModel, 4);
+		relay4.initializeRelay(serverModel.findModelNode("SWDeviceGenericIO/XSWC4.Pos", Fc.CO));
 	}
 	
 	public void rebootDevice() {
