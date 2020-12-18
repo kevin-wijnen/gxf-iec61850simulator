@@ -17,17 +17,19 @@ class Relay {
 	// Relay 1, 2, 3, 4
 	int indexNumber;
 	boolean lightStatus;
-	
-	Schedule schedule1;
-	Schedule schedule2;
-	Schedule schedule3;
+	ModelNode scheduleInfo;
+	Schedule[] schedules;
+//	Schedule schedule1;
+//	Schedule schedule2;
+//	Schedule schedule3;
 	//..
-	Schedule schedule50;
+//	Schedule schedule50;
 	//filling up to 50 of them
 
-	public void initializeRelay(ModelNode relayInfo){
+	public Relay(ModelNode relayInfo, ModelNode scheduleInfo){
 	
 	this.indexNumber = Integer.parseInt(relayInfo.getReference().toString().substring(22,23));
+	this.scheduleInfo = scheduleInfo;
 	
 	
 	//ModelNode relayInfo = serverModel.findModelNode("SWDeviceGenericIO/XSWC*.SwType.Oper".replace("*", Integer.toString(this.indexNumber)), Fc.CO);
@@ -44,10 +46,12 @@ class Relay {
 			}
 		}
 	// Initalize Schedules!
+	//initializeSchedules(scheduleInfo);
 	}
 	public void displayRelay() {
 		logger.info("**Printing relay " + Integer.toString(indexNumber) + "**");
 		logger.info("Light status:  " + Boolean.toString(lightStatus) + "\n");
+		//logger.info(schedules[0].toString());
 	}
 	
 	public void initializeSchedules(ModelNode scheduleInfo) {
@@ -56,14 +60,16 @@ class Relay {
 			String scheduleReference = "SWDeviceGenericIO/XSWC*.Sche.sche~".replace("*", Integer.toString(this.indexNumber)).replace("~", Integer.toString(scheduleNumber));
 			
 			return scheduleReference;*/
-		this.schedule1 = new Schedule();
-		this.schedule1.initializeSchedule(scheduleInfo);
-		this.schedule2 = new Schedule();
+		schedules[0] = new Schedule(scheduleInfo);
+		for (int scheduleNr = 0; scheduleNr < 50; scheduleNr++) {
+			schedules[scheduleNr] = new Schedule(scheduleInfo);
+		}
+		/*this.schedule2 = new Schedule();
 		this.schedule2.initializeSchedule(scheduleInfo);
 		this.schedule3 = new Schedule();
 		this.schedule3.initializeSchedule(scheduleInfo);
 		this.schedule50 = new Schedule();
-		this.schedule50.initializeSchedule(scheduleInfo);
+		this.schedule50.initializeSchedule(scheduleInfo);*/
 		}
 		//TODO: Initializing all 50 schedules to be accepted by the platform
 		// Using a for-loop to get all 50 initialized per device?

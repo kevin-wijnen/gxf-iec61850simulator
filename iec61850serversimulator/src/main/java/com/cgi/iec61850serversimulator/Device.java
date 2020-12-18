@@ -37,10 +37,11 @@ class Device {
 	int offsetAstronomRise;
 	String sensorTransition;*/
 	Clock clock;
-	Relay relay1;
-	Relay relay2;
-	Relay relay3;
-	Relay relay4;
+	Relay[] relays;
+	//Relay relay1;
+	//Relay relay2;
+	//Relay relay3;
+	//Relay relay4;
 	
 	
 	
@@ -68,24 +69,22 @@ class Device {
 		clock.displayClock();
 		
 		logger.info("** Printing relays.\n");
-		relay1.displayRelay();
-		relay2.displayRelay();
-		relay3.displayRelay();
-		relay4.displayRelay();
+		for (int relayNr = 0; relayNr < 4; relayNr++) {
+			relays[relayNr].displayRelay();
+		}
 	}
 	
 	public void initalizeDevice(ServerModel serverModel) {
-
+		// Only one schedule supported at the moment
+		
+		
 		this.clock = new Clock();
 		clock.initializeClock(serverModel.findModelNode("SWDeviceGenericIO/CSLC.Clock", Fc.CF));
-		this.relay1 = new Relay();
-		relay1.initializeRelay(serverModel.findModelNode("SWDeviceGenericIO/XSWC1.Pos", Fc.CO));
-		this.relay2 = new Relay();
-		relay2.initializeRelay(serverModel.findModelNode("SWDeviceGenericIO/XSWC2.Pos", Fc.CO));
-		this.relay3 = new Relay();
-		relay3.initializeRelay(serverModel.findModelNode("SWDeviceGenericIO/XSWC3.Pos", Fc.CO));
-		this.relay4 = new Relay();
-		relay4.initializeRelay(serverModel.findModelNode("SWDeviceGenericIO/XSWC4.Pos", Fc.CO));
+		relays = new Relay[4];
+		
+		for (int relayNr = 0; relayNr < 4; relayNr++) {
+			relays[relayNr] = new Relay(serverModel.findModelNode("SWDeviceGenericIO/XSWC" + (relayNr + 1) + ".Pos", Fc.CO), serverModel.findModelNode("SWDeviceGenericIO/XSWC" + (relayNr + 1) + ".Sche.sche1", Fc.CF));
+		}
 	}
 	
 	public void rebootDevice() {

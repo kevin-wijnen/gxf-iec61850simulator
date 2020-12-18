@@ -116,5 +116,59 @@ public class Clock {
 		this.ipAddressNTP = ipAddressNTP;
 		this.timeSyncInterval = timeSyncInterval;
 	}
+	public LocalDateTime getCurrentTime() {
+		return currentTime;
+	}
+	public void setCurrentTime(LocalDateTime currentTime) {
+		this.currentTime = currentTime;
+	}
+	public short getTimeZoneOffset() {
+		return timeZoneOffset;
+	}
+	public void setTimeZoneOffset(short timeZoneOffset) {
+		this.timeZoneOffset = timeZoneOffset;
+	}
+	public String getBeginDateDST() {
+		return beginDateDST;
+	}
+	public void setBeginDateDST(String beginDateDST) {
+		this.beginDateDST = beginDateDST;
+	}
+	public String getEndDateDST() {
+		return endDateDST;
+	}
+	public void setEndDateDST(String endDateDST) {
+		this.endDateDST = endDateDST;
+	}
+	public short getDeviationDST() {
+		return deviationDST;
+	}
+	public void setDeviationDST(short deviationDST) {
+		this.deviationDST = deviationDST;
+	}
+	public boolean isEnableDST() {
+		return enableDST;
+	}
+	public void setEnableDST(boolean enableDST) {
+		this.enableDST = enableDST;
+	}
+	public boolean isEnableNTP() {
+		return enableNTP;
+	}
+	public void setEnableNTP(boolean enableNTP) {
+		this.enableNTP = enableNTP;
+	}
+	public String getIpAddressNTP() {
+		return ipAddressNTP;
+	}
+	public void setIpAddressNTP(String ipAddressNTP) {
+		this.ipAddressNTP = ipAddressNTP;
+	}
+	public int getTimeSyncInterval() {
+		return timeSyncInterval;
+	}
+	public void setTimeSyncInterval(int timeSyncInterval) {
+		this.timeSyncInterval = timeSyncInterval;
+	}
 }
 
