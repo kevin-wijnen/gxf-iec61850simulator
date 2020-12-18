@@ -4,23 +4,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import ch.qos.logback.*;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import com.beanit.openiec61850.BasicDataAttribute;
 import com.beanit.openiec61850.SclParseException;
 import com.beanit.openiec61850.SclParser;
-import com.beanit.openiec61850.ServerEventListener;
 import com.beanit.openiec61850.ServerModel;
 import com.beanit.openiec61850.ServerSap;
-import com.beanit.openiec61850.ServiceError;
 import com.beanit.openiec61850.internal.cli.Action;
-import com.beanit.openiec61850.internal.cli.ActionException;
-import com.beanit.openiec61850.internal.cli.ActionListener;
 import com.beanit.openiec61850.internal.cli.ActionProcessor;
 import com.beanit.openiec61850.internal.cli.CliParameter;
 import com.beanit.openiec61850.internal.cli.CliParameterBuilder;
@@ -29,22 +22,22 @@ import com.beanit.openiec61850.internal.cli.CliParser;
 import com.beanit.openiec61850.internal.cli.IntCliParameter;
 import com.beanit.openiec61850.internal.cli.StringCliParameter;
 
-// Code integrated from the OpenIEC61850 application from BeanIt, licensed under Apache 2.0.
-
 @SpringBootApplication
-public class Iec61850serversimulatorApplication {
+public class ServerSimulator {
 	
-	private static final Logger logger = LoggerFactory.getLogger(Iec61850serversimulatorApplication.class);
+	private static final Logger logger = LoggerFactory.getLogger(ServerSimulator.class);
 	//private static final Logger logger = LogManager.getLogger(Iec61850serversimulatorApplication.class);
 	
 	private static final String PRINT_SERVER_MODEL_KEY = "p";
 	private static final String PRINT_SERVER_MODEL_KEY_DESCRIPTION = "print server's model";
+	private static final String DEVICE_SHOW_MODEL = "d";
+	private static final String DEVICE_SHOW_MODEL_DESCRIPTION = "print device object";
 	
 	private static final IntCliParameter portParam =
 	    new CliParameterBuilder("-p")
 	        .setDescription(
 	            "The port to listen on. On unix based systems you need root privilages for ports < 1000. Default: 102")
-	        .buildIntParameter("port", 10000);
+	        .buildIntParameter("port", 10102);
 	
 	private static final StringCliParameter modelFileParam =
 	      new CliParameterBuilder("-m")
@@ -52,54 +45,12 @@ public class Iec61850serversimulatorApplication {
 	          .setMandatory()
 	          .buildStringParameter("model-file");
 	
-    public static class ActionExecutor implements ActionListener {
-
-        @Override
-        public void actionCalled(String actionKey) throws ActionException {
-          try {
-            switch (actionKey) {
-              case PRINT_SERVER_MODEL_KEY:
-                System.out.println("** Printing model.");
-                logger.info("Server model:" + serverModel);
-
-                break;
-            }
-          } catch (Exception e) {
-            throw new ActionException(e);
-          }
-        }
-
-		@Override
-		public void quit() {
-			logger.info("Shutting down application...");
-			serverSap.stop();
-			return;
-			
-		}
-    }
-	
-	private static final ActionProcessor actionProcessor = new ActionProcessor(new ActionExecutor());
-	private static ServerModel serverModel;
-	private static ServerSap serverSap = null;
-    static class EventListener implements ServerEventListener {
-
-        @Override
-        public void serverStoppedListening(ServerSap serverSap) {
-          System.out.println("The SAP stopped listening");
-        }
-
-        @Override
-        public List<ServiceError> write(List<BasicDataAttribute> bdas) {
-          for (BasicDataAttribute bda : bdas) {
-            System.out.println("got a write request: " + bda);
-          }
-          return null;
-        }
-      }
+	public static ServerModel serverModel;
+	public static ServerSap serverSap = null;
 	
 	public static void main(String[] args) throws IOException{
 		
-		SpringApplication.run(Iec61850serversimulatorApplication.class, args);
+		SpringApplication.run(ServerSimulator.class, args);
 		logger.info("Applicatie starten...");
 		
 	    List<CliParameter> cliParameters = new ArrayList<>();
@@ -144,11 +95,21 @@ public class Iec61850serversimulatorApplication {
 	    serverModel = serverSap.getModelCopy();
 	    logger.info("Model copy done!");
 	    
+	    // Device intialization by copying from serverModel
+	    Device device = new Device();
+	    device.initalizeDevice(serverModel);
+	    //Functie toevoegen om details van serverModel naar Device te doen
+	    	
+	    //ActionExecutor actionExecutor = new ActionExecutor(PRINT_SERVER_MODEL_KEY, serverSap, serverModel);
+	    
 	    logger.info("SERVER START LISTENING");
-	    serverSap.startListening(new EventListener());
-
+	    //serverSap.startListening(new EventListener());
+	    serverSap.startListening(new LightMeasurementDeviceListener(device));
+	    
+		final ActionProcessor actionProcessor = new ActionProcessor(new ActionExecutor(serverSap, serverModel, device));
 	    actionProcessor.addAction(
 	        new Action(PRINT_SERVER_MODEL_KEY, PRINT_SERVER_MODEL_KEY_DESCRIPTION));
+	    actionProcessor.addAction(new Action(DEVICE_SHOW_MODEL, DEVICE_SHOW_MODEL_DESCRIPTION));
 	    //actionProcessor.addAction(new Action(WRITE_VALUE_KEY, WRITE_VALUE_KEY_DESCRIPTION));
 
 	    actionProcessor.start();
