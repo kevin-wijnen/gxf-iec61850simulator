@@ -1,5 +1,6 @@
 package com.cgi.iec61850serversimulator;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -46,7 +47,7 @@ class Relay {
 			}
 		}
 	// Initalize Schedules!
-	//initializeSchedules(scheduleInfo);
+	initializeSchedules(scheduleInfo);
 	}
 	public void displayRelay() {
 		logger.info("**Printing relay " + Integer.toString(indexNumber) + "**");
@@ -60,9 +61,9 @@ class Relay {
 			String scheduleReference = "SWDeviceGenericIO/XSWC*.Sche.sche~".replace("*", Integer.toString(this.indexNumber)).replace("~", Integer.toString(scheduleNumber));
 			
 			return scheduleReference;*/
-		schedules[0] = new Schedule(scheduleInfo);
+		schedules = new Schedule[50];
 		for (int scheduleNr = 0; scheduleNr < 50; scheduleNr++) {
-			schedules[scheduleNr] = new Schedule(scheduleInfo);
+			schedules[scheduleNr] = new Schedule(scheduleInfo, scheduleNr);
 		}
 		/*this.schedule2 = new Schedule();
 		this.schedule2.initializeSchedule(scheduleInfo);
@@ -74,6 +75,11 @@ class Relay {
 		//TODO: Initializing all 50 schedules to be accepted by the platform
 		// Using a for-loop to get all 50 initialized per device?
 		// Using .toString generator to get the information
+	@Override
+	public String toString() {
+		return "Relay [indexNumber=" + indexNumber + ", lightStatus=" + lightStatus + ", scheduleInfo=" + scheduleInfo
+				+ ", schedules=" + Arrays.toString(schedules) + "]";
+	}
 		
 		// Giving proper ModelNode per schedule by constructing the reference:
 		// SWDeviceGenericIP/XSWC<indexNumber>.Sche.sche<scheduleNumber>

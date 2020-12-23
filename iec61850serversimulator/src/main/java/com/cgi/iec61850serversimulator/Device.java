@@ -71,7 +71,11 @@ class Device {
 		logger.info("** Printing relays.\n");
 		for (int relayNr = 0; relayNr < 4; relayNr++) {
 			relays[relayNr].displayRelay();
+			for (int scheduleNr = 0; scheduleNr < 50; scheduleNr++) {
+				logger.info(relays[relayNr].schedules[scheduleNr].toString());
+			}
 		}
+		
 	}
 	
 	public void initalizeDevice(ServerModel serverModel) {

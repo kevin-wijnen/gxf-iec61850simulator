@@ -62,7 +62,7 @@ class Schedule {
 		}
 	}
 	// serverModel.findModelNode("SWDeviceGenericIO/CSLC.Clock", Fc.CF)
-	int indexNumber = 1; // Temporarily pre-set because only the first one is implemented
+	int indexNumber; // Temporarily pre-set because only the first one is implemented
 	boolean enabled;
 	String description;
 	int dayInt;
@@ -77,8 +77,9 @@ class Schedule {
 	short beforeOffset; // Maximum of 150?
 	short afterOffset; // Maximum of 150?
 	
-	public Schedule(ModelNode scheduleInfo) {
-	
+	public Schedule(ModelNode scheduleInfo, int scheduleNr) {
+		this.indexNumber = scheduleNr + 1;
+		
 		List<BasicDataAttribute> bdas = scheduleInfo.getBasicDataAttributes();
 		
 		for (BasicDataAttribute bda : bdas ) {
