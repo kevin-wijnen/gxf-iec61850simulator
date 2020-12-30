@@ -36,8 +36,8 @@ class Device {
 	int offsetAstronomSet;
 	int offsetAstronomRise;
 	String sensorTransition;*/
-	Clock clock;
-	Relay[] relays;
+	private Clock clock;
+	private Relay[] relays;
 	//Relay relay1;
 	//Relay relay2;
 	//Relay relay3;
@@ -72,7 +72,7 @@ class Device {
 		for (int relayNr = 0; relayNr < 4; relayNr++) {
 			relays[relayNr].displayRelay();
 			for (int scheduleNr = 0; scheduleNr < 50; scheduleNr++) {
-				logger.info(relays[relayNr].schedules[scheduleNr].toString());
+				logger.info(this.getRelay(relayNr+1).getSchedule(scheduleNr+1).toString());
 			}
 		}
 		
@@ -89,6 +89,18 @@ class Device {
 		for (int relayNr = 0; relayNr < 4; relayNr++) {
 			relays[relayNr] = new Relay(serverModel.findModelNode("SWDeviceGenericIO/XSWC" + (relayNr + 1) + ".Pos", Fc.CO), serverModel.findModelNode("SWDeviceGenericIO/XSWC" + (relayNr + 1) + ".Sche.sche1", Fc.CF));
 		}
+	}
+	
+	public Clock getClock() {
+		return clock;
+	}
+	
+	public Relay getRelay(int index) {
+		return relays[index - 1];
+	}
+	
+	public Schedule getSchedule(int[] relayScheduleNumbers) {
+		return this.getRelay(relayScheduleNumbers[0]).getSchedule(relayScheduleNumbers[1]);
 	}
 	
 	public void rebootDevice() {

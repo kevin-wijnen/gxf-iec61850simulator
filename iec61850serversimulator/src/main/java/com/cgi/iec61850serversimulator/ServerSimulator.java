@@ -104,7 +104,7 @@ public class ServerSimulator {
 	    
 	    logger.info("SERVER START LISTENING");
 	    //serverSap.startListening(new EventListener());
-	    serverSap.startListening(new LightMeasurementDeviceListener(device));
+	    serverSap.startListening(new EventDataListener(device));
 	    
 		final ActionProcessor actionProcessor = new ActionProcessor(new ActionExecutor(serverSap, serverModel, device));
 	    actionProcessor.addAction(

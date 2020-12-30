@@ -19,7 +19,7 @@ class Relay {
 	int indexNumber;
 	boolean lightStatus;
 	ModelNode scheduleInfo;
-	Schedule[] schedules;
+	private Schedule[] schedules;
 //	Schedule schedule1;
 //	Schedule schedule2;
 //	Schedule schedule3;
@@ -75,10 +75,18 @@ class Relay {
 		//TODO: Initializing all 50 schedules to be accepted by the platform
 		// Using a for-loop to get all 50 initialized per device?
 		// Using .toString generator to get the information
+	
+	public Schedule getSchedule(int index) {
+		return schedules[index - 1];
+	}
 	@Override
 	public String toString() {
 		return "Relay [indexNumber=" + indexNumber + ", lightStatus=" + lightStatus + ", scheduleInfo=" + scheduleInfo
 				+ ", schedules=" + Arrays.toString(schedules) + "]";
+	}
+	
+	public void setLight(boolean lightStatus) {
+		this.lightStatus = lightStatus;
 	}
 		
 		// Giving proper ModelNode per schedule by constructing the reference:

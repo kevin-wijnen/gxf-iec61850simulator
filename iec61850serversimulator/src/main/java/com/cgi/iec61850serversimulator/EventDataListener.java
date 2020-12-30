@@ -23,14 +23,14 @@ import com.beanit.openiec61850.ServerEventListener;
 import com.beanit.openiec61850.ServerSap;
 import com.beanit.openiec61850.ServiceError;
 
-class LightMeasurementDeviceListener implements ServerEventListener{
+class EventDataListener implements ServerEventListener{
 	
-	private static final Logger logger = LoggerFactory.getLogger(LightMeasurementDeviceListener.class);
+	private static final Logger logger = LoggerFactory.getLogger(EventDataListener.class);
 	LocalDateTime currentTime = null;
 	String syncPer;
 	Device device = null;
 	
-	public LightMeasurementDeviceListener(Device device) {
+	public EventDataListener(Device device) {
 		this.device = device;
 		
 	}
@@ -42,6 +42,8 @@ class LightMeasurementDeviceListener implements ServerEventListener{
 		
 		for (BasicDataAttribute bda : bdas) {
 			String dataAttribute = bda.getName();
+			String referenceString = bda.getReference().toString();
+			logger.info(dataAttribute);
 			int[] relayScheduleNumbers; 
 			//System.out.println("Relay array aangemaakt." + relayScheduleNumbers);
 			switch(dataAttribute) {
@@ -54,165 +56,193 @@ class LightMeasurementDeviceListener implements ServerEventListener{
 				byte[] bytesEpochTime = ((BdaTimestamp) bda).getValue();
 				ByteBuffer wrappedTime = ByteBuffer.wrap(bytesEpochTime);
 				long longTime = wrappedTime.getLong();
-				device.clock.setCurrentTime(LocalDateTime.ofEpochSecond(longTime, 0, ZoneOffset.ofHours(1)));
+				device.getClock().setCurrentTime(LocalDateTime.ofEpochSecond(longTime, 0, ZoneOffset.ofHours(1)));
 				//System.out.println("CurT variabel test");
 				break;
 				
 			case "tZ":
 				logger.info("Time Zone value found. (Offset in minutes from UTC!)");
-				device.clock.setTimeZoneOffset(((BdaInt16) bda).getValue());
+				device.getClock().setTimeZoneOffset(((BdaInt16) bda).getValue());
 				break;
 				
 			case "dstBegT":
 				logger.info("Daylight Saving Time Start Date value found.");
-				device.clock.setBeginDateDST(((BdaVisibleString) bda).getValueString());
+				device.getClock().setBeginDateDST(((BdaVisibleString) bda).getValueString());
 				break;
 				
 			case "dstEndT":
 				logger.info("Daylight Saving Time Start Date value found.");
-				device.clock.setEndDateDST(((BdaVisibleString) bda).getValueString());
+				device.getClock().setEndDateDST(((BdaVisibleString) bda).getValueString());
 				break;
 				
 			case "dvt":
 				logger.info("Daylight Saving Time Deviation value found.");
-				device.clock.setDeviationDST(((BdaInt16) bda).getValue());
+				device.getClock().setDeviationDST(((BdaInt16) bda).getValue());
 				break;
 				
 			case "enbDst":
 				logger.info("Daylight Saving Time Status value found.");
-				device.clock.setEnableDST(((BdaBoolean) bda).getValue());
+				device.getClock().setEnableDST(((BdaBoolean) bda).getValue());
 				break;
 				
 			case "enbNtpC":
 				logger.info("NTP Client Enabled value found.");
-				device.clock.setEnableNTP(((BdaBoolean) bda).getValue());
+				device.getClock().setEnableNTP(((BdaBoolean) bda).getValue());
 				break;
 			
 			case "ntpSvrA":
 				logger.info("NTP Server IP Address value found.");
-				device.clock.setIpAddressNTP(((BdaVisibleString) bda).getValueString());
+				device.getClock().setIpAddressNTP(((BdaVisibleString) bda).getValueString());
 				break;
 				
 			case "syncPer":
 				logger.info("Time Sync Interval (in minutes) value found.");
-				device.clock.setTimeSyncInterval(((BdaInt16U) bda).getValue());
+				device.getClock().setTimeSyncInterval(((BdaInt16U) bda).getValue());
 				break;
 			
-			// Relay data	
-			//case "":
-				//break;
+			// Relay data
+			// Remember: Set CTLModel to 1, then it would work with enbOpr enabled!
+			case "ctlVal": {
+				int relayIndex = extractRelayIndex(bda.getReference());
+				boolean lightStatus = ((BdaBoolean) bda).getValue();
+				System.out.println(lightStatus);
+						
+				if (lightStatus) {
+					device.getRelay(relayIndex).setLight(true);
+				}
+				else {
+						device.getRelay(relayIndex).setLight(false);
+				}
+					
+				logger.info("Relay " + relayIndex + "'s light status ON is " + lightStatus);
+				break;}
 			
 			// Schedule data
 				
-			case "enable":
+			case "enable":{
 				logger.info("Schedule Enabled Status found.");
-				relayScheduleNumbers = relayScheduleNumbersCheck(bda.getReference());
+				//TODO: Why is the previous instance out of scope?
+				int relayIndex = extractRelayIndex(bda.getReference());
+				int scheduleIndex = extractScheduleIndex(bda.getReference());
+				//relayScheduleNumbers = extractRelayScheduleNumbers(bda.getReference());
 				
 				logger.info("Value to set for schedule 1 of relay 1:", ((BdaBoolean) bda).getValue());
 				try {
-					device.relays[relayScheduleNumbers[0]].schedules[relayScheduleNumbers[1]].setEnabled(((BdaBoolean) bda).getValue());
+					//device.getSchedule(relayScheduleNumbers).setEnabled(((BdaBoolean) bda).getValue());
+					device.getRelay(relayIndex).getSchedule(scheduleIndex).setEnabled(((BdaBoolean) bda).getValue());
 				}
 				catch(Exception e){
 					logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
 				}
-				break;
+				break;}
 				
-			case "day":
+			case "day":{
 				logger.info("Day found.");
-				relayScheduleNumbers = relayScheduleNumbersCheck(bda.getReference());
+				int relayIndex = extractRelayIndex(bda.getReference());
+				int scheduleIndex = extractScheduleIndex(bda.getReference());
+				
 				try{
-					device.relays[relayScheduleNumbers[0]].schedules[relayScheduleNumbers[1]].setDayInt(((BdaInt32) bda).getValue());
+					device.getRelay(relayIndex).getSchedule(scheduleIndex).setDayInt(((BdaInt32) bda).getValue());
 				}
 				catch(Exception e){
 					logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
 				}
-				break;
+				break;}
 			
-			case "tOn":
+			case "tOn":{
 				logger.info("Time On found.");
-				relayScheduleNumbers = relayScheduleNumbersCheck(bda.getReference());
+				int relayIndex = extractRelayIndex(bda.getReference());
+				int scheduleIndex = extractScheduleIndex(bda.getReference());
 				try{
-					device.relays[relayScheduleNumbers[0]].schedules[relayScheduleNumbers[1]].setTimeOn((short) ((BdaInt32) bda).getValue());
+					device.getRelay(relayIndex).getSchedule(scheduleIndex).setTimeOn((short) ((BdaInt32) bda).getValue());
 				}
 				catch(Exception e){
 					logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
 				}
-				break;
+				break;}
 				
-			case "tOnT":
+			case "tOnT":{
 				logger.info("Time On Type found.");
-				relayScheduleNumbers = relayScheduleNumbersCheck(bda.getReference());
+				int relayIndex = extractRelayIndex(bda.getReference());
+				int scheduleIndex = extractScheduleIndex(bda.getReference());
 				try{
-					device.relays[relayScheduleNumbers[0]].schedules[relayScheduleNumbers[1]].setTimeOnTypeInt((int) ((BdaInt8) bda).getValue());
+					device.getRelay(relayIndex).getSchedule(scheduleIndex).setTimeOnTypeInt((int) ((BdaInt8) bda).getValue());
 				}
 				catch(Exception e){
 					logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
 				}
-				break;
+				break;}
 				
-			case "tOff":
+			case "tOff":{
 				logger.info("Time Off found.");
-				relayScheduleNumbers = relayScheduleNumbersCheck(bda.getReference());
+				int relayIndex = extractRelayIndex(bda.getReference());
+				int scheduleIndex = extractScheduleIndex(bda.getReference());
 				try{
-					device.relays[relayScheduleNumbers[0]].schedules[relayScheduleNumbers[1]].setTimeOff((short) ((BdaInt32) bda).getValue());
+					device.getRelay(relayIndex).getSchedule(scheduleIndex).setTimeOff((short) ((BdaInt32) bda).getValue());
 				}
 				catch(Exception e){
 					logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
-				}break;
+				}
+				break;}
 				
-			case "tOffT":
+			case "tOffT":{
 				logger.info("Time Off Type found.");
-				relayScheduleNumbers = relayScheduleNumbersCheck(bda.getReference());
+				int relayIndex = extractRelayIndex(bda.getReference());
+				int scheduleIndex = extractScheduleIndex(bda.getReference());
 				try{
-					device.relays[relayScheduleNumbers[0]].schedules[relayScheduleNumbers[1]].setTimeOffTypeInt((int) ((BdaInt8) bda).getValue());
+					device.getRelay(relayIndex).getSchedule(scheduleIndex).setTimeOffTypeInt((int) ((BdaInt8) bda).getValue());
 				}
 				catch(Exception e){
 					logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
 				}
-				break;
+				break;}
 				
-			case "minOnPer":
+			case "minOnPer":{
 				logger.info("Burning Minutes found.");
-				relayScheduleNumbers = relayScheduleNumbersCheck(bda.getReference());
+				int relayIndex = extractRelayIndex(bda.getReference());
+				int scheduleIndex = extractScheduleIndex(bda.getReference());
 				try{
-					device.relays[relayScheduleNumbers[0]].schedules[relayScheduleNumbers[1]].setBurningMinsOn((short) ((BdaInt16U) bda).getValue());
+					device.getRelay(relayIndex).getSchedule(scheduleIndex).setBurningMinsOn((short) ((BdaInt16U) bda).getValue());
 				}
 				catch(Exception e){
 					logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
 				}
-				break;
+				break;}
 				
-			case "srBefWd":
+			case "srBefWd":{
 				logger.info("Before Astrological Time Offset found.");
-				relayScheduleNumbers = relayScheduleNumbersCheck(bda.getReference());
+				int relayIndex = extractRelayIndex(bda.getReference());
+				int scheduleIndex = extractScheduleIndex(bda.getReference());
 				try{
-					device.relays[relayScheduleNumbers[0]].schedules[relayScheduleNumbers[1]].setBeforeOffset((short) ((BdaInt16U) bda).getValue());
+					device.getRelay(relayIndex).getSchedule(scheduleIndex).setBeforeOffset((short) ((BdaInt16U) bda).getValue());
 				}
 				catch(Exception e){
 					logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
 				}
-				break;
+				break;}
 				
-			case "srAftWd":
+			case "srAftWd":{
 				logger.info("After Astrological Time Offset found.");
-				relayScheduleNumbers = relayScheduleNumbersCheck(bda.getReference());
+				int relayIndex = extractRelayIndex(bda.getReference());
+				int scheduleIndex = extractScheduleIndex(bda.getReference());
 				try{
-					device.relays[relayScheduleNumbers[0]].schedules[relayScheduleNumbers[1]].setAfterOffset((short) ((BdaInt16U) bda).getValue());
+					device.getRelay(relayIndex).getSchedule(scheduleIndex).setAfterOffset((short) ((BdaInt16U) bda).getValue());
 				}
 				catch(Exception e){
 					logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
 				}
-				break;
+				break;}
 				
-			case "Descr":
+			case "Descr":{
 				logger.info(" found.");
-				relayScheduleNumbers = relayScheduleNumbersCheck(bda.getReference());
+				int relayIndex = extractRelayIndex(bda.getReference());
+				int scheduleIndex = extractScheduleIndex(bda.getReference());
 				try {
-				device.relays[relayScheduleNumbers[0]].schedules[relayScheduleNumbers[1]].setDescription(((BdaVisibleString) bda).getValueString());}
+					device.getRelay(relayIndex).getSchedule(scheduleIndex).setDescription(((BdaVisibleString) bda).getValueString());}
 				catch(Exception e){
 					logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
 				}
-				break;
+				break;}
 				
 				
 			default:
@@ -287,7 +317,7 @@ class LightMeasurementDeviceListener implements ServerEventListener{
 		
 	}
 	
-	public int[] relayScheduleNumbersCheck(ObjectReference reference) {
+	public int[] extractRelayScheduleNumbers(ObjectReference reference) {
 		System.out.println(reference);
 		System.out.println(reference.toString());
 		
@@ -295,18 +325,18 @@ class LightMeasurementDeviceListener implements ServerEventListener{
 		String referenceString = reference.toString();
 		System.out.println("Reference string aangemaakt.");
 		
-		relaySchedule[0] = Integer.parseInt(Character.toString(referenceString.charAt(22))) - 1;
+		relaySchedule[0] = Integer.parseInt(Character.toString(referenceString.charAt(22)));
 		System.out.println("Eerste integer in relaySchedule aangemaakt: " + relaySchedule[0]);
 		
 		// Check to see if schedule number is over 9, to take second digit into account
 		try {
 		String scheduleNumber = Character.toString(referenceString.charAt(33)) + Character.toString(referenceString.charAt(34));
-		relaySchedule[1] = Integer.parseInt(scheduleNumber) - 1;
+		relaySchedule[1] = Integer.parseInt(scheduleNumber);
 		System.out.println("Eerste nummer gevonden voor tweede getal.");
 		}
 		catch(Exception e){
 			System.out.println("Tweede getal gevonden! Nu nog naar integer maken.");
-			relaySchedule[1] = Integer.parseInt(Character.toString(referenceString.charAt(33))) - 1;
+			relaySchedule[1] = Integer.parseInt(Character.toString(referenceString.charAt(33)));
 			System.out.println("Tweede getal omgezet.");
 		}
 		
@@ -315,5 +345,39 @@ class LightMeasurementDeviceListener implements ServerEventListener{
 		
 		return relaySchedule;
 	}
-
+	
+	public int extractRelayIndex(ObjectReference reference) {
+		String referenceString = reference.toString();
+		
+		int[] regexResults = new int[2];
+		Pattern numberPattern = Pattern.compile("[0-9]{1,}");
+		Matcher numberMatcher = numberPattern.matcher(reference.toString());
+		
+		for (int i = 0; i < 2; i++) {
+			numberMatcher.find();
+			regexResults[i] = Integer.parseInt(numberMatcher.group());
+		}
+		int relayIndex = regexResults[0];
+		
+		return relayIndex;
+		
+	}
+	
+	public int extractScheduleIndex(ObjectReference reference) {
+		String referenceString = reference.toString();
+		//int scheduleIndex = Integer.parseInt(Character.toString(referenceString.charAt(33)));
+		
+		int[] regexResults = new int[2];
+		Pattern numberPattern = Pattern.compile("[0-9]{1,}");
+		Matcher numberMatcher = numberPattern.matcher(reference.toString());
+		
+		for (int i = 0; i < 2; i++) {
+			numberMatcher.find();
+			regexResults[i] = Integer.parseInt(numberMatcher.group());
+		}
+		int scheduleIndex = regexResults[1];
+		
+		return scheduleIndex;
+	}
+	
 }

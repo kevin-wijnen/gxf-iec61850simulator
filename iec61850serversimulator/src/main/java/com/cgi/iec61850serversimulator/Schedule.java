@@ -132,7 +132,7 @@ class Schedule {
 				break;
 				
 			case "Descr":
-				logger.info(" found.");
+				logger.info("Description found.");
 				this.description = ((BdaVisibleString) bda).getValueString();
 				break;
 				
