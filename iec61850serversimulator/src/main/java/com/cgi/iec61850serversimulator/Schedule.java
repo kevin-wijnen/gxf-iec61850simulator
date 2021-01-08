@@ -1,5 +1,6 @@
 package com.cgi.iec61850serversimulator;
 
+import java.time.LocalTime;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -63,22 +64,29 @@ class Schedule {
 	}
 	// serverModel.findModelNode("SWDeviceGenericIO/CSLC.Clock", Fc.CF)
 	int indexNumber; // Temporarily pre-set because only the first one is implemented
+	int relayNr;
 	boolean enabled;
 	String description;
 	int dayInt;
 	//DAY day;
-	short timeOn; //(between 0 and 2359, then 100 % 59) -1 = no action
+	LocalTime timeOn;
 	int timeOnTypeInt;
 	//TIMETYPE timeOnType;
-	short timeOff; //(between 0 and 2359, then 100 % 59) -1 = no action
+	LocalTime timeOff;
 	int timeOffTypeInt;
 	//TIMETYPE timeOffType;
-	short burningMinsOn;
-	short beforeOffset; // Maximum of 150?
-	short afterOffset; // Maximum of 150?
+	int burningMinsOn;
+	int beforeOffset; // Maximum of 150?
+	int afterOffset; // Maximum of 150?
 	
-	public Schedule(ModelNode scheduleInfo, int scheduleNr) {
-		this.indexNumber = scheduleNr + 1;
+	public Schedule(int indexNumber) {
+		// For empty schedule initialization, especially for test cases!
+		this.setIndexNumber(indexNumber + 1);
+	}
+	
+	public Schedule(ModelNode scheduleInfo, int scheduleNr, int relayNr) {
+		this.setIndexNumber(scheduleNr + 1);
+		this.setRelayNr(relayNr);
 		
 		List<BasicDataAttribute> bdas = scheduleInfo.getBasicDataAttributes();
 		
@@ -98,7 +106,8 @@ class Schedule {
 			
 			case "tOn":
 				logger.info("Time On found.");
-				this.timeOn = (short) ((BdaInt32) bda).getValue();
+				int timeOnInt = ((BdaInt32) bda).getValue();
+				this.timeOn = LocalTime.of(timeOnInt / 100, timeOnInt % 100);
 				break;
 				
 			case "tOnT":
@@ -108,7 +117,8 @@ class Schedule {
 				
 			case "tOff":
 				logger.info("Time Off found.");
-				this.timeOff = (short) ((BdaInt32) bda).getValue();
+				int timeOffInt = ((BdaInt32) bda).getValue();
+				this.timeOff = LocalTime.of(timeOffInt / 100, timeOffInt % 100);
 				break;
 				
 			case "tOffT":
@@ -157,6 +167,14 @@ class Schedule {
 	public void setIndexNumber(int indexNumber) {
 		this.indexNumber = indexNumber;
 	}
+	
+	public int getRelayNr() {
+		return relayNr;
+	}
+	
+	public void setRelayNr(int relayNr) {
+		this.relayNr = relayNr;
+	}
 
 	public boolean isEnabled() {
 		return enabled;
@@ -182,11 +200,11 @@ class Schedule {
 		this.dayInt = dayInt;
 	}
 
-	public short getTimeOn() {
+	public LocalTime getTimeOn() {
 		return timeOn;
 	}
 
-	public void setTimeOn(short timeOn) {
+	public void setTimeOn(LocalTime timeOn) {
 		this.timeOn = timeOn;
 	}
 
@@ -198,11 +216,11 @@ class Schedule {
 		this.timeOnTypeInt = timeOnTypeInt;
 	}
 
-	public short getTimeOff() {
+	public LocalTime getTimeOff() {
 		return timeOff;
 	}
 
-	public void setTimeOff(short timeOff) {
+	public void setTimeOff(LocalTime timeOff) {
 		this.timeOff = timeOff;
 	}
 
@@ -214,27 +232,28 @@ class Schedule {
 		this.timeOffTypeInt = timeOffTypeInt;
 	}
 
-	public short getBurningMinsOn() {
+	public int getBurningMinsOn() {
 		return burningMinsOn;
 	}
 
-	public void setBurningMinsOn(short burningMinsOn) {
+	public void setBurningMinsOn(int burningMinsOn) {
 		this.burningMinsOn = burningMinsOn;
 	}
 
-	public short getBeforeOffset() {
+	public int getBeforeOffset() {
 		return beforeOffset;
 	}
 
-	public void setBeforeOffset(short beforeOffset) {
+	public void setBeforeOffset(int beforeOffset) {
 		this.beforeOffset = beforeOffset;
 	}
 
-	public short getAfterOffset() {
+	public int getAfterOffset() {
 		return afterOffset;
 	}
 
-	public void setAfterOffset(short afterOffset) {
+	public void setAfterOffset(int afterOffset) {
 		this.afterOffset = afterOffset;
 	}
+	
 }

@@ -87,7 +87,21 @@ class Device {
 		relays = new Relay[4];
 		
 		for (int relayNr = 0; relayNr < 4; relayNr++) {
+			//TODO: Making sure it will also get all 50 schedules instead of just the first one! Making Sche.sche1 dynamic!
 			relays[relayNr] = new Relay(serverModel.findModelNode("SWDeviceGenericIO/XSWC" + (relayNr + 1) + ".Pos", Fc.CO), serverModel.findModelNode("SWDeviceGenericIO/XSWC" + (relayNr + 1) + ".Sche.sche1", Fc.CF));
+		}
+	}
+	
+	public void initalizeDevice() {
+		// Only for unit tests!
+		
+		
+		this.clock = new Clock();
+		relays = new Relay[4];
+		
+		for (int relayNr = 0; relayNr < 4; relayNr++) {
+			//TODO: Making sure it will also get all 50 schedules instead of just the first one! Making Sche.sche1 dynamic!
+			relays[relayNr] = new Relay(relayNr);
 		}
 	}
 	

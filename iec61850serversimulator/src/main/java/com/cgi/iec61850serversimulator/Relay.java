@@ -47,15 +47,20 @@ class Relay {
 			}
 		}
 	// Initalize Schedules!
-	initializeSchedules(scheduleInfo);
+	initializeSchedules(scheduleInfo, indexNumber);
 	}
+	
+	public Relay(int relayNr) {
+		this.indexNumber = relayNr + 1;
+	}
+	
 	public void displayRelay() {
 		logger.info("**Printing relay " + Integer.toString(indexNumber) + "**");
 		logger.info("Light status:  " + Boolean.toString(lightStatus) + "\n");
 		//logger.info(schedules[0].toString());
 	}
 	
-	public void initializeSchedules(ModelNode scheduleInfo) {
+	public void initializeSchedules(ModelNode scheduleInfo, int relayNr) {
 		/*for (int scheduleNumber = 1; scheduleNumber < 51; scheduleNumber++) {
 			// Schedule initialization up to 50
 			String scheduleReference = "SWDeviceGenericIO/XSWC*.Sche.sche~".replace("*", Integer.toString(this.indexNumber)).replace("~", Integer.toString(scheduleNumber));
@@ -63,7 +68,7 @@ class Relay {
 			return scheduleReference;*/
 		schedules = new Schedule[50];
 		for (int scheduleNr = 0; scheduleNr < 50; scheduleNr++) {
-			schedules[scheduleNr] = new Schedule(scheduleInfo, scheduleNr);
+			schedules[scheduleNr] = new Schedule(scheduleInfo, scheduleNr, relayNr);
 		}
 		/*this.schedule2 = new Schedule();
 		this.schedule2.initializeSchedule(scheduleInfo);
@@ -87,6 +92,10 @@ class Relay {
 	
 	public void setLight(boolean lightStatus) {
 		this.lightStatus = lightStatus;
+	}
+	
+	public boolean getLight() {
+		return this.lightStatus;
 	}
 		
 		// Giving proper ModelNode per schedule by constructing the reference:

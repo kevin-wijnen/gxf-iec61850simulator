@@ -2,7 +2,9 @@ package com.cgi.iec61850serversimulator;
 
 import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;  
 import java.util.regex.Pattern;  
@@ -39,7 +41,7 @@ class EventDataListener implements ServerEventListener{
 	public List<ServiceError> write(List<BasicDataAttribute> bdas) {
 		//TODO: Fixing relayScheduleNumbers integration to not lose connection with GUI/SoapUI! Problem lies with the setters.
 		logger.info("BDA write request scanning...");
-		
+      try {
 		for (BasicDataAttribute bda : bdas) {
 			String dataAttribute = bda.getName();
 			String referenceString = bda.getReference().toString();
@@ -102,7 +104,7 @@ class EventDataListener implements ServerEventListener{
 			
 			// Relay data
 			// Remember: Set CTLModel to 1, then it would work with enbOpr enabled!
-			case "ctlVal": {
+			case "ctlVal":{
 				int relayIndex = extractRelayIndex(bda.getReference());
 				boolean lightStatus = ((BdaBoolean) bda).getValue();
 				System.out.println(lightStatus);
@@ -122,14 +124,14 @@ class EventDataListener implements ServerEventListener{
 			case "enable":{
 				logger.info("Schedule Enabled Status found.");
 				//TODO: Why is the previous instance out of scope?
-				int relayIndex = extractRelayIndex(bda.getReference());
-				int scheduleIndex = extractScheduleIndex(bda.getReference());
-				//relayScheduleNumbers = extractRelayScheduleNumbers(bda.getReference());
+				//int relayIndex = extractRelayIndex(bda.getReference());
+				//int scheduleIndex = extractScheduleIndex(bda.getReference());
+				relayScheduleNumbers = extractRelayScheduleNumbers(bda.getReference());
 				
 				logger.info("Value to set for schedule 1 of relay 1:", ((BdaBoolean) bda).getValue());
 				try {
-					//device.getSchedule(relayScheduleNumbers).setEnabled(((BdaBoolean) bda).getValue());
-					device.getRelay(relayIndex).getSchedule(scheduleIndex).setEnabled(((BdaBoolean) bda).getValue());
+					device.getSchedule(relayScheduleNumbers).setEnabled(((BdaBoolean) bda).getValue());
+					//device.getRelay(relayIndex).getSchedule(scheduleIndex).setEnabled(((BdaBoolean) bda).getValue());
 				}
 				catch(Exception e){
 					logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
@@ -154,7 +156,9 @@ class EventDataListener implements ServerEventListener{
 				int relayIndex = extractRelayIndex(bda.getReference());
 				int scheduleIndex = extractScheduleIndex(bda.getReference());
 				try{
-					device.getRelay(relayIndex).getSchedule(scheduleIndex).setTimeOn((short) ((BdaInt32) bda).getValue());
+					int timeOnInt = ((BdaInt32) bda).getValue();
+					LocalTime timeOn = LocalTime.of(timeOnInt / 100, timeOnInt % 100);
+					device.getRelay(relayIndex).getSchedule(scheduleIndex).setTimeOn(timeOn);
 				}
 				catch(Exception e){
 					logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
@@ -178,7 +182,9 @@ class EventDataListener implements ServerEventListener{
 				int relayIndex = extractRelayIndex(bda.getReference());
 				int scheduleIndex = extractScheduleIndex(bda.getReference());
 				try{
-					device.getRelay(relayIndex).getSchedule(scheduleIndex).setTimeOff((short) ((BdaInt32) bda).getValue());
+					int timeOffInt = ((BdaInt32) bda).getValue();
+					LocalTime timeOff = LocalTime.of(timeOffInt / 100, timeOffInt % 100);
+					device.getRelay(relayIndex).getSchedule(scheduleIndex).setTimeOff(timeOff);
 				}
 				catch(Exception e){
 					logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
@@ -249,66 +255,12 @@ class EventDataListener implements ServerEventListener{
 				logger.info("Unimplemented value found, " + "'" + dataAttribute + "'" + ", skipped.");
 				break;
 			}
-			/*System.out.println(bda.getReference());
-			System.out.println(bda.getFc());
-			String updatedNodeName = bda.getName();
-			System.out.println(updatedNodeName);
-			System.out.println(bda.getValueString());
-			try {
-			
-				
-				
-			/*if (updatedNodeName.equals("enbDst")){	
-				logger.info("DST STATUS FOUND!");
-				logger.info(bda.getValueString());
-				boolean daylightActive = Boolean.parseBoolean(bda.getValueString());
-				device.clock.changeDST(daylightActive);
-			}
-			
-			else if (updatedNodeName.equals("curT")){
-				logger.info("CURRENT TIME FOUND!");
-				logger.info(bda.getValueString());
-				currentTime = LocalDateTime.parse(bda.getValueString());}
-			
-			else if (updatedNodeName.equals("syncPer")) {
-			logger.info("TIME SYNC INTERVAL FOUND!");
-			int syncPer = ((BdaInt16U) bda).getValue();
-			logger.info("Value: " + syncPer);
-			device.updateSyncInterval(syncPer);
-			}
-			
-			else if (updatedNodeName.equals("Oper.ctlVal")) {
-				logger.info("SWITCH LIGHT STATUS FOUND!");
-				System.out.println(bda.getParent());
-			}
-			
-			/*else if (bda.getName().equals(bda)){
-				
-			}
-			
-			} catch (RuntimeException re)	 {
-				logger.error("Parsen van nodewaarde is gefaald", re);
-			}*/
-
-						
-		//device.updateDeviceCheck(daylightActive);
-		//BLIJFT VASTHANGEN ALS IE CURRENTTIME OF SYNCPER OPHAALT! SYNCPER IS NULL, dayLightActive werkt wel gewoon!
-		// Vasthangen = opnieuw moeten reconnecten om de server opnieuw te starten, programma zelf blijft wel draaien zonder crash. (Dus 'stopped listening'?)
-			}
-			
-			/*if (bda.getParent().toString().contains("SWDeviceGenericIO/CSLC.Clock.enbDst:")) {
-				logger.info(bda.getName());
-			}*/	
-			
-			/*if (bda.getParent().toString().contains("SWDeviceGenericIO/XSWC") && bda.getParent().toString().contains("Sche.sche"))
-				logger.info("Switch schedule data.");
-	          	logger.info(bda.getName());
-	          	logger.info(bda.getParent().getName());
-	     }*/
-		logger.info("**Printing device.");
-		//device.deviceDisplay();
-		
-		return null;
+		}	
+		} catch (Exception e) {
+			logger.error("An unexpected exception occurred", e);
+		}
+      
+		return new ArrayList<>();
 	}
 
 	@Override
@@ -348,36 +300,29 @@ class EventDataListener implements ServerEventListener{
 	
 	public int extractRelayIndex(ObjectReference reference) {
 		String referenceString = reference.toString();
+		System.out.println(referenceString);
 		
-		int[] regexResults = new int[2];
-		Pattern numberPattern = Pattern.compile("[0-9]{1,}");
-		Matcher numberMatcher = numberPattern.matcher(reference.toString());
+		Pattern numberPattern = Pattern.compile("[0-9]+");
+		Matcher numberMatcher = numberPattern.matcher(referenceString);
 		
-		for (int i = 0; i < 2; i++) {
-			numberMatcher.find();
-			regexResults[i] = Integer.parseInt(numberMatcher.group());
-		}
-		int relayIndex = regexResults[0];
+		numberMatcher.find();
+		System.out.println(numberMatcher.group());
 		
-		return relayIndex;
-		
+		return Integer.parseInt(numberMatcher.group());
 	}
 	
 	public int extractScheduleIndex(ObjectReference reference) {
 		String referenceString = reference.toString();
 		//int scheduleIndex = Integer.parseInt(Character.toString(referenceString.charAt(33)));
 		
-		int[] regexResults = new int[2];
-		Pattern numberPattern = Pattern.compile("[0-9]{1,}");
-		Matcher numberMatcher = numberPattern.matcher(reference.toString());
+		Pattern numberPattern = Pattern.compile("[0-9]+");
+		Matcher numberMatcher = numberPattern.matcher(referenceString);
 		
 		for (int i = 0; i < 2; i++) {
 			numberMatcher.find();
-			regexResults[i] = Integer.parseInt(numberMatcher.group());
 		}
-		int scheduleIndex = regexResults[1];
 		
-		return scheduleIndex;
+		return Integer.parseInt(numberMatcher.group());
 	}
 	
 }
