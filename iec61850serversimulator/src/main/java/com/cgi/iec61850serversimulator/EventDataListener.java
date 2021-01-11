@@ -2,7 +2,9 @@ package com.cgi.iec61850serversimulator;
 
 import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,6 +24,7 @@ import com.beanit.openiec61850.ObjectReference;
 import com.beanit.openiec61850.ServerEventListener;
 import com.beanit.openiec61850.ServerSap;
 import com.beanit.openiec61850.ServiceError;
+
 
 class EventDataListener implements ServerEventListener {
 
@@ -409,4 +412,6 @@ class EventDataListener implements ServerEventListener {
         return scheduleIndex;
     }
 
+teger.parseInt(numberMatcher.group());
+	}
 }
