@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import com.beanit.openiec61850.BasicDataAttribute;
 import com.beanit.openiec61850.BdaBoolean;
+import com.beanit.openiec61850.BdaInt8;
 import com.beanit.openiec61850.Fc;
 
 class Device {
@@ -55,7 +56,6 @@ class Device {
 	}
 
 	public void initalizeDevice(final ServerWrapper serverSapWrapper) {
-		// Only one schedule supported at the moment
 
 		this.serverWrapper = serverSapWrapper;
 		this.clock = new Clock();
@@ -66,7 +66,11 @@ class Device {
 			this.relays[relayNr] = new Relay(
 					this.serverWrapper.findModelNode("SWDeviceGenericIO/XSWC" + (relayNr + 1) + ".Pos", Fc.CO),
 					this.serverWrapper.findModelNode("SWDeviceGenericIO/XSWC" + (relayNr + 1) + ".Sche.sche1", Fc.CF));
+			// this.setCtlModel(relayNr + 1, 1);
 		}
+		// CTLModel naar 1 veranderen door de ServerModel te muteren
+		// Kijk naar Ruud z'n voorbeeld bij setLightStatus!
+
 	}
 
 	public Clock getClock() {
@@ -95,6 +99,27 @@ class Device {
 			this.serverWrapper.setValues(attributes);
 		} catch (final Exception e) {
 			logger.error("Find node or set value failed", e);
+		}
+	}
+
+	public void setCtlModel(final int relay, final int ctlModelInt) {
+		try {
+			// Necessary to have CTLModel set to 1 in the ServerModel along with having
+			// enbOpr enabled (enabled on default) to be able to switch the status.
+			logger.info("Setting CTLModel to 1 to enable relay control");
+
+			final BdaInt8 ctlModel = (BdaInt8) this.serverWrapper
+					.findModelNode("SWDeviceGenericIO/XSWC" + relay + ".Pos.ctlModel", Fc.CF);
+			byte ctlModelByte = 01;
+			logger.info("Byte: " + ctlModelByte);
+			ctlModel.setValue((byte) 01);
+			logger.info("CTLModel: {}", ctlModelByte);
+
+			final List<BasicDataAttribute> attributes = Arrays.asList(ctlModel);
+			this.serverWrapper.setValues(attributes);
+
+		} catch (final Exception e) {
+			logger.error("Setting CTLModel failed", e);
 		}
 	}
 }
