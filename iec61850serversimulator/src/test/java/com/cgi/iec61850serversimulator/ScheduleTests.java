@@ -4,24 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.jupiter.api.Test;
-
-import com.beanit.openiec61850.Fc;
-import com.beanit.openiec61850.ModelNode;
-import com.beanit.openiec61850.SclParseException;
-import com.beanit.openiec61850.SclParser;
-import com.beanit.openiec61850.ServerModel;
-import com.beanit.openiec61850.ServerSap;
-import com.beanit.openiec61850.internal.cli.CliParameter;
-import com.beanit.openiec61850.internal.cli.CliParameterBuilder;
-import com.beanit.openiec61850.internal.cli.CliParseException;
-import com.beanit.openiec61850.internal.cli.CliParser;
-import com.beanit.openiec61850.internal.cli.StringCliParameter;
-import com.cgi.iec61850serversimulator.Schedule;
-import com.cgi.iec61850serversimulator.Scheduler;
 
 
 class ScheduleTests {
@@ -61,7 +45,7 @@ class ScheduleTests {
 
 	@Test
 	void testTriggeringSchedule() {
-		device.initalizeDevice();
+		device.initalizeDevice(null);
 		
 		schedule1.setIndexNumber(1);
 		schedule1.setRelayNr(1);
