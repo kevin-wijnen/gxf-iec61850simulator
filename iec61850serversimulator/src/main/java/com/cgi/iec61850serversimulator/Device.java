@@ -66,7 +66,7 @@ class Device {
 			this.relays[relayNr] = new Relay(
 					this.serverWrapper.findModelNode("SWDeviceGenericIO/XSWC" + (relayNr + 1) + ".Pos", Fc.CO),
 					this.serverWrapper.findModelNode("SWDeviceGenericIO/XSWC" + (relayNr + 1) + ".Sche.sche1", Fc.CF));
-			// this.setCtlModel(relayNr + 1, 1);
+			this.setCtlModel(relayNr + 1, 1);
 		}
 		// CTLModel naar 1 veranderen door de ServerModel te muteren
 		// Kijk naar Ruud z'n voorbeeld bij setLightStatus!
