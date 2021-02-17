@@ -152,10 +152,9 @@ class EventDataListener implements ServerEventListener {
 					// TODO: Why is the previous instance out of scope?
 					final int relayIndex = this.extractRelayIndex(bda.getReference());
 					final int scheduleIndex = this.extractScheduleIndex(bda.getReference());
-					// relayScheduleNumbers =
-					// extractRelayScheduleNumbers(bda.getReference());
 
-					logger.info("Value to set for schedule 1 of relay 1:", ((BdaBoolean) bda).getValue());
+					logger.info("Value to set for schedule {} of relay {}: {}", scheduleIndex, relayIndex,
+							((BdaBoolean) bda).getValue());
 					try {
 						// device.getSchedule(relayScheduleNumbers).setEnabled(((BdaBoolean)
 						// bda).getValue());
@@ -311,19 +310,9 @@ class EventDataListener implements ServerEventListener {
 			logger.warn("Exception EventDataListener loop", e);
 		}
 
-		/*
-		 * if (bda.getParent().toString().contains(
-		 * "SWDeviceGenericIO/CSLC.Clock.enbDst:")) { logger.info(bda.getName()); }
-		 */
-
-		/*
-		 * if (bda.getParent().toString().contains("SWDeviceGenericIO/XSWC") &&
-		 * bda.getParent().toString().contains("Sche.sche"))
-		 * logger.info("Switch schedule data."); logger.info(bda.getName());
-		 * logger.info(bda.getParent().getName()); }
-		 */
 		logger.info("**Printing device.");
-		// device.deviceDisplay();
+
+		// Flag for Schedule modifications
 		if (modified) {
 			// scheduler.scheduleSwitchingMomentCalculation(this.device);
 
@@ -336,36 +325,6 @@ class EventDataListener implements ServerEventListener {
 	public void serverStoppedListening(final ServerSap serverSAP) {
 		// TODO Auto-generated method stub
 
-	}
-
-	public int[] extractRelayScheduleNumbers(final ObjectReference reference) {
-		System.out.println(reference);
-		System.out.println(reference.toString());
-
-		final int[] relaySchedule = new int[2];
-		final String referenceString = reference.toString();
-		System.out.println("Reference string aangemaakt.");
-
-		relaySchedule[0] = Integer.parseInt(Character.toString(referenceString.charAt(22)));
-		System.out.println("Eerste integer in relaySchedule aangemaakt: " + relaySchedule[0]);
-
-		// Check to see if schedule number is over 9, to take second digit into
-		// account
-		try {
-			final String scheduleNumber = Character.toString(referenceString.charAt(33))
-					+ Character.toString(referenceString.charAt(34));
-			relaySchedule[1] = Integer.parseInt(scheduleNumber);
-			System.out.println("Eerste nummer gevonden voor tweede getal.");
-		} catch (final Exception e) {
-			System.out.println("Tweede getal gevonden! Nu nog naar integer maken.");
-			relaySchedule[1] = Integer.parseInt(Character.toString(referenceString.charAt(33)));
-			System.out.println("Tweede getal omgezet.");
-		}
-
-		System.out.println(relaySchedule[0]);
-		System.out.println(relaySchedule[1]);
-
-		return relaySchedule;
 	}
 
 	public int extractRelayIndex(final ObjectReference reference) {
