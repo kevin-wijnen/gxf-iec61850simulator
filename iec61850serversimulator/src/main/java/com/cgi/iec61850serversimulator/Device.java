@@ -11,6 +11,9 @@ import com.beanit.openiec61850.BdaBoolean;
 import com.beanit.openiec61850.BdaInt8;
 import com.beanit.openiec61850.Fc;
 
+/**
+ * Class which represents a simulated device. It holds the clock and 4 relays.
+ */
 class Device {
 	private static final Logger logger = LoggerFactory.getLogger(Device.class);
 

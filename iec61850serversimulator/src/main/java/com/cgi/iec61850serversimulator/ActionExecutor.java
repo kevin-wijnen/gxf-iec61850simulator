@@ -8,6 +8,10 @@ import com.beanit.openiec61850.ServerSap;
 import com.beanit.openiec61850.internal.cli.ActionException;
 import com.beanit.openiec61850.internal.cli.ActionListener;
 
+/**
+ * Class which takes certain button inputs for debug features during runtime.
+ */
+
 public class ActionExecutor implements ActionListener {
 
 	private static final Logger logger = LoggerFactory.getLogger(ServerSimulator.class);
@@ -16,9 +20,6 @@ public class ActionExecutor implements ActionListener {
 	public ServerSap serverSap = null;
 	public ServerModel serverModel = null;
 	public Device device = null;
-	// private static final String PRINT_SERVER_MODEL_KEY = "p";
-	// private static final String PRINT_SERVER_MODEL_KEY_DESCRIPTION = "print
-	// server's model";
 
 	public ActionExecutor(final ServerSap serverSap, final ServerModel serverModel, final Device device) {
 		this.serverSap = serverSap;

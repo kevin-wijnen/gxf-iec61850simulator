@@ -14,6 +14,9 @@ import com.beanit.openiec61850.BdaInt8;
 import com.beanit.openiec61850.BdaVisibleString;
 import com.beanit.openiec61850.ModelNode;
 
+/**
+ * Class which represents a schedule.
+ */
 class Schedule {
 	private static final Logger logger = LoggerFactory.getLogger(Schedule.class);
 	// TODO: SwitchingMoment related attributes and functions here.

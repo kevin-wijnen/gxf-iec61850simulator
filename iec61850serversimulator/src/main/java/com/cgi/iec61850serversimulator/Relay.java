@@ -9,6 +9,11 @@ import com.beanit.openiec61850.BasicDataAttribute;
 import com.beanit.openiec61850.BdaBoolean;
 import com.beanit.openiec61850.ModelNode;
 
+/**
+ * Class which represents a relay. It holds 50 schedules. While 64 schedules are
+ * possible with IEC61850, the GXF platform only 50 of them. Hence why there are
+ * only 50 schedules attached to every relay.
+ */
 class Relay {
 	private static final Logger logger = LoggerFactory.getLogger(Relay.class);
 
