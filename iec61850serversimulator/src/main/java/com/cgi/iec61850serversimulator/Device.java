@@ -12,7 +12,6 @@ import com.beanit.openiec61850.BdaInt8;
 import com.beanit.openiec61850.Fc;
 
 class Device {
-	// TODO: Split the class up into several classes
 	private static final Logger logger = LoggerFactory.getLogger(Device.class);
 
 	private static final String SWITCH_ROOT = "SWDeviceGenericIO/XSWC";
@@ -40,18 +39,21 @@ class Device {
 	public String toString() {
 		final StringBuilder deviceStringBuilder = new StringBuilder();
 
-		deviceStringBuilder.append("** Printing device:\n");
-		deviceStringBuilder.append(this.clock.toString() + '\n');
+		deviceStringBuilder.append("** Printing device:\n\n");
+		deviceStringBuilder.append(this.clock.toString() + "\n\n");
 
 		deviceStringBuilder.append("** Printing relays.\n");
-		for (int relayNr = 0; relayNr < 4; relayNr++) {
-			this.relays[relayNr].toString();
-			for (int scheduleNr = 1; scheduleNr <= 50; scheduleNr++) {
-				deviceStringBuilder.append("Schedule " + scheduleNr)
-						.append(this.getRelay(relayNr + 1).getSchedule(scheduleNr)).append('\n');
-			}
-		}
 
+		for (int relayNr = 0; relayNr < 4; relayNr++) {
+			deviceStringBuilder.append(this.relays[relayNr].toString() + '\n').append("Enabled schedules: \n");
+			for (int scheduleNr = 1; scheduleNr <= 50; scheduleNr++) {
+				if (this.getRelay(relayNr + 1).getSchedule(scheduleNr).enabled) {
+					deviceStringBuilder.append(this.getRelay(relayNr + 1).getSchedule(scheduleNr)).append('\n');
+				}
+			}
+			deviceStringBuilder.append('\n');
+		}
+		deviceStringBuilder.append('\n');
 		return deviceStringBuilder.toString();
 	}
 
@@ -68,9 +70,6 @@ class Device {
 					this.serverWrapper.findModelNode(SWITCH_ROOT + (relayNr + 1) + ".Sche.sche1", Fc.CF));
 			this.enableSwitching(relayNr + 1);
 		}
-		// CTLModel naar 1 veranderen door de ServerModel te muteren
-		// Kijk naar Ruud z'n voorbeeld bij setLightStatus!
-
 	}
 
 	public Clock getClock() {
