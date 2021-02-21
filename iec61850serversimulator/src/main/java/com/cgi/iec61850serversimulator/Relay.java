@@ -50,12 +50,12 @@ class Relay {
 		/*
 		 * try { logger.info("Set CTLModel for relay {} to value {}", this.indexNumber,
 		 * 1);
-		 * 
+		 *
 		 * final BdaBoolean lightModel = (BdaBoolean) this.serverWrapper
 		 * .findModelNode("SWDeviceGenericIO/XSWC" + this.indexNumber +
 		 * ".Pos.Oper.ctlVal", Fc.CO); // .findModelNode("SWDeviceGenericIO/XSWC" +
 		 * relay + ".Pos.stVal", // Fc.ST); lightModel.setValue(light);
-		 * 
+		 *
 		 * final List<BasicDataAttribute> attributes = Arrays.asList(lightModel);
 		 * this.serverWrapper.setValues(attributes); } catch (final Exception e) {
 		 * logger.error("Find node or set value failed", e); }
@@ -66,12 +66,6 @@ class Relay {
 
 	public Relay(int relayNr) {
 		this.indexNumber = relayNr + 1;
-	}
-
-	public void displayRelay() {
-		logger.info("**Printing relay " + Integer.toString(this.indexNumber) + "**");
-		logger.info("Light status:  " + Boolean.toString(this.lightStatus) + "\n");
-		// logger.info(schedules[0].toString());
 	}
 
 	public void initializeSchedules(ModelNode scheduleInfo, int relayNr) {
@@ -105,6 +99,7 @@ class Relay {
 
 	@Override
 	public String toString() {
+		// TODO: Only print Enabled Schedules instead of all of them.
 		return "Relay [indexNumber=" + this.indexNumber + ", lightStatus=" + this.lightStatus + ", scheduleInfo="
 				+ this.scheduleInfo + ", schedules=" + Arrays.toString(this.schedules) + "]";
 	}
