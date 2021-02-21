@@ -12,17 +12,12 @@ import com.beanit.openiec61850.ModelNode;
 class Relay {
 	private static final Logger logger = LoggerFactory.getLogger(Relay.class);
 
-	// Relay 1, 2, 3, 4
+	// Either 1, 2, 3 or 4
 	int indexNumber;
 	boolean lightStatus;
 	ModelNode scheduleInfo;
 	private Schedule[] schedules;
-//	Schedule schedule1;
-//	Schedule schedule2;
-//	Schedule schedule3;
-	// ..
-//	Schedule schedule50;
-	// filling up to 50 of them
+
 	private ServerWrapper serverWrapper;
 
 	public Relay(ModelNode relayInfo, ModelNode scheduleInfo) {

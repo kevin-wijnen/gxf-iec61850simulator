@@ -19,6 +19,7 @@ class Schedule {
 	// TODO: SwitchingMoment related attributes and functions here.
 
 	// Enum as prescribed in the GXF documentation for SetSchedule
+	// To use for clearer visualization to users?
 	public enum DAY {
 		EVERYDAY(0), WEEKDAY(-1), WEEKEND(-2), MONDAY(1), TUESDAY(2), WEDNESDAY(3), THURSDAY(4), FRIDAY(5), SATURDAY(6),
 		SUNDAY(7);
@@ -35,6 +36,7 @@ class Schedule {
 
 	}
 
+	// Usage for clearer visualization to users?
 	public enum TIMETYPE {
 		FIXED(0), SENSOR(1), ASTRONOMIC(2);
 
@@ -49,8 +51,7 @@ class Schedule {
 		}
 	}
 
-	// serverModel.findModelNode("SWDeviceGenericIO/CSLC.Clock", Fc.CF)
-	int indexNumber; // Temporarily pre-set because only the first one is implemented
+	int indexNumber;
 	int relayNr;
 	boolean enabled;
 	String description;
@@ -63,8 +64,9 @@ class Schedule {
 	int timeOffTypeInt;
 	// TIMETYPE timeOffType;
 	int burningMinsOn;
-	int beforeOffset; // Maximum of 150?
-	int afterOffset; // Maximum of 150?
+	// Maximum of 150 minutes for offsets, in GXF platform
+	int beforeOffset;
+	int afterOffset;
 
 	public Schedule(int indexNumber) {
 		// For empty schedule initialization, especially for test cases!
@@ -141,11 +143,18 @@ class Schedule {
 
 	@Override
 	public String toString() {
-		return "Schedule [indexNumber=" + this.indexNumber + ", enabled=" + this.enabled + ", description="
-				+ this.description + ", day=" + this.dayInt + ", timeOn=" + this.timeOn + ", timeOnType="
-				+ this.timeOnTypeInt + ", timeOff=" + this.timeOff + ", timeOffType=" + this.timeOffTypeInt
-				+ ", burningMinsOn=" + this.burningMinsOn + ", beforeOffset=" + this.beforeOffset + ", afterOffset="
-				+ this.afterOffset + "]";
+		// TODO: Making certain raw data better visualized towards users? AKA Day,
+		// timeOn/timeOff, their types etc.
+		StringBuilder scheduleStringBuilder = new StringBuilder();
+		scheduleStringBuilder.append("Schedule " + this.indexNumber + ":\n")
+				.append("Is it enabled? " + this.enabled + '\n').append("Description: " + this.description + '\n')
+				.append("Day: " + this.dayInt + '\n').append("Time On: " + this.timeOn + '\n')
+				.append("Time On type: " + this.timeOnTypeInt + '\n').append("Time Off: " + this.timeOffTypeInt + '\n')
+				.append("Burning Minutes On: " + this.burningMinsOn + '\n')
+				.append("Offset (Before): " + this.beforeOffset + '\n')
+				.append("Offset (After): " + this.afterOffset + '\n');
+
+		return scheduleStringBuilder.toString();
 	}
 
 	public int getIndexNumber() {
