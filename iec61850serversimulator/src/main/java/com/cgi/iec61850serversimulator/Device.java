@@ -45,10 +45,10 @@ class Device {
 		deviceStringBuilder.append("** Printing device:\n\n");
 		deviceStringBuilder.append(this.clock.toString() + "\n\n");
 
-		deviceStringBuilder.append("** Printing relays.\n");
+		deviceStringBuilder.append("** Printing relays:\n");
 
 		for (int relayNr = 0; relayNr < 4; relayNr++) {
-			deviceStringBuilder.append(this.relays[relayNr].toString() + '\n').append("Enabled schedules: \n");
+			deviceStringBuilder.append(this.relays[relayNr].toString() + '\n').append("Enabled schedules: \n\n");
 			for (int scheduleNr = 1; scheduleNr <= 50; scheduleNr++) {
 				if (this.getRelay(relayNr + 1).getSchedule(scheduleNr).enabled) {
 					deviceStringBuilder.append(this.getRelay(relayNr + 1).getSchedule(scheduleNr)).append('\n');
