@@ -48,17 +48,10 @@ class SchedulerTest {
 		// Second relay with first schedule
 		// <initialize 4 Relays>
 		// <initialize Schedule within 2nd relay
-		// TODO: MAKE UNIT TEST!
-
-		// BUG oplossen:
-		// Vullen van relays, zijn allemaal leeg!
-		// Relay array wordt wel aangemaakt maar is helemaal leeg
-		// Op te lossen door for-loop aan te maken
-		// BUG OPGELOST!
 
 		Relay[] relays = new Relay[4];
 
-		// For-loop voor vullen Relays
+		// For-loop to initialize the mock relays
 		for (int i = 0; i < 4; i++) {
 			relays[i] = new Relay(i + 1);
 		}
@@ -67,8 +60,11 @@ class SchedulerTest {
 		schedule[0] = new Schedule(0);
 
 		this.device.setRelays(relays);
+		logger.info(relays.toString());
 		relays[0].setLight(true);
 		relays[0].setSchedules(schedule);
+		logger.info(this.device.getRelay(1).toString());
+
 	}
 
 	public void mockFixedTimeScheduleScheduler(int indexNumber, int relayNr, int dayInt, LocalTime timeOn,
@@ -76,7 +72,7 @@ class SchedulerTest {
 		// TODO: Add other types of Schedules (Astronomic times use the srBef/-AftWd
 		// variables), and have a TimeType of 1
 
-		// Enabled fixed time Schedule 1 of Relay 2
+		// Enabled fixed time schedule of Relay 2
 		this.device.getRelay(1).getSchedule(1).setIndexNumber(indexNumber);
 		this.device.getRelay(1).getSchedule(1).setRelayNr(relayNr);
 		this.device.getRelay(1).getSchedule(1).setEnabled(true);
@@ -94,6 +90,13 @@ class SchedulerTest {
 		this.mockFixedTimeScheduleScheduler(0, 1, 0, LocalTime.of(12, 00), LocalTime.of(13, 00), 30);
 		// TODO: Fill in!
 		assertNotNull(this.device.getRelay(1).getSchedule(1));
+
+		// Scheduler tasks:
+		// Checking schedules of device
+		// Calculating switching moments for X amount of hours. 24?
+
+		// Result: Calculated moments in Scheduled Future
+
 		// To test:
 		// Check for correct calculation
 

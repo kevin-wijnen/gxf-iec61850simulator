@@ -105,7 +105,9 @@ public class ServerSimulator {
 		// ...
 
 		logger.info("SERVER START LISTENING");
-		serverSap.startListening(new EventDataListener(device));
+		EventDataListener edl = new EventDataListener(device, scheduler);
+		serverSap.startListening(edl);
+		edl.getScheduler().switchingMomentCalculation(device);
 
 		final ActionProcessor actionProcessor = new ActionProcessor(new ActionExecutor(serverSap, serverModel, device));
 		actionProcessor.addAction(new Action(PRINT_SERVER_MODEL_KEY, PRINT_SERVER_MODEL_KEY_DESCRIPTION));

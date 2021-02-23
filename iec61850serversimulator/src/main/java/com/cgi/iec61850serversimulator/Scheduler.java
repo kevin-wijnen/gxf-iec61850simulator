@@ -33,7 +33,7 @@ public class Scheduler {
 	}
 
 	public void switchingMomentCalculation(final Device device) {
-
+		logger.info("Switching moment calculation feature yet to implement.");
 		// Switching moment calculation using schedules from device...
 	}
 

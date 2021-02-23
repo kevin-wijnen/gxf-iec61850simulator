@@ -8,7 +8,7 @@ import com.beanit.openiec61850.ObjectReference;
 
 public class EventDataListenerTest {
 
-	private EventDataListener eventDataListener = new EventDataListener(null);
+	private EventDataListener eventDataListener = new EventDataListener(null, null);
 
 	@Test
 	public void extractRelaySingleDigit() {
