@@ -31,7 +31,10 @@ class Device {
         for (int relayNr = 0; relayNr < 4; relayNr++) {
             this.relays[relayNr].displayRelay();
             for (int scheduleNr = 1; scheduleNr <= 50; scheduleNr++) {
-                logger.info("Schedule {}: {}", scheduleNr, this.getRelay(relayNr + 1).getSchedule(scheduleNr));
+                final Schedule schedule = this.getRelay(relayNr + 1).getSchedule(scheduleNr);
+                if (schedule.isEnabled()) {
+                    logger.info("Schedule {}: {}", scheduleNr, schedule);
+                }
             }
         }
     }
