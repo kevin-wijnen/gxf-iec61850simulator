@@ -21,8 +21,15 @@ class Device {
 
 	private Clock clock;
 	private Relay[] relays;
-
 	private ServerWrapper serverWrapper;
+
+	public Relay[] getRelays() {
+		return this.relays;
+	}
+
+	public void setRelays(Relay[] relays) {
+		this.relays = relays;
+	}
 
 	public void displayDevice() {
 		logger.info("** Printing device:");

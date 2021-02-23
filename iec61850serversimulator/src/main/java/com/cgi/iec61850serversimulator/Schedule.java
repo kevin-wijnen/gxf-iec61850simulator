@@ -190,7 +190,6 @@ class Schedule {
 	}
 
 	public void setDescription(String description) {
-
 		this.description = description;
 	}
 
@@ -199,7 +198,6 @@ class Schedule {
 	}
 
 	public void setDayInt(int dayInt) {
-
 		this.dayInt = dayInt;
 	}
 

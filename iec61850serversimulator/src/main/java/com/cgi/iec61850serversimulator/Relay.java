@@ -21,6 +21,7 @@ class Relay {
 	int indexNumber;
 	boolean lightStatus;
 	ModelNode scheduleInfo;
+
 	private Schedule[] schedules;
 
 	private ServerWrapper serverWrapper;
@@ -47,6 +48,14 @@ class Relay {
 
 	public Relay(int relayNr) {
 		this.indexNumber = relayNr + 1;
+	}
+
+	public Schedule[] getSchedules() {
+		return this.schedules;
+	}
+
+	public void setSchedules(Schedule[] schedules) {
+		this.schedules = schedules;
 	}
 
 	public void initializeSchedules(ModelNode scheduleInfo, int relayNr) {
