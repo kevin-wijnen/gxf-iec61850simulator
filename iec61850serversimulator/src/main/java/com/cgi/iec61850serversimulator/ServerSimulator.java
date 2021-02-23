@@ -95,20 +95,21 @@ public class ServerSimulator {
 		final TaskScheduler taskScheduler = new ConcurrentTaskScheduler(localExecutor);
 		final Scheduler scheduler = new Scheduler(taskScheduler);
 
-		// Device intialization by copying from serverModel
+		// Device initialization by copying from serverModel
 		final ServerWrapper serverWrapper = new ServerWrapper(serverSap);
 		final Device device = new Device();
 		device.initalizeDevice(serverWrapper);
 
-		// Calculating initial switching moments from device
-		// scheduler.switchingMomentCalculation(device);
-		// ...
-
 		logger.info("SERVER START LISTENING");
 		EventDataListener edl = new EventDataListener(device, scheduler);
 		serverSap.startListening(edl);
-		edl.getScheduler().switchingMomentCalculation(device);
 
+		// Initial schedule
+		try {
+			edl.getScheduler().switchingMomentCalculation(device);
+		} catch (Exception e) {
+			logger.info("Initial switching moment calculation failed, try sending another schedule.");
+		}
 		final ActionProcessor actionProcessor = new ActionProcessor(new ActionExecutor(serverSap, serverModel, device));
 		actionProcessor.addAction(new Action(PRINT_SERVER_MODEL_KEY, PRINT_SERVER_MODEL_KEY_DESCRIPTION));
 		actionProcessor.addAction(new Action(DEVICE_SHOW_MODEL, DEVICE_SHOW_MODEL_DESCRIPTION));
