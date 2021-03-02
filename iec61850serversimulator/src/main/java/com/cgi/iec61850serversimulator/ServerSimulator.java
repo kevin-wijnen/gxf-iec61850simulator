@@ -93,7 +93,7 @@ public class ServerSimulator {
 		// Initializing Scheduler related components
 		final ScheduledExecutorService localExecutor = Executors.newSingleThreadScheduledExecutor();
 		final TaskScheduler taskScheduler = new ConcurrentTaskScheduler(localExecutor);
-		final Scheduler scheduler = new Scheduler(taskScheduler);
+		final Scheduler scheduler = new Scheduler();
 
 		// Device initialization by copying from serverModel
 		final ServerWrapper serverWrapper = new ServerWrapper(serverSap);
