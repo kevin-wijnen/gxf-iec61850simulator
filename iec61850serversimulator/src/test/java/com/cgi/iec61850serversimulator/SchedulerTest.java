@@ -42,7 +42,7 @@ class SchedulerTest {
 	// handmatige invullen via setters
 	// Nodig: Clock, Relays, 50 Schedules per relay
 
-	public void mockDeviceScheduler() {
+	public Relay mockRelaySchedule() {
 		// Mocking Device for Unit Tests Scheduler
 		// Relay + Schedule
 		// Second relay with first schedule
@@ -65,6 +65,8 @@ class SchedulerTest {
 		relays[0].setSchedules(schedule);
 		logger.info(this.device.getRelay(1).toString());
 
+		return relays[0];
+
 	}
 
 	public void mockFixedTimeScheduleScheduler(int indexNumber, int relayNr, int dayInt, LocalTime timeOn,
@@ -79,15 +81,18 @@ class SchedulerTest {
 		schedule.setEnabled(true);
 		schedule.setDayInt(dayInt);
 		schedule.setTimeOn(timeOn);
+		// Time On type set to Fixed Time
 		schedule.setTimeOnTypeInt(0);
 		schedule.setTimeOff(timeOff);
+		// Time Off type set to Fixed Time
 		schedule.setTimeOffTypeInt(0);
 		schedule.setBurningMinsOn(burningMinutes);
 	}
 
 	@Test
 	public void calculateSwitchingMoments() {
-		this.mockDeviceScheduler();
+		this.mockRelaySchedule();
+		// TODO: Look at limiting parameters to 1 or 2, maybe with Schedule object?
 		this.mockFixedTimeScheduleScheduler(0, 1, 0, LocalTime.of(12, 00), LocalTime.of(13, 00), 30);
 		// TODO: Fill in!
 		assertNotNull(this.device.getRelay(1).getSchedule(1));
