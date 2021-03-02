@@ -15,6 +15,14 @@ import org.slf4j.LoggerFactory;
  * Periodic switching moments will have each their own individual switching
  * moments instances based on how many are needed within the calculated X of
  * hours.
+ *
+ * The data being stored in this class is:
+ *
+ * @formatter:off
+ * The destination relay's number
+ * The date and time when to trigger the switching moment (LocalDateTime)
+ * The type of action what to trigger (On = true, Off = false)
+ * @formatter:on
  */
 
 public class SwitchingMoment {
@@ -29,5 +37,11 @@ public class SwitchingMoment {
 	private int relayNr;
 	private LocalDateTime triggerTime;
 	private boolean triggerAction;
+
+	SwitchingMoment(int relayNr, LocalDateTime triggerTime, boolean triggerAction) {
+		this.relayNr = relayNr;
+		this.triggerTime = triggerTime;
+		this.triggerAction = triggerAction;
+	}
 
 }
