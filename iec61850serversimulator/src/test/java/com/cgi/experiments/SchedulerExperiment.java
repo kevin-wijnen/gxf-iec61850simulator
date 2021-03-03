@@ -89,6 +89,10 @@ public class SchedulerExperiment {
 	@Test
 	public void queuePurge() {
 		int timeDelay = 10;
+		// Steps @ EventDataListener modified:
+		// Check through every task to get it cancelled
+		// Purge queue after tasks are cancelled (needed before purging)
+		//
 
 		for (int i = 0; i < 3; i++) {
 			ScheduledFuture<?> resultFuture = this.schedulerService.schedule(new onTask(i + 1), 2 + i,
