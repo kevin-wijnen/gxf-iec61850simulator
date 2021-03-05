@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 
-class SchedulerTest {
+class SwitchingMomentCalculatorTest {
 	// TODO:
 	// Triggeren per wijziging?
 	// TaskScheduler aanroepen
@@ -26,7 +26,7 @@ class SchedulerTest {
 	// Baseer het op het ontwerp van feature/example-scheduling!
 	// Initializing example schedule + scheduler class
 
-	private static final Logger logger = LoggerFactory.getLogger(SchedulerTest.class);
+	private static final Logger logger = LoggerFactory.getLogger(SwitchingMomentCalculatorTest.class);
 
 	// Initializing Scheduler components
 	final ScheduledExecutorService localExecutor = Executors.newSingleThreadScheduledExecutor();
@@ -42,58 +42,13 @@ class SchedulerTest {
 	// handmatige invullen via setters
 	// Nodig: Clock, Relays, 50 Schedules per relay
 
-	public Relay mockRelaySchedule() {
-		// Mocking Device for Unit Tests Scheduler
-		// Relay + Schedule
-		// Second relay with first schedule
-		// <initialize 4 Relays>
-		// <initialize Schedule within 2nd relay
-
-		Relay[] relays = new Relay[4];
-
-		// For-loop to initialize the mock relays
-		for (int i = 0; i < 4; i++) {
-			relays[i] = new Relay(i + 1);
-		}
-
-		Schedule[] schedule = new Schedule[1];
-		schedule[0] = new Schedule(0);
-
-		this.device.setRelays(relays);
-		logger.info(relays.toString());
-		relays[0].setLight(true);
-		relays[0].setSchedules(schedule);
-		logger.info(this.device.getRelay(1).toString());
-
-		return relays[0];
-
-	}
-
-	public void mockFixedTimeScheduleScheduler(int indexNumber, int relayNr, int dayInt, LocalTime timeOn,
-			LocalTime timeOff, int burningMinutes) {
-		// TODO: Add other types of Schedules (Astronomic times use the srBef/-AftWd
-		// variables), and have a TimeType of 1
-
-		Schedule schedule = this.device.getRelay(1).getSchedule(1);
-		// Enabled fixed time schedule of Relay 2
-		schedule.setIndexNumber(indexNumber);
-		schedule.setRelayNr(relayNr);
-		schedule.setEnabled(true);
-		schedule.setDayInt(dayInt);
-		schedule.setTimeOn(timeOn);
-		// Time On type set to Fixed Time
-		schedule.setTimeOnTypeInt(0);
-		schedule.setTimeOff(timeOff);
-		// Time Off type set to Fixed Time
-		schedule.setTimeOffTypeInt(0);
-		schedule.setBurningMinsOn(burningMinutes);
-	}
-
 	@Test
 	public void calculateSwitchingMoments() {
-		this.mockRelaySchedule();
-		// TODO: Look at limiting parameters to 1 or 2, maybe with Schedule object?
-		this.mockFixedTimeScheduleScheduler(0, 1, 0, LocalTime.of(12, 00), LocalTime.of(13, 00), 30);
+		Relay relay = getMockedRelay(1);
+		Relay[] relays = new Relay[1];
+		relays[0] = relay;
+		this.device.setRelays(relays);
+
 		// TODO: Fill in!
 		assertNotNull(this.device.getRelay(1).getSchedule(1));
 
@@ -105,6 +60,44 @@ class SchedulerTest {
 
 		// To test:
 		// Check for correct calculation
+	}
+
+	private Relay getMockedRelay(int relayNr) {
+		// Mocking Device for Unit Tests Scheduler
+		// Relay + Schedule
+		// Second relay with first schedule
+		// <initialize Schedule for the relay
+		Relay relay = new Relay(relayNr);
+		relay.setLight(true);
+
+		Schedule schedule = this.getMockedSchedule(0, 1, 0, LocalTime.of(12, 00), LocalTime.of(13, 00), 30);
+
+		Schedule[] schedules = new Schedule[1];
+		schedules[0] = schedule;
+		relay.setSchedules(schedules);
+
+		logger.info(relay.toString());
+
+		return relay;
+	}
+
+	private Schedule getMockedSchedule(int indexNumber, int relayNr, int dayInt, LocalTime timeOn,
+									  LocalTime timeOff, int burningMinutes) {
+
+		Schedule schedule = new Schedule(indexNumber);
+		// Enabled fixed time schedule of Relay 2
+		schedule.setRelayNr(relayNr);
+		schedule.setEnabled(true);
+		schedule.setDayInt(dayInt);
+		schedule.setTimeOn(timeOn);
+		// Time On type set to Fixed Time
+		schedule.setTimeOnTypeInt(0);
+		schedule.setTimeOff(timeOff);
+		// Time Off type set to Fixed Time
+		schedule.setTimeOffTypeInt(0);
+		schedule.setBurningMinsOn(burningMinutes);
+
+		return schedule;
 	}
 
 }
