@@ -44,4 +44,28 @@ public class SwitchingMoment {
 		this.triggerAction = triggerAction;
 	}
 
+	public int getRelayNr() {
+		return this.relayNr;
+	}
+
+	public void setRelayNr(int relayNr) {
+		this.relayNr = relayNr;
+	}
+
+	public LocalDateTime getTriggerTime() {
+		return this.triggerTime;
+	}
+
+	public void setTriggerTime(LocalDateTime triggerTime) {
+		this.triggerTime = triggerTime;
+	}
+
+	public boolean isTriggerAction() {
+		return this.triggerAction;
+	}
+
+	public void setTriggerAction(boolean triggerAction) {
+		this.triggerAction = triggerAction;
+	}
+
 }

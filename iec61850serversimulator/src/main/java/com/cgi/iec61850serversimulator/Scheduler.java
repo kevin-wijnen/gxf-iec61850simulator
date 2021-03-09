@@ -1,7 +1,11 @@
 package com.cgi.iec61850serversimulator;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,6 +14,21 @@ import org.slf4j.LoggerFactory;
  * Class which schedules autonomous switching moments for future activation.
  */
 public class Scheduler {
+
+	private ScheduledThreadPoolExecutor executor;
+	private List<ScheduledFuture> scheduledFutures;
+	private TimeCalculator timeCalculator;
+	private static final Logger logger = LoggerFactory.getLogger(Scheduler.class);
+	private Device device;
+
+	public Scheduler(Device device) {
+		ScheduledThreadPoolExecutor executor = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(1);
+		// executor.purge() no longer necessary?
+		executor.setRemoveOnCancelPolicy(true);
+		TimeCalculator timeCalculator = this.timeCalculator;
+		device = this.device;
+	}
+
 	// Base it on feature/example-scheduling code! Triggering at certain
 	// times instead of a continuous check!
 
@@ -20,9 +39,6 @@ public class Scheduler {
 	// Scheduling said tasks by calculating the relative time and using said
 	// relative time to set the task with ScheduledExecutorService from Java
 
-	private static final Logger logger = LoggerFactory.getLogger(Scheduler.class);
-
-	ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 	// Callables declareren ivm ScheduledFuture
 	// Of toch runnables?
 
@@ -37,6 +53,29 @@ public class Scheduler {
 	 * public Scheduler(final TaskScheduler scheduler) {
 	 * this.switchingMomentScheduler = scheduler; }
 	 */
+	public void schedulingTasks(List<SwitchingMoment> switchingMoments) {
+		// Check future if it is empty. If it is not empty, then cancel > purge > clear
+		// it.
+		// Calculate relative time for each task
+		// Schedule it, with future put into list
+		this.futureCheck(this.scheduledFutures);
+		for (int i = 0; i < switchingMoments.size(); i++) {
+			SwitchingMoment switchingMoment = switchingMoments.get(i);
+			LocalDateTime currentTime = LocalDateTime.now();
+			// Calculate relative time
+			int relativeTime = this.timeCalculator.calculateRelativeTime(switchingMoment, currentTime);
+			int relayNr = switchingMoment.getRelayNr();
+			if (switchingMoment.isTriggerAction()) {
+				Runnable runOn = this.onRunnableCreator(relayNr);
+				this.executor.schedule(runOn, relativeTime, TimeUnit.SECONDS);
+			} else if (!switchingMoment.isTriggerAction()) {
+				Runnable runOff = this.offRunnableCreator(relayNr);
+				this.executor.schedule(runOff, relativeTime, TimeUnit.SECONDS);
+			}
+
+		}
+
+	}
 
 	public void switchingMomentCalculation(final Device device) {
 		logger.info("Switching moment calculation feature yet to implement.");
@@ -66,8 +105,7 @@ public class Scheduler {
 		Runnable onRun = new Runnable() {
 			@Override
 			public void run() {
-				// functie hier met parameter
-				Scheduler.this.switchingMomentRelativeTimeConversion();
+				Scheduler.this.device.getRelay(relayNr).setLight(true);
 			}
 		};
 		return onRun;
@@ -78,10 +116,21 @@ public class Scheduler {
 		Runnable offRun = new Runnable() {
 			@Override
 			public void run() {
-				// functie hier met parameter
-				Scheduler.this.switchingMomentRelativeTimeConversion();
+				Scheduler.this.device.getRelay(relayNr).setLight(false);
 			}
 		};
 		return offRun;
+	}
+
+	private void futureCheck(List<ScheduledFuture> scheduledFutures) {
+		if (!scheduledFutures.isEmpty()) {
+			for (int i = 0; i < scheduledFutures.size(); i++) {
+				ScheduledFuture future = scheduledFutures.get(i);
+				if (!future.isDone()) {
+					future.cancel(true);
+				}
+			}
+			scheduledFutures.clear();
+		}
 	}
 }

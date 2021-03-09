@@ -70,6 +70,7 @@ class Schedule {
 	// Maximum of 150 minutes for offsets, in GXF platform
 	int beforeOffset;
 	int afterOffset;
+	int triggerDate;
 
 	public Schedule(int indexNumber) {
 		// For empty schedule initialization, especially for test cases!
@@ -99,7 +100,13 @@ class Schedule {
 			case "tOn":
 				logger.info("Time On found.");
 				int timeOnInt = ((BdaInt32) bda).getValue();
-				this.timeOn = LocalTime.of(timeOnInt / 100, timeOnInt % 100);
+
+				if (timeOnInt >= -2 && timeOnInt <= 7) {
+					this.timeOn = LocalTime.of(timeOnInt / 100, timeOnInt % 100);
+				} else {
+
+					this.triggerDate = timeOnInt;
+				}
 				break;
 
 			case "tOnT":

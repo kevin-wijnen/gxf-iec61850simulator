@@ -32,6 +32,7 @@ class EventDataListener implements ServerEventListener {
 	private String syncPer;
 	private Device device = null;
 	private Scheduler scheduler;
+	private SwitchingMomentCalculator calculator;
 
 	// private OnzeScheduleScheduler scheduler;
 
@@ -330,7 +331,8 @@ class EventDataListener implements ServerEventListener {
 		// Flag for Schedule modifications
 		if (modified) {
 			logger.info("Schedules are modified! Calculate switching moments...");
-			this.scheduler.switchingMomentCalculation(this.device);
+			List<SwitchingMoment> switchingMoments = this.calculator.calculateSwitchingMoments(this.device);
+			this.scheduler.schedulingTasks(switchingMoments);
 			// Initializing scheduler?
 			// scheduler.switchingMomentCalculation(this.device);
 
