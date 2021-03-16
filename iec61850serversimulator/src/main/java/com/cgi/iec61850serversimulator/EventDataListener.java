@@ -10,6 +10,9 @@ import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import com.beanit.openiec61850.BasicDataAttribute;
 import com.beanit.openiec61850.BdaBoolean;
@@ -24,6 +27,8 @@ import com.beanit.openiec61850.ServerEventListener;
 import com.beanit.openiec61850.ServerSap;
 import com.beanit.openiec61850.ServiceError;
 
+@Configuration
+@EnableScheduling
 class EventDataListener implements ServerEventListener {
 
 	private static final Logger logger = LoggerFactory.getLogger(EventDataListener.class);
@@ -44,6 +49,11 @@ class EventDataListener implements ServerEventListener {
 		this.scheduler = scheduler;
 
 		// OnzeScheduleScheduler scheduler = new ...;
+	}
+
+	@Scheduled(cron = "0 0 0 * * ?")
+	public void dailySwitchingMomentCalculation() {
+		this.scheduler.switchingMomentCalculation(this.device);
 	}
 
 	@Override

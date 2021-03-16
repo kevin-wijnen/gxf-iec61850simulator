@@ -1,11 +1,15 @@
 package com.cgi.iec61850serversimulator;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SwitchingMomentCalculator {
 	// Steps:
@@ -14,29 +18,43 @@ public class SwitchingMomentCalculator {
 	// Checks on, off time and action type to create SwitchingMoments by assigning
 	// relay Number, TriggerTime and TriggerType
 
+	private static final Logger logger = LoggerFactory.getLogger(SwitchingMomentCalculator.class);
+
 	public List<SwitchingMoment> calculateSwitchingMoments(Device device) {
 		List<SwitchingMoment> switchingMoments = new ArrayList<SwitchingMoment>();
-		for (int i = 1; i <= 4; i++) {
-			Relay relay = device.getRelay(i);
+		// Calculating switching moments for today and tomorrow
+		LocalDateTime now = LocalDateTime.now();
+		LocalDateTime nextDay = now.plusDays(1);
 
-			for (int j = 1; j <= 50; j++) {
-				Schedule schedule = relay.getSchedule(j);
-				if (schedule.isEnabled())
+		for (int relayNr = 1; relayNr <= 4; relayNr++) {
+			Relay relay = device.getRelay(relayNr);
+
+			for (int scheduleNr = 1; scheduleNr <= 50; scheduleNr++) {
+				Schedule schedule = relay.getSchedule(scheduleNr);
+				if (schedule.isEnabled()) {
 					try {
-						SwitchingMoment switchingMomentOn = this.calculateSwitchingMoment(i, schedule, true);
+						SwitchingMoment switchingMomentOn = this.calculateSwitchingMoment(relayNr, schedule, true, now);
 						switchingMoments.add(switchingMomentOn);
+						SwitchingMoment switchingMomentOn2 = this.calculateSwitchingMoment(relayNr, schedule, true,
+								nextDay);
+						switchingMoments.add(switchingMomentOn2);
 					} catch (Exception e) {
-						System.out.println("No Switching Moment for On action created...");
-						System.out.println(e.toString());
+						logger.info("No Switching Moment for On action created...");
+						logger.info(e.toString());
 					}
 
-				try {
-					SwitchingMoment switchingMomentOff = this.calculateSwitchingMoment(i, schedule, false);
-					switchingMoments.add(switchingMomentOff);
-				} catch (Exception e) {
-					System.out.println("No Switching Moment for Off action created...");
-					System.out.println(e.toString());
+					try {
+						SwitchingMoment switchingMomentOff = this.calculateSwitchingMoment(relayNr, schedule, false,
+								now);
+						switchingMoments.add(switchingMomentOff);
+						SwitchingMoment switchingMomentOff2 = this.calculateSwitchingMoment(relayNr, schedule, false,
+								nextDay);
+						switchingMoments.add(switchingMomentOff2);
+					} catch (Exception e) {
+						logger.info("No Switching Moment for Off action created...");
+						logger.info(e.toString());
 
+					}
 				}
 
 			}
@@ -44,47 +62,91 @@ public class SwitchingMomentCalculator {
 		return switchingMoments;
 	}
 
-	public SwitchingMoment calculateSwitchingMoment(int relayNr, Schedule schedule, boolean triggerAction) {
+	public SwitchingMoment calculateSwitchingMoment(int relayNr, Schedule schedule, boolean triggerAction,
+			LocalDateTime toCheckTime) {
 
 		SwitchingMoment switchingMoment = new SwitchingMoment(relayNr, null, triggerAction);
 		int day = schedule.getDayInt();
-
+		DayOfWeek dayOfWeek = toCheckTime.getDayOfWeek();
+		/*
+		 * LocalDateTime now = LocalDateTime.now(); LocalDateTime nextday =
+		 * now.plusDays(1); DayOfWeek day1 = now.getDayOfWeek(); DayOfWeek day2 =
+		 * nextday.getDayOfWeek();
+		 */
 		switch (day) {
-		// For days: Checking date of now, and checking if day corresponds with the day
-		// of date?
+		// Check if day is within 2 days. Always recalculate every day.
+		// TODO: Implementing every day, every week day and every weekend day
 		case 0:
-			System.out.println("Elke dag, niet geimplementeerd");
+			logger.info("Elke dag, niet geimplementeerd");
+			break;
 
 		case -1:
-			System.out.println("Elke werkdag, niet geimplementeerd");
+			logger.info("Elke werkdag, niet geimplementeerd");
+			break;
 
 		case -2:
-			System.out.println("Elke weekenddag, niet geimplementeerd");
+			logger.info("Elke weekenddag, niet geimplementeerd");
+			break;
 
 		case 1:
-			System.out.println("Maandag, niet geimplementeerd");
+			if (dayOfWeek == DayOfWeek.MONDAY) {
+				switchingMoment.setTriggerTime(toCheckTime);
+			} else {
+				logger.info("Given date is not on {0}, no switching moment.", DayOfWeek.MONDAY);
+			}
+			break;
 
 		case 2:
-			System.out.println("Dinsdag, niet geimplementeerd");
+			if (dayOfWeek == DayOfWeek.TUESDAY) {
+				switchingMoment.setTriggerTime(toCheckTime);
+			} else {
+				logger.info("Given date is not on {0}, no switching moment.", DayOfWeek.TUESDAY);
+			}
+			break;
 
 		case 3:
-			System.out.println("Woensdag, niet geimplementeerd");
+			if (dayOfWeek == DayOfWeek.WEDNESDAY) {
+				switchingMoment.setTriggerTime(toCheckTime);
+			} else {
+				logger.info("Given date is not on {0}, no switching moment.", DayOfWeek.WEDNESDAY);
+			}
+			break;
 
 		case 4:
-			System.out.println("Donderdag, niet geimplementeerd");
+			if (dayOfWeek == DayOfWeek.THURSDAY) {
+				switchingMoment.setTriggerTime(toCheckTime);
+			} else {
+				logger.info("Given date is not on {0}, no switching moment.", DayOfWeek.THURSDAY);
+			}
+			break;
 
 		case 5:
-			System.out.println("Vrijdag, niet geimplementeerd");
+			if (dayOfWeek == DayOfWeek.FRIDAY) {
+				switchingMoment.setTriggerTime(toCheckTime);
+			} else {
+				logger.info("Given date is not on {0}, no switching moment.", DayOfWeek.FRIDAY);
+			}
+			break;
 
 		case 6:
-			System.out.println("Zaterdag, niet geimplementeerd");
+			if (dayOfWeek == DayOfWeek.SATURDAY) {
+				switchingMoment.setTriggerTime(toCheckTime);
+			} else {
+				logger.info("Given date is not on {0}, no switching moment.", DayOfWeek.SATURDAY);
+			}
+			break;
 
 		case 7:
-			System.out.println("Zondag, niet geimplementeerd");
+			if (dayOfWeek == DayOfWeek.SUNDAY) {
+				switchingMoment.setTriggerTime(toCheckTime);
+			} else {
+				logger.info("Given date is not on {0}, no switching moment.", DayOfWeek.SUNDAY);
+			}
+			break;
 
 		default:
 			// With specific date
-			System.out.println("Datum... (yyyymmdd)");
+			logger.info("Datum... (yyyymmdd)");
 			// Kijken naar formaat: YYYY, MM, DD
 			DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd");
 			String stringDate = String.valueOf(day);
@@ -93,7 +155,6 @@ public class SwitchingMomentCalculator {
 
 			// Nog doen: triggerDate returnen! Al aan SwitchingMoment geven om dat te laten
 			// returnen?
-
 		}
 		LocalDateTime triggerTime = switchingMoment.getTriggerTime();
 		// Uur/minuut optellen
