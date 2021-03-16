@@ -83,4 +83,12 @@ class Relay {
 	public boolean getLight() {
 		return this.lightStatus;
 	}
+
+	public int getIndexNumber() {
+		return this.indexNumber;
+	}
+
+	public void setIndexNumber(int indexNumber) {
+		this.indexNumber = indexNumber;
+	}
 }
