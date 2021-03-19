@@ -1,8 +1,12 @@
 package com.cgi.iec61850serversimulator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
@@ -97,7 +101,8 @@ class SwitchingMomentCalculatorTest {
 
 		// Initializing mock relay
 		if (!useCustomSchedule) {
-			Relay relay = this.getMockRelay(relayNr, null);
+			Schedule schedule = this.getMockLunchTimeSchedule(scheduleNr);
+			Relay relay = this.getMockRelay(relayNr, schedule);
 			Relay[] relays = new Relay[1];
 			relays[0] = relay;
 			this.device.setRelays(relays);
@@ -112,6 +117,32 @@ class SwitchingMomentCalculatorTest {
 
 		// Tests
 		// TODO: Check the SwitchingMoments
+
+		SwitchingMomentCalculator calculator = new SwitchingMomentCalculator();
+		List<SwitchingMoment> switchingMoments = calculator.calculateSwitchingMoments(this.device);
+
+		SwitchingMoment switchingMomentOn = switchingMoments.get(0);
+		SwitchingMoment switchingMomentOff = switchingMoments.get(2);
+		SwitchingMoment switchingMomentNextDayOn = switchingMoments.get(1);
+		SwitchingMoment switchingMomentNextDayOff = switchingMoments.get(3);
+
+		LocalDateTime lunchTime = LocalDateTime.now().withHour(12).withMinute(00).withSecond(0).withNano(0);
+		assertEquals(lunchTime, switchingMomentOn.getTriggerTime());
+		assertTrue(switchingMomentOn.isTriggerAction());
+
+		LocalDateTime afterLunchTime = LocalDateTime.now().withHour(13).withMinute(00).withSecond(0).withNano(0);
+		assertEquals(afterLunchTime, switchingMomentOff.getTriggerTime());
+		assertFalse(switchingMomentOff.isTriggerAction());
+
+		LocalDateTime nextLunchTime = LocalDateTime.now().plusDays(1).withHour(12).withMinute(00).withSecond(0)
+				.withNano(0);
+		assertEquals(nextLunchTime, switchingMomentNextDayOn.getTriggerTime());
+		assertTrue(switchingMomentOn.isTriggerAction());
+
+		LocalDateTime nextAfterLunchTime = LocalDateTime.now().plusDays(1).withHour(13).withMinute(00).withSecond(0)
+				.withNano(0);
+		assertEquals(nextAfterLunchTime, switchingMomentNextDayOff.getTriggerTime());
+		assertFalse(switchingMomentOff.isTriggerAction());
 
 	}
 
@@ -169,6 +200,7 @@ class SwitchingMomentCalculatorTest {
 			schedule.setTimeOffTypeInt(fixedTimeOff);
 		}
 		schedule.setBurningMinsOn(burningMinutes);
+		schedule.setEnabled(true);
 
 		return schedule;
 	}
