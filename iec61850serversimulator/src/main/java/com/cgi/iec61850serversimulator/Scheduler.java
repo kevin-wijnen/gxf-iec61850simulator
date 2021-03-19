@@ -16,16 +16,18 @@ import org.slf4j.LoggerFactory;
 public class Scheduler {
 
 	private ScheduledThreadPoolExecutor executor;
-	private List<ScheduledFuture> scheduledFutures;
+	private List<ScheduledFuture<?>> scheduledFutures;
 	private TimeCalculator timeCalculator;
 	private static final Logger logger = LoggerFactory.getLogger(Scheduler.class);
 	private Device device;
 
 	public Scheduler(Device device) {
 		ScheduledThreadPoolExecutor executor = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(1);
-		// executor.purge() no longer necessary?
+
+		// Should remove cancelled futures, still included .purge when calculating new
+		// switching moments
 		executor.setRemoveOnCancelPolicy(true);
-		TimeCalculator timeCalculator = this.timeCalculator;
+		this.timeCalculator = new TimeCalculator();
 		device = this.device;
 	}
 
@@ -39,20 +41,6 @@ public class Scheduler {
 	// Scheduling said tasks by calculating the relative time and using said
 	// relative time to set the task with ScheduledExecutorService from Java
 
-	// Callables declareren ivm ScheduledFuture
-	// Of toch runnables?
-
-	// private TaskScheduler switchingMomentScheduler;
-	// private ScheduledFuture<?> future;
-
-	/*
-	 * public ScheduledFuture<?> getFuture() { return this.future; }
-	 *
-	 * public void setFuture(ScheduledFuture<?> future) { this.future = future; }
-	 *
-	 * public Scheduler(final TaskScheduler scheduler) {
-	 * this.switchingMomentScheduler = scheduler; }
-	 */
 	public void schedulingTasks(List<SwitchingMoment> switchingMoments) {
 		// Check future if it is empty. If it is not empty, then cancel > purge > clear
 		// it.
@@ -80,6 +68,8 @@ public class Scheduler {
 	public void switchingMomentCalculation(final Device device) {
 		logger.info("Switching moment calculation feature yet to implement.");
 
+		// Done in branch feature-78, with the SwitchingMomentCalculator class
+
 		/* @formatter:off
 		 * TODO: Switching moment calculation using schedules from device...
 		 *
@@ -98,9 +88,11 @@ public class Scheduler {
 	public void switchingMomentRelativeTimeConversion() {
 		// TODO: Switching moment --> relative time conversion for scheduled trigger
 		// actions
+
+		// Done by TimeCalculator.calculateRelativeTime instead
 	}
 
-	// Voorbeeld voor On task
+	// Runnable to turn on relay light
 	private Runnable onRunnableCreator(final int relayNr) {
 		Runnable onRun = new Runnable() {
 			@Override
@@ -111,7 +103,7 @@ public class Scheduler {
 		return onRun;
 	}
 
-	// Voorbeeld voor Off task
+	// Runnable to turn off relay light
 	private Runnable offRunnableCreator(final int relayNr) {
 		Runnable offRun = new Runnable() {
 			@Override
@@ -122,15 +114,17 @@ public class Scheduler {
 		return offRun;
 	}
 
-	private void futureCheck(List<ScheduledFuture> scheduledFutures) {
+	private void futureCheck(List<ScheduledFuture<?>> scheduledFutures) {
 		if (!scheduledFutures.isEmpty()) {
 			for (int i = 0; i < scheduledFutures.size(); i++) {
-				ScheduledFuture future = scheduledFutures.get(i);
+				ScheduledFuture<?> future = scheduledFutures.get(i);
 				if (!future.isDone()) {
 					future.cancel(true);
 				}
 			}
 			scheduledFutures.clear();
+			// To prevent memory leak: Purging executor's queue
+			this.executor.purge();
 		}
 	}
 }
