@@ -76,19 +76,11 @@ public class SwitchingMomentCalculator {
 		SwitchingMoment actualSwitchingMoment = new SwitchingMoment(relayNr, null, triggerAction);
 		int scheduledOccurence = schedule.getDayInt();
 		DayOfWeek dayOfWeek = toCheckTime.getDayOfWeek();
-		/*
-		 * LocalDateTime now = LocalDateTime.now(); LocalDateTime nextday =
-		 * now.plusDays(1); DayOfWeek day1 = now.getDayOfWeek(); DayOfWeek day2 =
-		 * nextday.getDayOfWeek();
-		 */
-
-		// TODO: Switching to ScheduleDay Enum
 
 		switch (ScheduleDay.valueOf(scheduledOccurence)) {
 		case EVERY_DAY:
-			// Trigger every day? No condition check?
 			actualSwitchingMoment.setTriggerTime(toCheckTime);
-			logger.info("Elke dag");
+			logger.info("Every day occurrence");
 			break;
 
 		case WEEKDAY:
@@ -96,7 +88,7 @@ public class SwitchingMomentCalculator {
 			if (dayOfWeek == DayOfWeek.MONDAY || dayOfWeek == DayOfWeek.TUESDAY || dayOfWeek == DayOfWeek.WEDNESDAY
 					|| dayOfWeek == DayOfWeek.THURSDAY || dayOfWeek == DayOfWeek.FRIDAY) {
 				actualSwitchingMoment.setTriggerTime(toCheckTime);
-				logger.info("Elke werkdag");
+				logger.info("Every weekday occurrence");
 			} else {
 				logger.info("Given date is not on a weekday, no switching moment.");
 			}
@@ -107,7 +99,7 @@ public class SwitchingMomentCalculator {
 
 			if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
 				actualSwitchingMoment.setTriggerTime(toCheckTime);
-				logger.info("Elke weekenddag");
+				logger.info("Every weekend day occurrence");
 			} else {
 				logger.info("Given date is not on weekend day, no switching moment.", DayOfWeek.MONDAY);
 			}
