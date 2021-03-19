@@ -71,9 +71,7 @@ class Relay {
 
 	@Override
 	public String toString() {
-		final StringBuilder relayStringBuilder = new StringBuilder();
-		relayStringBuilder.append("Relay " + this.indexNumber + "'s light status is " + this.lightStatus + "\n");
-		return relayStringBuilder.toString();
+		return "Relay " + this.indexNumber + "'s light status is " + this.lightStatus + "\n";
 	}
 
 	public void setLight(boolean light) {

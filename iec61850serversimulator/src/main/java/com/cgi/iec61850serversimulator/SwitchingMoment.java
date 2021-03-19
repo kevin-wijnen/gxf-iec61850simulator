@@ -18,11 +18,12 @@ import org.slf4j.LoggerFactory;
  * hours.
  *
  * The data being stored in this class is:
- * @formatter:off
- * The destination relay's number
- * The date and time when to trigger the switching moment (LocalDateTime)
- * The type of action what to trigger (On = true, Off = false)
- * @formatter:on
+ * <ul>
+ * <li>The destination relay's number</li>
+ * <li>The date and time when to trigger the switching moment
+ * (LocalDateTime)</li>
+ * <li>The type of action what to trigger (On = true, Off = false)</li>
+ * </ul>
  */
 
 public class SwitchingMoment {

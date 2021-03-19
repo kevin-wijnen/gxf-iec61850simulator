@@ -50,6 +50,7 @@ class EventDataListener implements ServerEventListener {
 		// OnzeScheduleScheduler scheduler = new ...;
 	}
 
+	// TODO: Make it Single Responsibility compliant > moving Cron Job over
 	@Scheduled(cron = "0 0 0 * * ?")
 	public void dailySwitchingMomentCalculation() {
 		this.scheduler.switchingMomentCalculation(this.device);
@@ -340,9 +341,6 @@ class EventDataListener implements ServerEventListener {
 		if (modified) {
 			logger.info("Schedules are modified! Calculate switching moments...");
 			this.scheduler.switchingMomentCalculation(this.device);
-			// Initializing scheduler?
-			// scheduler.switchingMomentCalculation(this.device);
-
 		}
 
 		return null;

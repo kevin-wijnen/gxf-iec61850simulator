@@ -62,8 +62,8 @@ public class ServerSimulator {
 		try {
 			cliParser.parseArguments(args);
 		} catch (final CliParseException e1) {
-			System.err.println("Error parsing command line parameters: " + e1.getMessage());
-			System.out.println(cliParser.getUsageString());
+			logger.error("Error parsing command line parameters: " + e1.getMessage());
+			logger.info(cliParser.getUsageString());
 			System.exit(1);
 		}
 
