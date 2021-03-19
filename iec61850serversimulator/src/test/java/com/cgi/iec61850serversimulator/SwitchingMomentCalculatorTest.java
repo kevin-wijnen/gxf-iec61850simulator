@@ -48,7 +48,7 @@ class SwitchingMomentCalculatorTest {
 		int scheduleNr = 1;
 		int relayNr = 1;
 		// Trigger day(s), see Enum in GXF LF Energy documentation
-		// 1 = Every day
+		// 0 = Every day
 		int dayInt = 0;
 		// General time type for both on and off times
 		// 0 = fixed time, 1 = light sensor, 2 = astronomical time
@@ -76,12 +76,12 @@ class SwitchingMomentCalculatorTest {
 	}
 
 	@Test
-	public void calculateSwitchingMoments() {
+	public void calculateEveryDaySwitchingMoments() {
 
 		int scheduleNr = 1;
 		int relayNr = 1;
 		// Trigger day(s), see Enum in GXF LF Energy documentation
-		// 1 = Every day
+		// 0 = Every day
 		int dayInt = 0;
 		// General time type for both on and off times
 		int fixedTimeInt = 0;
@@ -115,11 +115,10 @@ class SwitchingMomentCalculatorTest {
 
 		// Calculating switching moment
 
-		// Tests
-		// TODO: Check the SwitchingMoments
-
 		SwitchingMomentCalculator calculator = new SwitchingMomentCalculator();
 		List<SwitchingMoment> switchingMoments = calculator.calculateSwitchingMoments(this.device);
+
+		// Tests
 
 		SwitchingMoment switchingMomentOn = switchingMoments.get(0);
 		SwitchingMoment switchingMomentOff = switchingMoments.get(2);
