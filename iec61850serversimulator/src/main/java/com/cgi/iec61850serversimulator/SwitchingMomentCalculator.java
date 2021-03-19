@@ -35,11 +35,11 @@ public class SwitchingMomentCalculator {
 						Schedule schedule = relay.getSchedule(scheduleNr);
 						if (schedule.isEnabled()) {
 							try {
-								SwitchingMoment actualSwitchingMomentOn = this.calculateSwitchingMoment(relayNr, schedule,
-										true, now);
+								SwitchingMoment actualSwitchingMomentOn = this.calculateSwitchingMoment(relayNr,
+										schedule, true, now);
 								switchingMoments.add(actualSwitchingMomentOn);
-								SwitchingMoment actualSwitchingMomentOn2 = this.calculateSwitchingMoment(relayNr, schedule,
-										true, nextDay);
+								SwitchingMoment actualSwitchingMomentOn2 = this.calculateSwitchingMoment(relayNr,
+										schedule, true, nextDay);
 								switchingMoments.add(actualSwitchingMomentOn2);
 							} catch (Exception e) {
 								logger.info("No Switching Moment for On action created...");
@@ -47,11 +47,11 @@ public class SwitchingMomentCalculator {
 							}
 
 							try {
-								SwitchingMoment actualSwitchingMomentOff = this.calculateSwitchingMoment(relayNr, schedule,
-										false, now);
+								SwitchingMoment actualSwitchingMomentOff = this.calculateSwitchingMoment(relayNr,
+										schedule, false, now);
 								switchingMoments.add(actualSwitchingMomentOff);
-								SwitchingMoment actualSwitchingMomentOff2 = this.calculateSwitchingMoment(relayNr, schedule,
-										false, nextDay);
+								SwitchingMoment actualSwitchingMomentOff2 = this.calculateSwitchingMoment(relayNr,
+										schedule, false, nextDay);
 								switchingMoments.add(actualSwitchingMomentOff2);
 							} catch (Exception e) {
 								logger.info("No Switching Moment for Off action created...");
@@ -81,16 +81,17 @@ public class SwitchingMomentCalculator {
 		 * now.plusDays(1); DayOfWeek day1 = now.getDayOfWeek(); DayOfWeek day2 =
 		 * nextday.getDayOfWeek();
 		 */
-		switch (scheduledOccurence) {
-		// Check if day is within 2 days. Always recalculate every day.
-		// TODO: Implementing every day, every week day and every weekend day
-		case 0:
+
+		// TODO: Switching to ScheduleDay Enum
+
+		switch (ScheduleDay.valueOf(scheduledOccurence)) {
+		case EVERY_DAY:
 			// Trigger every day? No condition check?
 			actualSwitchingMoment.setTriggerTime(toCheckTime);
 			logger.info("Elke dag");
 			break;
 
-		case -1:
+		case WEEKDAY:
 			// Check at Monday, Tuesday, Wednesday, Thursday, Friday
 			if (dayOfWeek == DayOfWeek.MONDAY || dayOfWeek == DayOfWeek.TUESDAY || dayOfWeek == DayOfWeek.WEDNESDAY
 					|| dayOfWeek == DayOfWeek.THURSDAY || dayOfWeek == DayOfWeek.FRIDAY) {
@@ -101,7 +102,7 @@ public class SwitchingMomentCalculator {
 			}
 			break;
 
-		case -2:
+		case WEEKEND_DAY:
 			// Check at Saturday, Sunday
 
 			if (dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) {
@@ -112,7 +113,7 @@ public class SwitchingMomentCalculator {
 			}
 			break;
 
-		case 1:
+		case MONDAY:
 			if (dayOfWeek == DayOfWeek.MONDAY) {
 				actualSwitchingMoment.setTriggerTime(toCheckTime);
 			} else {
@@ -120,7 +121,7 @@ public class SwitchingMomentCalculator {
 			}
 			break;
 
-		case 2:
+		case TUESDAY:
 			if (dayOfWeek == DayOfWeek.TUESDAY) {
 				actualSwitchingMoment.setTriggerTime(toCheckTime);
 			} else {
@@ -128,7 +129,7 @@ public class SwitchingMomentCalculator {
 			}
 			break;
 
-		case 3:
+		case WEDNESDAY:
 			if (dayOfWeek == DayOfWeek.WEDNESDAY) {
 				actualSwitchingMoment.setTriggerTime(toCheckTime);
 			} else {
@@ -136,7 +137,7 @@ public class SwitchingMomentCalculator {
 			}
 			break;
 
-		case 4:
+		case THURSDAY:
 			if (dayOfWeek == DayOfWeek.THURSDAY) {
 				actualSwitchingMoment.setTriggerTime(toCheckTime);
 			} else {
@@ -144,7 +145,7 @@ public class SwitchingMomentCalculator {
 			}
 			break;
 
-		case 5:
+		case FRIDAY:
 			if (dayOfWeek == DayOfWeek.FRIDAY) {
 				actualSwitchingMoment.setTriggerTime(toCheckTime);
 			} else {
@@ -152,7 +153,7 @@ public class SwitchingMomentCalculator {
 			}
 			break;
 
-		case 6:
+		case SATURDAY:
 			if (dayOfWeek == DayOfWeek.SATURDAY) {
 				actualSwitchingMoment.setTriggerTime(toCheckTime);
 			} else {
@@ -160,7 +161,7 @@ public class SwitchingMomentCalculator {
 			}
 			break;
 
-		case 7:
+		case SUNDAY:
 			if (dayOfWeek == DayOfWeek.SUNDAY) {
 				actualSwitchingMoment.setTriggerTime(toCheckTime);
 			} else {
