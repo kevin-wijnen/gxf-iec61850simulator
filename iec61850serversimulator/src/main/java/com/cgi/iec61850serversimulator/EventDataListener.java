@@ -10,7 +10,6 @@ import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
@@ -27,7 +26,7 @@ import com.beanit.openiec61850.ServerEventListener;
 import com.beanit.openiec61850.ServerSap;
 import com.beanit.openiec61850.ServiceError;
 
-@Configuration
+//@Configuration
 @EnableScheduling
 class EventDataListener implements ServerEventListener {
 
