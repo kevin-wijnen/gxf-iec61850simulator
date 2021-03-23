@@ -13,6 +13,8 @@ import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.cgi.iec61850serversimulator.Schedule.ScheduleBuilder;
+
 class SwitchingMomentCalculatorTest {
 	/**
 	 * JUnit test class which tests the various related functions of the
@@ -28,100 +30,6 @@ class SwitchingMomentCalculatorTest {
 	 * schedule
 	 * </ul>
 	 */
-
-	public static class MockedScheduleBuilder {
-
-		private int scheduleNr;
-		private int relayNr;
-		private int dayInt;
-		private int fixedTimeInt;
-		private int fixedTimeOn;
-		private int fixedTimeOff;
-		private LocalTime timeOn;
-		private LocalTime timeOff;
-		private int burningMins;
-		private boolean isEnabled;
-
-		public MockedScheduleBuilder(int scheduleNr) {
-			this.scheduleNr = scheduleNr;
-		}
-
-		public MockedScheduleBuilder setRelayNr(int relayNr) {
-			this.relayNr = relayNr;
-
-			return this;
-		}
-
-		public MockedScheduleBuilder setDayInt(int dayInt) {
-			this.dayInt = dayInt;
-
-			return this;
-		}
-
-		public MockedScheduleBuilder setFixedTimeInt(int fixedTimeInt) {
-			this.fixedTimeInt = fixedTimeInt;
-
-			return this;
-		}
-
-		public MockedScheduleBuilder setFixedTimeOn(int fixedTimeOn) {
-			this.fixedTimeOn = fixedTimeOn;
-
-			return this;
-		}
-
-		public MockedScheduleBuilder setFixedTimeOff(int fixedTimeOff) {
-			this.fixedTimeOff = fixedTimeOff;
-
-			return this;
-		}
-
-		public MockedScheduleBuilder setTimeOn(LocalTime timeOn) {
-			this.timeOn = timeOn;
-
-			return this;
-		}
-
-		public MockedScheduleBuilder setTimeOff(LocalTime timeOff) {
-			this.timeOff = timeOff;
-
-			return this;
-		}
-
-		public MockedScheduleBuilder setBurningMins(int burningMins) {
-			this.burningMins = burningMins;
-
-			return this;
-		}
-
-		public MockedScheduleBuilder enable(boolean isEnabled) {
-			this.isEnabled = isEnabled;
-
-			return this;
-		}
-
-		public Schedule buildSchedule() {
-			Schedule schedule = new Schedule(this.scheduleNr);
-			schedule.relayNr = this.relayNr;
-			schedule.dayInt = this.dayInt;
-
-			if (this.fixedTimeOn < 0 || this.fixedTimeOff < 0) {
-				schedule.timeOnTypeInt = this.fixedTimeInt;
-				schedule.timeOffTypeInt = this.fixedTimeInt;
-			} else {
-				schedule.timeOnTypeInt = this.fixedTimeOn;
-				schedule.timeOffTypeInt = this.fixedTimeOff;
-			}
-
-			schedule.timeOn = this.timeOn;
-			schedule.timeOff = this.timeOff;
-			schedule.burningMinsOn = this.burningMins;
-			schedule.enabled = this.isEnabled;
-
-			return schedule;
-
-		}
-	}
 
 	private static final Logger logger = LoggerFactory.getLogger(SwitchingMomentCalculatorTest.class);
 
@@ -158,7 +66,7 @@ class SwitchingMomentCalculatorTest {
 		int burningMinutes = 30;
 		boolean enabled = true;
 
-		Schedule schedule = new MockedScheduleBuilder(scheduleNr - 1).setRelayNr(relayNr).setDayInt(dayInt)
+		Schedule schedule = new ScheduleBuilder(scheduleNr - 1).setRelayNr(relayNr).setDayInt(dayInt)
 				.setFixedTimeInt(fixedTimeInt).setFixedTimeOn(fixedTimeOn).setFixedTimeOff(fixedTimeOff)
 				.setTimeOn(timeOn).setTimeOff(timeOff).setBurningMins(burningMinutes).enable(enabled).buildSchedule();
 
@@ -199,12 +107,7 @@ class SwitchingMomentCalculatorTest {
 		boolean enabled = true;
 
 		// Optional: Custom schedule
-		/*
-		 * Schedule customSchedule = this.getMockSchedule(scheduleNr - 1, relayNr,
-		 * dayInt, fixedTimeInt, fixedTimeOn, fixedTimeOff, timeOn, timeOff,
-		 * burningMinutes);
-		 */
-		Schedule customSchedule = new MockedScheduleBuilder(scheduleNr - 1).setRelayNr(relayNr).setDayInt(dayInt)
+		Schedule customSchedule = new ScheduleBuilder(scheduleNr - 1).setRelayNr(relayNr).setDayInt(dayInt)
 				.setFixedTimeInt(fixedTimeInt).setFixedTimeOn(fixedTimeOn).setFixedTimeOff(fixedTimeOff)
 				.setTimeOn(timeOn).setTimeOff(timeOff).setBurningMins(burningMinutes).enable(enabled).buildSchedule();
 		boolean useCustomSchedule = false;
@@ -274,7 +177,7 @@ class SwitchingMomentCalculatorTest {
 		boolean enabled = true;
 
 		// Custom schedule initialization
-		Schedule customSchedule = new MockedScheduleBuilder(scheduleNr - 1).setRelayNr(relayNr).setDayInt(dayInt)
+		Schedule customSchedule = new ScheduleBuilder(scheduleNr - 1).setRelayNr(relayNr).setDayInt(dayInt)
 				.setFixedTimeInt(fixedTimeInt).setFixedTimeOn(fixedTimeOn).setFixedTimeOff(fixedTimeOff)
 				.setTimeOn(timeOn).setTimeOff(timeOff).setBurningMins(burningMinutes).enable(enabled).buildSchedule();
 
@@ -381,25 +284,6 @@ class SwitchingMomentCalculatorTest {
 		}
 		schedule.setBurningMinsOn(burningMinutes);
 		schedule.setEnabled(true);
-
-		return schedule;
-	}
-
-	// TODO: Converting to Builder design pattern
-	public Schedule getMockSchedule(int scheduleNr, int relayNr, int dayInt, int fixedTimeInt, int fixedTimeOn,
-			int fixedTimeOff, LocalTime timeOn, LocalTime timeOff, int burningMinutes) {
-		Schedule schedule = new Schedule(scheduleNr);
-
-		schedule.setRelayNr(relayNr);
-		// Day 0: Everyday of the week
-		schedule.setDayInt(dayInt);
-		schedule.setTimeOn(timeOn);
-		// Time On Type 0: Fixed time
-		schedule.setTimeOnTypeInt(0);
-		schedule.setTimeOff(timeOff);
-		// Time Off Type 0: Fixed time
-		schedule.setTimeOffTypeInt(0);
-		schedule.setBurningMinsOn(burningMinutes);
 
 		return schedule;
 	}

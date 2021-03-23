@@ -19,38 +19,100 @@ import com.beanit.openiec61850.ModelNode;
  */
 class Schedule {
 	private static final Logger logger = LoggerFactory.getLogger(Schedule.class);
-	// TODO: SwitchingMoment related attributes and functions here.
 
-	// Enum as prescribed in the GXF documentation for SetSchedule
-	// To use for clearer visualization to users?
-	public enum DAY {
-		EVERYDAY(0), WEEKDAY(-1), WEEKEND(-2), MONDAY(1), TUESDAY(2), WEDNESDAY(3), THURSDAY(4), FRIDAY(5), SATURDAY(6),
-		SUNDAY(7);
+	// Builder class migrated from the Test package
 
-		private int day;
+	public static class ScheduleBuilder {
 
-		DAY(int day) {
-			this.day = day;
+		private int scheduleNr;
+		private int relayNr;
+		private int dayInt;
+		private int fixedTimeInt;
+		private int fixedTimeOn;
+		private int fixedTimeOff;
+		private LocalTime timeOn;
+		private LocalTime timeOff;
+		private int burningMins;
+		private boolean isEnabled;
+
+		public ScheduleBuilder(int scheduleNr) {
+			this.scheduleNr = scheduleNr;
 		}
 
-		public int getDay() {
-			return this.day;
+		public ScheduleBuilder setRelayNr(int relayNr) {
+			this.relayNr = relayNr;
+
+			return this;
 		}
 
-	}
+		public ScheduleBuilder setDayInt(int dayInt) {
+			this.dayInt = dayInt;
 
-	// Usage for clearer visualization to users?
-	public enum TIMETYPE {
-		FIXED(0), SENSOR(1), ASTRONOMIC(2);
-
-		private int timeType;
-
-		TIMETYPE(int timeType) {
-			this.timeType = timeType;
+			return this;
 		}
 
-		public int getTimeType() {
-			return this.timeType;
+		public ScheduleBuilder setFixedTimeInt(int fixedTimeInt) {
+			this.fixedTimeInt = fixedTimeInt;
+
+			return this;
+		}
+
+		public ScheduleBuilder setFixedTimeOn(int fixedTimeOn) {
+			this.fixedTimeOn = fixedTimeOn;
+
+			return this;
+		}
+
+		public ScheduleBuilder setFixedTimeOff(int fixedTimeOff) {
+			this.fixedTimeOff = fixedTimeOff;
+
+			return this;
+		}
+
+		public ScheduleBuilder setTimeOn(LocalTime timeOn) {
+			this.timeOn = timeOn;
+
+			return this;
+		}
+
+		public ScheduleBuilder setTimeOff(LocalTime timeOff) {
+			this.timeOff = timeOff;
+
+			return this;
+		}
+
+		public ScheduleBuilder setBurningMins(int burningMins) {
+			this.burningMins = burningMins;
+
+			return this;
+		}
+
+		public ScheduleBuilder enable(boolean isEnabled) {
+			this.isEnabled = isEnabled;
+
+			return this;
+		}
+
+		public Schedule buildSchedule() {
+			Schedule schedule = new Schedule(this.scheduleNr);
+			schedule.relayNr = this.relayNr;
+			schedule.dayInt = this.dayInt;
+
+			if (this.fixedTimeOn < 0 || this.fixedTimeOff < 0) {
+				schedule.timeOnTypeInt = this.fixedTimeInt;
+				schedule.timeOffTypeInt = this.fixedTimeInt;
+			} else {
+				schedule.timeOnTypeInt = this.fixedTimeOn;
+				schedule.timeOffTypeInt = this.fixedTimeOff;
+			}
+
+			schedule.timeOn = this.timeOn;
+			schedule.timeOff = this.timeOff;
+			schedule.burningMinsOn = this.burningMins;
+			schedule.enabled = this.isEnabled;
+
+			return schedule;
+
 		}
 	}
 
