@@ -168,7 +168,7 @@ class SwitchingMomentCalculatorTest {
 	}
 
 	@Test
-	public void calculateEveryDaySwitchingMoments() {
+	public void calculateEveryDaySwitchingMoments() throws SwitchingMomentCalculationException {
 
 		int scheduleNr = 1;
 		int relayNr = 1;
@@ -225,11 +225,13 @@ class SwitchingMomentCalculatorTest {
 		assertEquals(expectedAfterLunchTime, actualSwitchingMomentOff.getTriggerTime());
 		assertFalse(actualSwitchingMomentOff.isTriggerAction());
 
-		LocalDateTime expectedNextLunchTime = LocalDateTime.now().plusDays(1).truncatedTo(ChronoUnit.HOURS).withHour(12);
+		LocalDateTime expectedNextLunchTime = LocalDateTime.now().plusDays(1).truncatedTo(ChronoUnit.HOURS)
+				.withHour(12);
 		assertEquals(expectedNextLunchTime, actualSwitchingMomentNextDayOn.getTriggerTime());
 		assertTrue(actualSwitchingMomentOn.isTriggerAction());
 
-		LocalDateTime expectedNextAfterLunchTime = LocalDateTime.now().plusDays(1).truncatedTo(ChronoUnit.HOURS).withHour(13);
+		LocalDateTime expectedNextAfterLunchTime = LocalDateTime.now().plusDays(1).truncatedTo(ChronoUnit.HOURS)
+				.withHour(13);
 		assertEquals(expectedNextAfterLunchTime, actualSwitchingMomentNextDayOff.getTriggerTime());
 		assertFalse(actualSwitchingMomentOff.isTriggerAction());
 

@@ -20,54 +20,42 @@ public class SwitchingMomentCalculator {
 
 	private static final Logger logger = LoggerFactory.getLogger(SwitchingMomentCalculator.class);
 
-	public List<SwitchingMoment> calculateSwitchingMoments(Device device) {
+	public List<SwitchingMoment> calculateSwitchingMoments(Device device) throws SwitchingMomentCalculationException {
 		List<SwitchingMoment> switchingMoments = new ArrayList<SwitchingMoment>();
 		// Calculating switching moments for today and tomorrow
 		LocalDateTime now = LocalDateTime.now();
 		LocalDateTime nextDay = now.plusDays(1);
+		int relayNr = 0;
+		int scheduleNr = 0;
 
-		for (int relayNr = 1; relayNr <= 4; relayNr++) {
-			try {
+		try {
+			for (relayNr = 1; relayNr <= device.getRelays().length; relayNr++) {
 				Relay relay = device.getRelay(relayNr);
+				for (scheduleNr = 1; scheduleNr <= relay.getSchedules().length; scheduleNr++) {
+					Schedule schedule = relay.getSchedule(scheduleNr);
+					if (schedule.isEnabled()) {
+						SwitchingMoment actualSwitchingMomentOn = this.calculateSwitchingMoment(relayNr, schedule, true,
+								now);
+						switchingMoments.add(actualSwitchingMomentOn);
+						SwitchingMoment actualSwitchingMomentOn2 = this.calculateSwitchingMoment(relayNr, schedule,
+								true, nextDay);
+						switchingMoments.add(actualSwitchingMomentOn2);
 
-				for (int scheduleNr = 1; scheduleNr <= relay.getSchedules().length; scheduleNr++) {
-					try {
-						Schedule schedule = relay.getSchedule(scheduleNr);
-						if (schedule.isEnabled()) {
-							try {
-								SwitchingMoment actualSwitchingMomentOn = this.calculateSwitchingMoment(relayNr,
-										schedule, true, now);
-								switchingMoments.add(actualSwitchingMomentOn);
-								SwitchingMoment actualSwitchingMomentOn2 = this.calculateSwitchingMoment(relayNr,
-										schedule, true, nextDay);
-								switchingMoments.add(actualSwitchingMomentOn2);
-							} catch (Exception e) {
-								logger.info("No Switching Moment for On action created...");
-								logger.info(e.toString());
-							}
-
-							try {
-								SwitchingMoment actualSwitchingMomentOff = this.calculateSwitchingMoment(relayNr,
-										schedule, false, now);
-								switchingMoments.add(actualSwitchingMomentOff);
-								SwitchingMoment actualSwitchingMomentOff2 = this.calculateSwitchingMoment(relayNr,
-										schedule, false, nextDay);
-								switchingMoments.add(actualSwitchingMomentOff2);
-							} catch (Exception e) {
-								logger.info("No Switching Moment for Off action created...");
-								logger.info(e.toString());
-
-							}
-						}
-					} catch (Exception e) {
-						logger.info("No enabled schedule found, number {}.", scheduleNr);
+						SwitchingMoment actualSwitchingMomentOff = this.calculateSwitchingMoment(relayNr, schedule,
+								false, now);
+						switchingMoments.add(actualSwitchingMomentOff);
+						SwitchingMoment actualSwitchingMomentOff2 = this.calculateSwitchingMoment(relayNr, schedule,
+								false, nextDay);
+						switchingMoments.add(actualSwitchingMomentOff2);
 					}
 				}
-			} catch (Exception e) {
-				logger.info("No relay found, number {}", relayNr);
 			}
+		} catch (Exception e) {
+			throw new SwitchingMomentCalculationException(
+					"Switching Moment calculation error at Relay " + relayNr + " Schedule " + scheduleNr);
 		}
 		return switchingMoments;
+
 	}
 
 	private SwitchingMoment calculateSwitchingMoment(int relayNr, Schedule schedule, boolean triggerAction,
