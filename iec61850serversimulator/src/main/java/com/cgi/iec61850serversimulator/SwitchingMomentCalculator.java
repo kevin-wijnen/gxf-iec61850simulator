@@ -52,7 +52,7 @@ public class SwitchingMomentCalculator {
 			}
 		} catch (Exception e) {
 			throw new SwitchingMomentCalculationException(
-					"Switching Moment calculation error at Relay " + relayNr + " Schedule " + scheduleNr);
+					"Switching Moment calculation error at Relay " + relayNr + " Schedule " + scheduleNr, e);
 		}
 		return switchingMoments;
 

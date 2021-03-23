@@ -4,8 +4,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum TriggerType {
-	// Meant to replace TimeType for schedules
-
 	FIXED(0), LIGHT_SENSOR(1), ASTRONOMIC(2);
 
 	private int timeTypeInt;
@@ -24,9 +22,4 @@ public enum TriggerType {
 	public static TriggerType valueOf(int timeTypeInt) {
 		return (TriggerType) map.get(timeTypeInt);
 	}
-
-	public int getDayInt() {
-		return this.timeTypeInt;
-	}
-
 }

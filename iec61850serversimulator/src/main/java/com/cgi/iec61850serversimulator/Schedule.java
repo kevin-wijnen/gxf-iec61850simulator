@@ -20,20 +20,19 @@ import com.beanit.openiec61850.ModelNode;
 class Schedule {
 	private static final Logger logger = LoggerFactory.getLogger(Schedule.class);
 
-	// Builder class migrated from the Test package
-
 	public static class ScheduleBuilder {
 
 		private int scheduleNr;
 		private int relayNr;
 		private int dayInt;
+		private ScheduleDay scheduledDay;
 		private int fixedTimeInt;
 		private int fixedTimeOn;
 		private int fixedTimeOff;
 		private LocalTime timeOn;
 		private LocalTime timeOff;
 		private int burningMins;
-		private boolean isEnabled;
+		private boolean enabled;
 
 		public ScheduleBuilder(int scheduleNr) {
 			this.scheduleNr = scheduleNr;
@@ -88,7 +87,7 @@ class Schedule {
 		}
 
 		public ScheduleBuilder isEnabled(boolean isEnabled) {
-			this.isEnabled = isEnabled;
+			this.enabled = isEnabled;
 
 			return this;
 		}
@@ -98,10 +97,14 @@ class Schedule {
 			schedule.relayNr = this.relayNr;
 			schedule.dayInt = this.dayInt;
 
-			if (this.fixedTimeOn < 0 || this.fixedTimeOff < 0) {
+			// When specific trigger types are disabled/not set (-1 = disabled)
+			if (this.fixedTimeOn == -1 || this.fixedTimeOff == -1) {
 				schedule.timeOnTypeInt = this.fixedTimeInt;
 				schedule.timeOffTypeInt = this.fixedTimeInt;
-			} else {
+			}
+
+			// When specific trigger types are set
+			else {
 				schedule.timeOnTypeInt = this.fixedTimeOn;
 				schedule.timeOffTypeInt = this.fixedTimeOff;
 			}
@@ -109,7 +112,7 @@ class Schedule {
 			schedule.timeOn = this.timeOn;
 			schedule.timeOff = this.timeOff;
 			schedule.burningMinsOn = this.burningMins;
-			schedule.enabled = this.isEnabled;
+			schedule.enabled = this.enabled;
 
 			return schedule;
 
@@ -132,6 +135,7 @@ class Schedule {
 	// Maximum of 150 minutes for offsets, in GXF platform
 	int beforeOffset;
 	int afterOffset;
+	ScheduleDay scheduledDay;
 
 	public Schedule(int indexNumber) {
 		// For empty schedule initialization, especially for test cases!
