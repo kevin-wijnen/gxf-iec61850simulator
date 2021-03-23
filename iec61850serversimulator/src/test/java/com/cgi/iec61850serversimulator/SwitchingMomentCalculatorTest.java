@@ -40,6 +40,7 @@ class SwitchingMomentCalculatorTest {
 		private LocalTime timeOn;
 		private LocalTime timeOff;
 		private int burningMins;
+		private boolean isEnabled;
 
 		public MockedScheduleBuilder(int scheduleNr) {
 			this.scheduleNr = scheduleNr;
@@ -93,6 +94,12 @@ class SwitchingMomentCalculatorTest {
 			return this;
 		}
 
+		public MockedScheduleBuilder enable(boolean isEnabled) {
+			this.isEnabled = isEnabled;
+
+			return this;
+		}
+
 		public Schedule buildSchedule() {
 			Schedule schedule = new Schedule(this.scheduleNr);
 			schedule.relayNr = this.relayNr;
@@ -109,6 +116,7 @@ class SwitchingMomentCalculatorTest {
 			schedule.timeOn = this.timeOn;
 			schedule.timeOff = this.timeOff;
 			schedule.burningMinsOn = this.burningMins;
+			schedule.enabled = this.isEnabled;
 
 			return schedule;
 
@@ -148,10 +156,11 @@ class SwitchingMomentCalculatorTest {
 		LocalTime timeOn = LocalTime.of(12, 00);
 		LocalTime timeOff = LocalTime.of(13, 00);
 		int burningMinutes = 30;
+		boolean enabled = true;
 
 		Schedule schedule = new MockedScheduleBuilder(scheduleNr - 1).setRelayNr(relayNr).setDayInt(dayInt)
 				.setFixedTimeInt(fixedTimeInt).setFixedTimeOn(fixedTimeOn).setFixedTimeOff(fixedTimeOff)
-				.setTimeOn(timeOn).setTimeOff(timeOff).setBurningMins(burningMinutes).buildSchedule();
+				.setTimeOn(timeOn).setTimeOff(timeOff).setBurningMins(burningMinutes).enable(enabled).buildSchedule();
 
 		// Schedule schedule = this.getMockSchedule(scheduleNr - 1, relayNr, dayInt,
 		// fixedTimeInt, fixedTimeOn,
@@ -164,6 +173,7 @@ class SwitchingMomentCalculatorTest {
 		assertEquals(timeOn, schedule.getTimeOn());
 		assertEquals(timeOff, schedule.getTimeOff());
 		assertEquals(burningMinutes, schedule.getBurningMinsOn());
+		assertEquals(enabled, schedule.isEnabled());
 
 	}
 
@@ -186,24 +196,26 @@ class SwitchingMomentCalculatorTest {
 		LocalTime timeOn = LocalTime.of(12, 00);
 		LocalTime timeOff = LocalTime.of(13, 00);
 		int burningMinutes = 30;
+		boolean enabled = true;
+
 		// Optional: Custom schedule
-		Schedule customSchedule = this.getMockSchedule(scheduleNr - 1, relayNr, dayInt, fixedTimeInt, fixedTimeOn,
-				fixedTimeOff, timeOn, timeOff, burningMinutes);
+		/*
+		 * Schedule customSchedule = this.getMockSchedule(scheduleNr - 1, relayNr,
+		 * dayInt, fixedTimeInt, fixedTimeOn, fixedTimeOff, timeOn, timeOff,
+		 * burningMinutes);
+		 */
+		Schedule customSchedule = new MockedScheduleBuilder(scheduleNr - 1).setRelayNr(relayNr).setDayInt(dayInt)
+				.setFixedTimeInt(fixedTimeInt).setFixedTimeOn(fixedTimeOn).setFixedTimeOff(fixedTimeOff)
+				.setTimeOn(timeOn).setTimeOff(timeOff).setBurningMins(burningMinutes).enable(enabled).buildSchedule();
 		boolean useCustomSchedule = false;
 
 		// Initializing mock relay
-		if (!useCustomSchedule) {
-			Schedule schedule = this.getMockLunchTimeSchedule(scheduleNr);
-			Relay relay = this.getMockRelay(relayNr, schedule);
-			Relay[] relays = new Relay[1];
-			relays[0] = relay;
-			this.device.setRelays(relays);
-		} else {
-			Relay relay = this.getMockRelay(relayNr, customSchedule);
-			Relay[] relays = new Relay[1];
-			relays[0] = relay;
-			this.device.setRelays(relays);
-		}
+		// Custom schedule separated test!
+		Schedule schedule = this.getMockLunchTimeSchedule(scheduleNr);
+		Relay relay = this.getMockRelay(relayNr, schedule);
+		Relay[] relays = new Relay[1];
+		relays[0] = relay;
+		this.device.setRelays(relays);
 
 		// Calculating switching moment
 
@@ -237,6 +249,79 @@ class SwitchingMomentCalculatorTest {
 
 	}
 
+	@Test
+	public void calculateCustomScheduleSwitchingMoments() throws SwitchingMomentCalculationException {
+
+		// Custom schedule
+		// Set up your own schedule with the variables
+
+		int scheduleNr = 1;
+		int relayNr = 1;
+		// Trigger day(s), see Enum in GXF LF Energy documentation
+		// 0 = Every day
+		int dayInt = 0;
+		// General time type for both on and off times
+		int fixedTimeInt = 0;
+		// Optional: Specific time type for on time
+		// -1 = using general time type
+		int fixedTimeOn = -1;
+		// Optional: Specific time type for off time
+		// -1 = using general time type
+		int fixedTimeOff = -1;
+		LocalTime timeOn = LocalTime.of(12, 00);
+		LocalTime timeOff = LocalTime.of(23, 33);
+		int burningMinutes = 30;
+		boolean enabled = true;
+
+		// Custom schedule initialization
+		Schedule customSchedule = new MockedScheduleBuilder(scheduleNr - 1).setRelayNr(relayNr).setDayInt(dayInt)
+				.setFixedTimeInt(fixedTimeInt).setFixedTimeOn(fixedTimeOn).setFixedTimeOff(fixedTimeOff)
+				.setTimeOn(timeOn).setTimeOff(timeOff).setBurningMins(burningMinutes).enable(enabled).buildSchedule();
+
+		// Flag to enable the custom schedule
+		boolean useCustomSchedule = true;
+
+		// Initializing mock relay
+
+		Relay relay = this.getMockRelay(relayNr, customSchedule);
+		Relay[] relays = new Relay[1];
+		relays[0] = relay;
+		this.device.setRelays(relays);
+
+		// Calculating switching moment
+
+		SwitchingMomentCalculator calculator = new SwitchingMomentCalculator();
+		List<SwitchingMoment> switchingMoments = calculator.calculateSwitchingMoments(this.device);
+
+		// Tests
+
+		SwitchingMoment actualSwitchingMomentOn = switchingMoments.get(0);
+		SwitchingMoment actualSwitchingMomentOff = switchingMoments.get(2);
+		SwitchingMoment actualSwitchingMomentNextDayOn = switchingMoments.get(1);
+		SwitchingMoment actualSwitchingMomentNextDayOff = switchingMoments.get(3);
+
+		LocalDateTime expectedTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES).withHour(timeOn.getHour())
+				.withMinute(timeOn.getMinute());
+		assertEquals(expectedTime, actualSwitchingMomentOn.getTriggerTime());
+		assertTrue(actualSwitchingMomentOn.isTriggerAction());
+
+		LocalDateTime expectedAfterTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES)
+				.withHour(timeOff.getHour()).withMinute(timeOff.getMinute());
+		assertEquals(expectedAfterTime, actualSwitchingMomentOff.getTriggerTime());
+		assertFalse(actualSwitchingMomentOff.isTriggerAction());
+
+		LocalDateTime expectedNextTime = LocalDateTime.now().plusDays(1).truncatedTo(ChronoUnit.MINUTES)
+				.withHour(timeOn.getHour()).withMinute(timeOn.getMinute());
+		assertEquals(expectedNextTime, actualSwitchingMomentNextDayOn.getTriggerTime());
+		assertTrue(actualSwitchingMomentOn.isTriggerAction());
+
+		LocalDateTime expectedNextAfterTime = LocalDateTime.now().plusDays(1).truncatedTo(ChronoUnit.MINUTES)
+				.withHour(timeOff.getHour()).withMinute(timeOff.getMinute());
+		assertEquals(expectedNextAfterTime, actualSwitchingMomentNextDayOff.getTriggerTime());
+		assertFalse(actualSwitchingMomentOff.isTriggerAction());
+
+	}
+
 	public Relay getMockRelay(int relayNr, Schedule customSchedule) {
 		Relay relay = new Relay(relayNr);
 
@@ -244,13 +329,17 @@ class SwitchingMomentCalculatorTest {
 
 		// Making mock fixed time schedule.
 
-		if (customSchedule != null) {
+		if (customSchedule == null) {
 			// Default mock schedule:
 			// On time: 12 PM
 			// Off time: 1 PM
 			// Burning Minutes: 30
 			Schedule schedule = this.getMockLunchTimeSchedule(1);
 			schedules[0] = schedule;
+		}
+
+		else {
+			schedules[0] = customSchedule;
 		}
 
 		relay.setSchedules(schedules);
