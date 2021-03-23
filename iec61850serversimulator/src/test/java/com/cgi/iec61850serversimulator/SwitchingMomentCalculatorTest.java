@@ -66,9 +66,9 @@ class SwitchingMomentCalculatorTest {
 		int burningMinutes = 30;
 		boolean enabled = true;
 
-		Schedule schedule = new ScheduleBuilder(scheduleNr - 1).setRelayNr(relayNr).setDayInt(dayInt)
-				.setFixedTimeInt(fixedTimeInt).setFixedTimeOn(fixedTimeOn).setFixedTimeOff(fixedTimeOff)
-				.setTimeOn(timeOn).setTimeOff(timeOff).setBurningMins(burningMinutes).enable(enabled).buildSchedule();
+		Schedule schedule = new ScheduleBuilder(scheduleNr - 1).relayNr(relayNr).dayInt(dayInt)
+				.fixedTimeInt(fixedTimeInt).fixedTimeOn(fixedTimeOn).fixedTimeOff(fixedTimeOff)
+				.timeOn(timeOn).timeOff(timeOff).burningMins(burningMinutes).isEnabled(enabled).buildSchedule();
 
 		// Schedule schedule = this.getMockSchedule(scheduleNr - 1, relayNr, dayInt,
 		// fixedTimeInt, fixedTimeOn,
@@ -107,9 +107,9 @@ class SwitchingMomentCalculatorTest {
 		boolean enabled = true;
 
 		// Optional: Custom schedule
-		Schedule customSchedule = new ScheduleBuilder(scheduleNr - 1).setRelayNr(relayNr).setDayInt(dayInt)
-				.setFixedTimeInt(fixedTimeInt).setFixedTimeOn(fixedTimeOn).setFixedTimeOff(fixedTimeOff)
-				.setTimeOn(timeOn).setTimeOff(timeOff).setBurningMins(burningMinutes).enable(enabled).buildSchedule();
+		Schedule customSchedule = new ScheduleBuilder(scheduleNr - 1).relayNr(relayNr).dayInt(dayInt)
+				.fixedTimeInt(fixedTimeInt).fixedTimeOn(fixedTimeOn).fixedTimeOff(fixedTimeOff)
+				.timeOn(timeOn).timeOff(timeOff).burningMins(burningMinutes).isEnabled(enabled).buildSchedule();
 		boolean useCustomSchedule = false;
 
 		// Initializing mock relay
@@ -177,9 +177,9 @@ class SwitchingMomentCalculatorTest {
 		boolean enabled = true;
 
 		// Custom schedule initialization
-		Schedule customSchedule = new ScheduleBuilder(scheduleNr - 1).setRelayNr(relayNr).setDayInt(dayInt)
-				.setFixedTimeInt(fixedTimeInt).setFixedTimeOn(fixedTimeOn).setFixedTimeOff(fixedTimeOff)
-				.setTimeOn(timeOn).setTimeOff(timeOff).setBurningMins(burningMinutes).enable(enabled).buildSchedule();
+		Schedule customSchedule = new ScheduleBuilder(scheduleNr - 1).relayNr(relayNr).dayInt(dayInt)
+				.fixedTimeInt(fixedTimeInt).fixedTimeOn(fixedTimeOn).fixedTimeOff(fixedTimeOff)
+				.timeOn(timeOn).timeOff(timeOff).burningMins(burningMinutes).isEnabled(enabled).buildSchedule();
 
 		// Flag to enable the custom schedule
 		boolean useCustomSchedule = true;

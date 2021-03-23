@@ -39,55 +39,55 @@ class Schedule {
 			this.scheduleNr = scheduleNr;
 		}
 
-		public ScheduleBuilder setRelayNr(int relayNr) {
+		public ScheduleBuilder relayNr(int relayNr) {
 			this.relayNr = relayNr;
 
 			return this;
 		}
 
-		public ScheduleBuilder setDayInt(int dayInt) {
+		public ScheduleBuilder dayInt(int dayInt) {
 			this.dayInt = dayInt;
 
 			return this;
 		}
 
-		public ScheduleBuilder setFixedTimeInt(int fixedTimeInt) {
+		public ScheduleBuilder fixedTimeInt(int fixedTimeInt) {
 			this.fixedTimeInt = fixedTimeInt;
 
 			return this;
 		}
 
-		public ScheduleBuilder setFixedTimeOn(int fixedTimeOn) {
+		public ScheduleBuilder fixedTimeOn(int fixedTimeOn) {
 			this.fixedTimeOn = fixedTimeOn;
 
 			return this;
 		}
 
-		public ScheduleBuilder setFixedTimeOff(int fixedTimeOff) {
+		public ScheduleBuilder fixedTimeOff(int fixedTimeOff) {
 			this.fixedTimeOff = fixedTimeOff;
 
 			return this;
 		}
 
-		public ScheduleBuilder setTimeOn(LocalTime timeOn) {
+		public ScheduleBuilder timeOn(LocalTime timeOn) {
 			this.timeOn = timeOn;
 
 			return this;
 		}
 
-		public ScheduleBuilder setTimeOff(LocalTime timeOff) {
+		public ScheduleBuilder timeOff(LocalTime timeOff) {
 			this.timeOff = timeOff;
 
 			return this;
 		}
 
-		public ScheduleBuilder setBurningMins(int burningMins) {
+		public ScheduleBuilder burningMins(int burningMins) {
 			this.burningMins = burningMins;
 
 			return this;
 		}
 
-		public ScheduleBuilder enable(boolean isEnabled) {
+		public ScheduleBuilder isEnabled(boolean isEnabled) {
 			this.isEnabled = isEnabled;
 
 			return this;
