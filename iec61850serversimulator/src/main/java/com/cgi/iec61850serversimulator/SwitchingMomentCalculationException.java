@@ -8,6 +8,6 @@ public class SwitchingMomentCalculationException extends Exception {
 	private static final long serialVersionUID = 1L;
 
 	public SwitchingMomentCalculationException(String message, Exception e) {
-		super(message + System.lineSeparator() + e);
+		super(message, e);
 	}
 }

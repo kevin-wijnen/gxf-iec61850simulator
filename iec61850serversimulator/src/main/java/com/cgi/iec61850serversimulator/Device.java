@@ -58,7 +58,7 @@ class Device {
 			deviceStringBuilder.append(this.relays[relayNr].toString()).append(System.lineSeparator())
 					.append("Enabled schedules: ").append(System.lineSeparator()).append(System.lineSeparator());
 			for (int scheduleNr = 1; scheduleNr <= 50; scheduleNr++) {
-				if (this.getRelay(relayNr + 1).getSchedule(scheduleNr).enabled) {
+				if (this.getRelay(relayNr + 1).getSchedule(scheduleNr).isEnabled()) {
 					deviceStringBuilder.append(this.getRelay(relayNr + 1).getSchedule(scheduleNr))
 							.append(System.lineSeparator());
 				}

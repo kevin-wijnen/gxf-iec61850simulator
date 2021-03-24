@@ -25,7 +25,6 @@ class Schedule {
 		private int scheduleNr;
 		private int relayNr;
 		private int dayInt;
-		private ScheduleDay scheduledDay;
 		private int fixedTimeInt;
 		private int fixedTimeOn;
 		private int fixedTimeOff;
@@ -119,23 +118,20 @@ class Schedule {
 		}
 	}
 
-	int indexNumber;
-	int relayNr;
-	boolean enabled;
-	String description;
-	int dayInt;
-	// DAY day;
-	LocalTime timeOn;
-	int timeOnTypeInt;
-	// TIMETYPE timeOnType;
-	LocalTime timeOff;
-	int timeOffTypeInt;
-	// TIMETYPE timeOffType;
-	int burningMinsOn;
+	private int indexNumber;
+	private int relayNr;
+	private boolean enabled;
+	private String description;
+	private int dayInt;
+	private LocalTime timeOn;
+	private int timeOnTypeInt;
+	private LocalTime timeOff;
+	private int timeOffTypeInt;
+	private int burningMinsOn;
+
 	// Maximum of 150 minutes for offsets, in GXF platform
-	int beforeOffset;
-	int afterOffset;
-	ScheduleDay scheduledDay;
+	private int beforeOffset;
+	private int afterOffset;
 
 	public Schedule(int indexNumber) {
 		// For empty schedule initialization, especially for test cases!

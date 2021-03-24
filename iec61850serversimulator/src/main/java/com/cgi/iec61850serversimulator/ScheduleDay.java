@@ -5,8 +5,16 @@ import java.util.Map;
 
 public enum ScheduleDay {
 
-	EVERY_DAY(0), WEEKDAY(-1), WEEKEND_DAY(-2), MONDAY(1), TUESDAY(2), WEDNESDAY(3), THURSDAY(4), FRIDAY(5),
-	SATURDAY(6), SUNDAY(7);
+	EVERY_DAY(0),
+	WEEKDAY(-1),
+	WEEKEND_DAY(-2),
+	MONDAY(1),
+	TUESDAY(2),
+	WEDNESDAY(3),
+	THURSDAY(4),
+	FRIDAY(5),
+	SATURDAY(6),
+	SUNDAY(7);
 
 	private int dayInt;
 	private static Map<Integer, ScheduleDay> map = new HashMap<>();

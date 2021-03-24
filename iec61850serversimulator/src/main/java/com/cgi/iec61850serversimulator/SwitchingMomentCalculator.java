@@ -21,7 +21,7 @@ public class SwitchingMomentCalculator {
 	private static final Logger logger = LoggerFactory.getLogger(SwitchingMomentCalculator.class);
 
 	public List<SwitchingMoment> calculateSwitchingMoments(Device device) throws SwitchingMomentCalculationException {
-		List<SwitchingMoment> switchingMoments = new ArrayList<SwitchingMoment>();
+		List<SwitchingMoment> switchingMoments = new ArrayList<>();
 		// Calculating switching moments for today and tomorrow
 		LocalDateTime now = LocalDateTime.now();
 		LocalDateTime nextDay = now.plusDays(1);
@@ -62,10 +62,10 @@ public class SwitchingMomentCalculator {
 			LocalDateTime toCheckTime) {
 
 		SwitchingMoment actualSwitchingMoment = new SwitchingMoment(relayNr, null, triggerAction);
-		int scheduledOccurence = schedule.getDayInt();
+		int scheduledOccurrence = schedule.getDayInt();
 		DayOfWeek dayOfWeek = toCheckTime.getDayOfWeek();
 
-		switch (ScheduleDay.valueOf(scheduledOccurence)) {
+		switch (ScheduleDay.valueOf(scheduledOccurrence)) {
 		case EVERY_DAY:
 			actualSwitchingMoment.setTriggerTime(toCheckTime);
 			logger.info("Every day occurrence");
@@ -89,7 +89,7 @@ public class SwitchingMomentCalculator {
 				actualSwitchingMoment.setTriggerTime(toCheckTime);
 				logger.info("Every weekend day occurrence");
 			} else {
-				logger.info("Given date is not on weekend day, no switching moment.", DayOfWeek.MONDAY);
+				logger.info("Given date is not on weekend day, no switching moment.");
 			}
 			break;
 
@@ -97,7 +97,7 @@ public class SwitchingMomentCalculator {
 			if (dayOfWeek == DayOfWeek.MONDAY) {
 				actualSwitchingMoment.setTriggerTime(toCheckTime);
 			} else {
-				logger.info("Given date is not on {0}, no switching moment.", DayOfWeek.MONDAY);
+				logger.info("Given date is not on {}, no switching moment.", DayOfWeek.MONDAY);
 			}
 			break;
 
@@ -105,7 +105,7 @@ public class SwitchingMomentCalculator {
 			if (dayOfWeek == DayOfWeek.TUESDAY) {
 				actualSwitchingMoment.setTriggerTime(toCheckTime);
 			} else {
-				logger.info("Given date is not on {0}, no switching moment.", DayOfWeek.TUESDAY);
+				logger.info("Given date is not on {}, no switching moment.", DayOfWeek.TUESDAY);
 			}
 			break;
 
@@ -113,7 +113,7 @@ public class SwitchingMomentCalculator {
 			if (dayOfWeek == DayOfWeek.WEDNESDAY) {
 				actualSwitchingMoment.setTriggerTime(toCheckTime);
 			} else {
-				logger.info("Given date is not on {0}, no switching moment.", DayOfWeek.WEDNESDAY);
+				logger.info("Given date is not on {}, no switching moment.", DayOfWeek.WEDNESDAY);
 			}
 			break;
 
@@ -121,7 +121,7 @@ public class SwitchingMomentCalculator {
 			if (dayOfWeek == DayOfWeek.THURSDAY) {
 				actualSwitchingMoment.setTriggerTime(toCheckTime);
 			} else {
-				logger.info("Given date is not on {0}, no switching moment.", DayOfWeek.THURSDAY);
+				logger.info("Given date is not on {}, no switching moment.", DayOfWeek.THURSDAY);
 			}
 			break;
 
@@ -129,7 +129,7 @@ public class SwitchingMomentCalculator {
 			if (dayOfWeek == DayOfWeek.FRIDAY) {
 				actualSwitchingMoment.setTriggerTime(toCheckTime);
 			} else {
-				logger.info("Given date is not on {0}, no switching moment.", DayOfWeek.FRIDAY);
+				logger.info("Given date is not on {}, no switching moment.", DayOfWeek.FRIDAY);
 			}
 			break;
 
@@ -137,7 +137,7 @@ public class SwitchingMomentCalculator {
 			if (dayOfWeek == DayOfWeek.SATURDAY) {
 				actualSwitchingMoment.setTriggerTime(toCheckTime);
 			} else {
-				logger.info("Given date is not on {0}, no switching moment.", DayOfWeek.SATURDAY);
+				logger.info("Given date is not on {}, no switching moment.", DayOfWeek.SATURDAY);
 			}
 			break;
 
@@ -145,7 +145,7 @@ public class SwitchingMomentCalculator {
 			if (dayOfWeek == DayOfWeek.SUNDAY) {
 				actualSwitchingMoment.setTriggerTime(toCheckTime);
 			} else {
-				logger.info("Given date is not on {0}, no switching moment.", DayOfWeek.SUNDAY);
+				logger.info("Given date is not on {}, no switching moment.", DayOfWeek.SUNDAY);
 			}
 			break;
 
@@ -158,7 +158,7 @@ public class SwitchingMomentCalculator {
 
 			// TODO: Formatting/converting should only happen when receiving a value
 			DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyyMMdd");
-			String stringDate = String.valueOf(scheduledOccurence);
+			String stringDate = String.valueOf(scheduledOccurrence);
 			LocalDateTime triggerDate = LocalDateTime.parse(stringDate, dateFormat);
 			actualSwitchingMoment.setTriggerTime(triggerDate);
 

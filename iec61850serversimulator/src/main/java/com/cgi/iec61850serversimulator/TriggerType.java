@@ -4,10 +4,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum TriggerType {
-	FIXED(0), LIGHT_SENSOR(1), ASTRONOMIC(2);
+
+	FIXED(0),
+	LIGHT_SENSOR(1),
+	ASTRONOMIC(2);
 
 	private int timeTypeInt;
-	private static Map map = new HashMap<>();
+	private static Map<Integer, TriggerType> map = new HashMap<>();
 
 	private TriggerType(int timeTypeInt) {
 		this.timeTypeInt = timeTypeInt;
@@ -20,6 +23,6 @@ public enum TriggerType {
 	}
 
 	public static TriggerType valueOf(int timeTypeInt) {
-		return (TriggerType) map.get(timeTypeInt);
+		return map.get(timeTypeInt);
 	}
 }
