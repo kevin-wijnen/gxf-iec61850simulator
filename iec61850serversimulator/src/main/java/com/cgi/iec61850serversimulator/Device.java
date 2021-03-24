@@ -11,34 +11,25 @@ import com.beanit.openiec61850.BdaBoolean;
 import com.beanit.openiec61850.BdaInt8;
 import com.beanit.openiec61850.Fc;
 
+/**
+ * Class which represents a simulated device. It holds the clock and 4 relays.
+ */
 class Device {
-	// TODO: Split the class up into several classes
 	private static final Logger logger = LoggerFactory.getLogger(Device.class);
 
-	/*
-	 * String switchType1; String switchType2; String switchType3; String
-	 * switchType4; boolean relayLight2; boolean relayLight3; boolean relayLight4;
-	 * String lightType;
-	 *
-	 * int offsetAstronomSet; int offsetAstronomRise; String sensorTransition;
-	 */
+	private static final String SWITCH_ROOT = "SWDeviceGenericIO/XSWC";
+
 	private Clock clock;
 	private Relay[] relays;
-
 	private ServerWrapper serverWrapper;
 
-	/*
-	 * String eventFilterBitmask; boolean enableEventBuffered;
-	 *
-	 * // Schedule array?
-	 *
-	 * String functionalFirmwareVer; String securityFirmwareVer;
-	 *
-	 * String ipAddressGXF; int portGXF; String ipAddressNTP; int timeSyncInterval;
-	 *
-	 * boolean enableDHCP; String ipAddressDHCP; String netmaskDHCP; String
-	 * gatewayDHCP;
-	 */
+	public Relay[] getRelays() {
+		return this.relays;
+	}
+
+	public void setRelays(Relay[] relays) {
+		this.relays = relays;
+	}
 
 	public void displayDevice() {
 		logger.info("** Printing device:");
@@ -47,12 +38,35 @@ class Device {
 
 		logger.info("** Printing relays.\n");
 		for (int relayNr = 0; relayNr < 4; relayNr++) {
-			this.relays[relayNr].displayRelay();
-			for (int scheduleNr = 0; scheduleNr < 50; scheduleNr++) {
-				logger.info(this.getRelay(relayNr + 1).getSchedule(scheduleNr + 1).toString());
+			logger.info(this.relays[relayNr].toString());
+			for (int scheduleNr = 1; scheduleNr <= 50; scheduleNr++) {
+				logger.info("Schedule {}: {}", scheduleNr, this.getRelay(relayNr + 1).getSchedule(scheduleNr));
 			}
 		}
+	}
 
+	@Override
+	public String toString() {
+		final StringBuilder deviceStringBuilder = new StringBuilder();
+
+		deviceStringBuilder.append("** Printing device:").append(System.lineSeparator()).append(System.lineSeparator());
+		deviceStringBuilder.append(this.clock.toString()).append(System.lineSeparator()).append(System.lineSeparator());
+
+		deviceStringBuilder.append("** Printing relays:").append(System.lineSeparator());
+
+		for (int relayNr = 0; relayNr < 4; relayNr++) {
+			deviceStringBuilder.append(this.relays[relayNr].toString()).append(System.lineSeparator())
+					.append("Enabled schedules: ").append(System.lineSeparator()).append(System.lineSeparator());
+			for (int scheduleNr = 1; scheduleNr <= 50; scheduleNr++) {
+				if (this.getRelay(relayNr + 1).getSchedule(scheduleNr).isEnabled()) {
+					deviceStringBuilder.append(this.getRelay(relayNr + 1).getSchedule(scheduleNr))
+							.append(System.lineSeparator());
+				}
+			}
+			deviceStringBuilder.append(System.lineSeparator());
+		}
+		deviceStringBuilder.append(System.lineSeparator());
+		return deviceStringBuilder.toString();
 	}
 
 	public void initalizeDevice(final ServerWrapper serverSapWrapper) {
@@ -64,13 +78,10 @@ class Device {
 
 		for (int relayNr = 0; relayNr < 4; relayNr++) {
 			this.relays[relayNr] = new Relay(
-					this.serverWrapper.findModelNode("SWDeviceGenericIO/XSWC" + (relayNr + 1) + ".Pos", Fc.CO),
-					this.serverWrapper.findModelNode("SWDeviceGenericIO/XSWC" + (relayNr + 1) + ".Sche.sche1", Fc.CF));
-			this.setCtlModel(relayNr + 1, 1);
+					this.serverWrapper.findModelNode(SWITCH_ROOT + (relayNr + 1) + ".Pos", Fc.CO),
+					this.serverWrapper.findModelNode(SWITCH_ROOT + (relayNr + 1) + ".Sche.sche1", Fc.CF));
+			this.enableSwitching(relayNr + 1);
 		}
-		// CTLModel naar 1 veranderen door de ServerModel te muteren
-		// Kijk naar Ruud z'n voorbeeld bij setLightStatus!
-
 	}
 
 	public Clock getClock() {
@@ -90,9 +101,7 @@ class Device {
 			logger.info("Set light status for relay {} to value {}", relay, status);
 
 			final BdaBoolean lightStatus = (BdaBoolean) this.serverWrapper
-					.findModelNode("SWDeviceGenericIO/XSWC" + relay + ".Pos.Oper.ctlVal", Fc.CO);
-			// .findModelNode("SWDeviceGenericIO/XSWC" + relay + ".Pos.stVal",
-			// Fc.ST);
+					.findModelNode(SWITCH_ROOT + relay + ".Pos.Oper.ctlVal", Fc.CO);
 			lightStatus.setValue(status);
 
 			final List<BasicDataAttribute> attributes = Arrays.asList(lightStatus);
@@ -102,16 +111,17 @@ class Device {
 		}
 	}
 
-	public void setCtlModel(final int relay, final int ctlModelInt) {
+	public void enableSwitching(final int relay) {
 		try {
-			// Necessary to have CTLModel set to 1 in the ServerModel along with having
-			// enbOpr enabled (enabled on default) to be able to switch the status.
+			// Necessary to have CTLModel set to 1 in the ServerModel along with
+			// having enbOpr enabled (enabled on default) to be able to switch
+			// the status.
 			logger.info("Setting CTLModel to 1 to enable relay control");
 
-			final BdaInt8 ctlModel = (BdaInt8) this.serverWrapper
-					.findModelNode("SWDeviceGenericIO/XSWC" + relay + ".Pos.ctlModel", Fc.CF);
-			byte ctlModelByte = 01;
-			logger.info("Byte: " + ctlModelByte);
+			final BdaInt8 ctlModel = (BdaInt8) this.serverWrapper.findModelNode(SWITCH_ROOT + relay + ".Pos.ctlModel",
+					Fc.CF);
+			final byte ctlModelByte = 01;
+			logger.info("Byte: {}", ctlModelByte);
 			ctlModel.setValue((byte) 01);
 			logger.info("CTLModel: {}", ctlModelByte);
 

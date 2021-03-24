@@ -14,57 +14,124 @@ import com.beanit.openiec61850.BdaInt8;
 import com.beanit.openiec61850.BdaVisibleString;
 import com.beanit.openiec61850.ModelNode;
 
+/**
+ * Class which represents a schedule.
+ */
 class Schedule {
 	private static final Logger logger = LoggerFactory.getLogger(Schedule.class);
-	// TODO: SwitchingMoment related attributes and functions here.
 
-	// Enum as prescribed in the GXF documentation for SetSchedule
-	public enum DAY {
-		EVERYDAY(0), WEEKDAY(-1), WEEKEND(-2), MONDAY(1), TUESDAY(2), WEDNESDAY(3), THURSDAY(4), FRIDAY(5), SATURDAY(6),
-		SUNDAY(7);
+	public static class ScheduleBuilder {
 
-		private int day;
+		private int scheduleNr;
+		private int relayNr;
+		private int dayInt;
+		private int fixedTimeInt;
+		private int fixedTimeOn;
+		private int fixedTimeOff;
+		private LocalTime timeOn;
+		private LocalTime timeOff;
+		private int burningMins;
+		private boolean enabled;
 
-		DAY(int day) {
-			this.day = day;
+		public ScheduleBuilder(int scheduleNr) {
+			this.scheduleNr = scheduleNr;
 		}
 
-		public int getDay() {
-			return this.day;
+		public ScheduleBuilder relayNr(int relayNr) {
+			this.relayNr = relayNr;
+
+			return this;
 		}
 
+		public ScheduleBuilder dayInt(int dayInt) {
+			this.dayInt = dayInt;
+
+			return this;
+		}
+
+		public ScheduleBuilder fixedTimeInt(int fixedTimeInt) {
+			this.fixedTimeInt = fixedTimeInt;
+
+			return this;
+		}
+
+		public ScheduleBuilder fixedTimeOn(int fixedTimeOn) {
+			this.fixedTimeOn = fixedTimeOn;
+
+			return this;
+		}
+
+		public ScheduleBuilder fixedTimeOff(int fixedTimeOff) {
+			this.fixedTimeOff = fixedTimeOff;
+
+			return this;
+		}
+
+		public ScheduleBuilder timeOn(LocalTime timeOn) {
+			this.timeOn = timeOn;
+
+			return this;
+		}
+
+		public ScheduleBuilder timeOff(LocalTime timeOff) {
+			this.timeOff = timeOff;
+
+			return this;
+		}
+
+		public ScheduleBuilder burningMins(int burningMins) {
+			this.burningMins = burningMins;
+
+			return this;
+		}
+
+		public ScheduleBuilder isEnabled(boolean isEnabled) {
+			this.enabled = isEnabled;
+
+			return this;
+		}
+
+		public Schedule buildSchedule() {
+			Schedule schedule = new Schedule(this.scheduleNr);
+			schedule.relayNr = this.relayNr;
+			schedule.dayInt = this.dayInt;
+
+			// When specific trigger types are disabled/not set (-1 = disabled)
+			if (this.fixedTimeOn == -1 || this.fixedTimeOff == -1) {
+				schedule.timeOnTypeInt = this.fixedTimeInt;
+				schedule.timeOffTypeInt = this.fixedTimeInt;
+			}
+
+			// When specific trigger types are set
+			else {
+				schedule.timeOnTypeInt = this.fixedTimeOn;
+				schedule.timeOffTypeInt = this.fixedTimeOff;
+			}
+
+			schedule.timeOn = this.timeOn;
+			schedule.timeOff = this.timeOff;
+			schedule.burningMinsOn = this.burningMins;
+			schedule.enabled = this.enabled;
+
+			return schedule;
+
+		}
 	}
 
-	public enum TIMETYPE {
-		FIXED(0), SENSOR(1), ASTRONOMIC(2);
+	private int indexNumber;
+	private int relayNr;
+	private boolean enabled;
+	private String description;
+	private int dayInt;
+	private LocalTime timeOn;
+	private int timeOnTypeInt;
+	private LocalTime timeOff;
+	private int timeOffTypeInt;
+	private int burningMinsOn;
 
-		private int timeType;
-
-		TIMETYPE(int timeType) {
-			this.timeType = timeType;
-		}
-
-		public int getTimeType() {
-			return this.timeType;
-		}
-	}
-
-	// serverModel.findModelNode("SWDeviceGenericIO/CSLC.Clock", Fc.CF)
-	int indexNumber; // Temporarily pre-set because only the first one is implemented
-	int relayNr;
-	boolean enabled;
-	String description;
-	int dayInt;
-	// DAY day;
-	LocalTime timeOn;
-	int timeOnTypeInt;
-	// TIMETYPE timeOnType;
-	LocalTime timeOff;
-	int timeOffTypeInt;
-	// TIMETYPE timeOffType;
-	int burningMinsOn;
-	int beforeOffset; // Maximum of 150?
-	int afterOffset; // Maximum of 150?
+	// Maximum of 150 minutes for offsets, in GXF platform
+	private int beforeOffset;
+	private int afterOffset;
 
 	public Schedule(int indexNumber) {
 		// For empty schedule initialization, especially for test cases!
@@ -141,11 +208,18 @@ class Schedule {
 
 	@Override
 	public String toString() {
-		return "Schedule [indexNumber=" + this.indexNumber + ", enabled=" + this.enabled + ", description="
-				+ this.description + ", day=" + this.dayInt + ", timeOn=" + this.timeOn + ", timeOnType="
-				+ this.timeOnTypeInt + ", timeOff=" + this.timeOff + ", timeOffType=" + this.timeOffTypeInt
-				+ ", burningMinsOn=" + this.burningMinsOn + ", beforeOffset=" + this.beforeOffset + ", afterOffset="
-				+ this.afterOffset + "]";
+		// TODO: Making certain raw data better visualized towards users? AKA Day,
+		// timeOn/timeOff, their types etc.
+		StringBuilder scheduleStringBuilder = new StringBuilder();
+		scheduleStringBuilder.append("Schedule " + this.indexNumber + ":\n")
+				.append("Is it enabled? " + this.enabled + '\n').append("Description: " + this.description + '\n')
+				.append("Day: " + this.dayInt + '\n').append("Time On: " + this.timeOn + '\n')
+				.append("Time On type: " + this.timeOnTypeInt + '\n').append("Time Off: " + this.timeOffTypeInt + '\n')
+				.append("Burning Minutes On: " + this.burningMinsOn + '\n')
+				.append("Offset (Before): " + this.beforeOffset + '\n')
+				.append("Offset (After): " + this.afterOffset + '\n');
+
+		return scheduleStringBuilder.toString();
 	}
 
 	public int getIndexNumber() {
@@ -178,7 +252,6 @@ class Schedule {
 	}
 
 	public void setDescription(String description) {
-
 		this.description = description;
 	}
 
@@ -187,7 +260,6 @@ class Schedule {
 	}
 
 	public void setDayInt(int dayInt) {
-
 		this.dayInt = dayInt;
 	}
 

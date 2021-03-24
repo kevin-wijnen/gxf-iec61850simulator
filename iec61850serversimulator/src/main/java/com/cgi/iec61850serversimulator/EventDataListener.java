@@ -10,6 +10,8 @@ import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 
 import com.beanit.openiec61850.BasicDataAttribute;
 import com.beanit.openiec61850.BdaBoolean;
@@ -24,6 +26,8 @@ import com.beanit.openiec61850.ServerEventListener;
 import com.beanit.openiec61850.ServerSap;
 import com.beanit.openiec61850.ServiceError;
 
+//@Configuration
+@EnableScheduling
 class EventDataListener implements ServerEventListener {
 
 	private static final Logger logger = LoggerFactory.getLogger(EventDataListener.class);
@@ -31,13 +35,25 @@ class EventDataListener implements ServerEventListener {
 	private LocalDateTime currentTime = null;
 	private String syncPer;
 	private Device device = null;
+	private Scheduler scheduler;
 
 	// private OnzeScheduleScheduler scheduler;
 
-	public EventDataListener(final Device device) {
+	public Scheduler getScheduler() {
+		return this.scheduler;
+	}
+
+	public EventDataListener(final Device device, Scheduler scheduler) {
 		this.device = device;
+		this.scheduler = scheduler;
 
 		// OnzeScheduleScheduler scheduler = new ...;
+	}
+
+	// TODO: Make it Single Responsibility compliant > moving Cron Job over
+	@Scheduled(cron = "0 0 0 * * ?")
+	public void dailySwitchingMomentCalculation() {
+		this.scheduler.switchingMomentCalculation(this.device);
 	}
 
 	@Override
@@ -162,6 +178,7 @@ class EventDataListener implements ServerEventListener {
 						// OOP Class
 						this.device.getRelay(relayIndex).getSchedule(scheduleIndex)
 								.setEnabled(((BdaBoolean) bda).getValue());
+						modified = true;
 
 					} catch (final Exception e) {
 						logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
@@ -181,6 +198,7 @@ class EventDataListener implements ServerEventListener {
 							modified = true;
 							this.device.getRelay(relayIndex).getSchedule(scheduleIndex).setDayInt(newDay);
 						}
+						modified = true;
 					} catch (final Exception e) {
 						logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
 					}
@@ -198,6 +216,7 @@ class EventDataListener implements ServerEventListener {
 						int timeMinute = timeInt % 100;
 						LocalTime timeLocalTime = LocalTime.of(timeHour, timeMinute);
 						this.device.getRelay(relayIndex).getSchedule(scheduleIndex).setTimeOn(timeLocalTime);
+						modified = true;
 					} catch (final Exception e) {
 						logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
 					}
@@ -211,6 +230,7 @@ class EventDataListener implements ServerEventListener {
 					try {
 						this.device.getRelay(relayIndex).getSchedule(scheduleIndex)
 								.setTimeOnTypeInt(((BdaInt8) bda).getValue());
+						modified = true;
 					} catch (final Exception e) {
 						logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
 					}
@@ -228,6 +248,7 @@ class EventDataListener implements ServerEventListener {
 						int timeMinute = timeInt % 100;
 						LocalTime timeLocalTime = LocalTime.of(timeHour, timeMinute);
 						this.device.getRelay(relayIndex).getSchedule(scheduleIndex).setTimeOff(timeLocalTime);
+						modified = true;
 					} catch (final Exception e) {
 						logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
 					}
@@ -241,6 +262,7 @@ class EventDataListener implements ServerEventListener {
 					try {
 						this.device.getRelay(relayIndex).getSchedule(scheduleIndex)
 								.setTimeOffTypeInt(((BdaInt8) bda).getValue());
+						modified = true;
 					} catch (final Exception e) {
 						logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
 					}
@@ -254,6 +276,7 @@ class EventDataListener implements ServerEventListener {
 					try {
 						this.device.getRelay(relayIndex).getSchedule(scheduleIndex)
 								.setBurningMinsOn((short) ((BdaInt16U) bda).getValue());
+						modified = true;
 					} catch (final Exception e) {
 						logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
 					}
@@ -267,6 +290,7 @@ class EventDataListener implements ServerEventListener {
 					try {
 						this.device.getRelay(relayIndex).getSchedule(scheduleIndex)
 								.setBeforeOffset((short) ((BdaInt16U) bda).getValue());
+						modified = true;
 					} catch (final Exception e) {
 						logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
 					}
@@ -280,6 +304,7 @@ class EventDataListener implements ServerEventListener {
 					try {
 						this.device.getRelay(relayIndex).getSchedule(scheduleIndex)
 								.setAfterOffset((short) ((BdaInt16U) bda).getValue());
+						modified = true;
 					} catch (final Exception e) {
 						logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
 					}
@@ -310,12 +335,12 @@ class EventDataListener implements ServerEventListener {
 			logger.warn("Exception EventDataListener loop", e);
 		}
 
-		logger.info("**Printing device.");
+		logger.info("\n\n Received BDA data applied to data objects.");
 
 		// Flag for Schedule modifications
 		if (modified) {
-			// scheduler.scheduleSwitchingMomentCalculation(this.device);
-
+			logger.info("Schedules are modified! Calculate switching moments...");
+			this.scheduler.switchingMomentCalculation(this.device);
 		}
 
 		return null;
