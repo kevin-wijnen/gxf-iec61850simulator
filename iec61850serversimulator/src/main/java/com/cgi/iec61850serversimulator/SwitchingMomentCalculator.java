@@ -11,7 +11,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 public class SwitchingMomentCalculator {
 	// Steps:
 	// Accept device
@@ -19,35 +18,7 @@ public class SwitchingMomentCalculator {
 	// Checks on, off time and action type to create SwitchingMoments by assigning
 	// relay Number, TriggerTime and TriggerType
 
-	public List<SwitchingMoment> calculateSwitchingMoments(Device device) {
-		List<SwitchingMoment> switchingMoments = new ArrayList<SwitchingMoment>();
-		for (int i = 1; i <= 4; i++) {
-			Relay relay = device.getRelay(i);
-
-			for (int j = 1; j <= 50; j++) {
-				Schedule schedule = relay.getSchedule(j);
-				if (schedule.isEnabled())
-					try {
-						SwitchingMoment switchingMomentOn = this.calculateSwitchingMoment(i, schedule, true);
-						switchingMoments.add(switchingMomentOn);
-					} catch (Exception e) {
-						System.out.println("No Switching Moment for On action created...");
-						System.out.println(e.toString());
-					}
-
-				try {
-					SwitchingMoment switchingMomentOff = this.calculateSwitchingMoment(i, schedule, false);
-					switchingMoments.add(switchingMomentOff);
-				} catch (Exception e) {
-					System.out.println("No Switching Moment for Off action created...");
-					System.out.println(e.toString());
-
-				}
-
-			}
-		}
-		return switchingMoments;
-	}
+	private static final Logger logger = LoggerFactory.getLogger(SwitchingMomentCalculator.class);
 
 	public List<SwitchingMoment> calculateSwitchingMoments(Device device) throws SwitchingMomentCalculationException {
 		List<SwitchingMoment> switchingMoments = new ArrayList<>();
@@ -214,4 +185,3 @@ public class SwitchingMomentCalculator {
 		return actualSwitchingMoment;
 	}
 }
-
