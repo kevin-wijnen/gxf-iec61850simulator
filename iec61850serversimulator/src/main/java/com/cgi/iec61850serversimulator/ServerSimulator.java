@@ -62,8 +62,8 @@ public class ServerSimulator {
 		try {
 			cliParser.parseArguments(args);
 		} catch (final CliParseException e1) {
-			System.err.println("Error parsing command line parameters: " + e1.getMessage());
-			System.out.println(cliParser.getUsageString());
+			logger.error("Error parsing command line parameters: " + e1.getMessage());
+			logger.info(cliParser.getUsageString());
 			System.exit(1);
 		}
 
@@ -93,11 +93,11 @@ public class ServerSimulator {
 		// Initializing Scheduler related components
 		final ScheduledExecutorService localExecutor = Executors.newSingleThreadScheduledExecutor();
 		final TaskScheduler taskScheduler = new ConcurrentTaskScheduler(localExecutor);
-		final Scheduler scheduler = new Scheduler();
 
 		// Device initialization by copying from serverModel
 		final ServerWrapper serverWrapper = new ServerWrapper(serverSap);
 		final Device device = new Device();
+		final Scheduler scheduler = new Scheduler();
 		device.initalizeDevice(serverWrapper);
 
 		logger.info("SERVER START LISTENING");

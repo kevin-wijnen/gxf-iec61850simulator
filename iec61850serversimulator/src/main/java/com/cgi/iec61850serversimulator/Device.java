@@ -38,7 +38,7 @@ class Device {
 
 		logger.info("** Printing relays.\n");
 		for (int relayNr = 0; relayNr < 4; relayNr++) {
-			this.relays[relayNr].toString();
+			logger.info(this.relays[relayNr].toString());
 			for (int scheduleNr = 1; scheduleNr <= 50; scheduleNr++) {
 				logger.info("Schedule {}: {}", scheduleNr, this.getRelay(relayNr + 1).getSchedule(scheduleNr));
 			}
@@ -49,21 +49,23 @@ class Device {
 	public String toString() {
 		final StringBuilder deviceStringBuilder = new StringBuilder();
 
-		deviceStringBuilder.append("** Printing device:\n\n");
-		deviceStringBuilder.append(this.clock.toString() + "\n\n");
+		deviceStringBuilder.append("** Printing device:").append(System.lineSeparator()).append(System.lineSeparator());
+		deviceStringBuilder.append(this.clock.toString()).append(System.lineSeparator()).append(System.lineSeparator());
 
-		deviceStringBuilder.append("** Printing relays:\n");
+		deviceStringBuilder.append("** Printing relays:").append(System.lineSeparator());
 
 		for (int relayNr = 0; relayNr < 4; relayNr++) {
-			deviceStringBuilder.append(this.relays[relayNr].toString() + '\n').append("Enabled schedules: \n\n");
+			deviceStringBuilder.append(this.relays[relayNr].toString()).append(System.lineSeparator())
+					.append("Enabled schedules: ").append(System.lineSeparator()).append(System.lineSeparator());
 			for (int scheduleNr = 1; scheduleNr <= 50; scheduleNr++) {
-				if (this.getRelay(relayNr + 1).getSchedule(scheduleNr).enabled) {
-					deviceStringBuilder.append(this.getRelay(relayNr + 1).getSchedule(scheduleNr)).append('\n');
+				if (this.getRelay(relayNr + 1).getSchedule(scheduleNr).isEnabled()) {
+					deviceStringBuilder.append(this.getRelay(relayNr + 1).getSchedule(scheduleNr))
+							.append(System.lineSeparator());
 				}
 			}
-			deviceStringBuilder.append('\n');
+			deviceStringBuilder.append(System.lineSeparator());
 		}
-		deviceStringBuilder.append('\n');
+		deviceStringBuilder.append(System.lineSeparator());
 		return deviceStringBuilder.toString();
 	}
 

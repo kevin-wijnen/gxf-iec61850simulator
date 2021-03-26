@@ -39,6 +39,8 @@ public class ActionExecutor implements ActionListener {
 
 			case DEVICE_SHOW_MODEL:
 				logger.info(this.device.toString());
+
+				break;
 			}
 		} catch (final Exception e) {
 			throw new ActionException(e);

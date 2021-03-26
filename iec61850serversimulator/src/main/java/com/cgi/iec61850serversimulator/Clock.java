@@ -35,7 +35,7 @@ public class Clock {
 	short deviationDST;
 	boolean enableDST;
 	boolean enableNTP;
-	// If multiple IP addresses are in use, use ; to separate them
+	// If multiple IP addresses are in use, use ";" to separate them
 	String ipAddressNTP;
 	// In minutes, regarding synchronizing time with the
 	// NTP server
