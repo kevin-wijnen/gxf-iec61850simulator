@@ -109,6 +109,7 @@ public class ServerSimulator {
 			edl.getScheduler().calculateTasks(device);
 		} catch (Exception e) {
 			logger.info("Initial switching moment calculation failed, try sending another schedule.");
+			e.printStackTrace();
 		}
 		final ActionProcessor actionProcessor = new ActionProcessor(new ActionExecutor(serverSap, serverModel, device));
 		actionProcessor.addAction(new Action(PRINT_SERVER_MODEL_KEY, PRINT_SERVER_MODEL_KEY_DESCRIPTION));

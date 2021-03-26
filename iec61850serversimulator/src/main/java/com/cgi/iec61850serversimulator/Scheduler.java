@@ -1,6 +1,7 @@
 package com.cgi.iec61850serversimulator;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledFuture;
@@ -29,7 +30,12 @@ public class Scheduler {
 		// switching moments
 		executor.setRemoveOnCancelPolicy(true);
 		this.timeCalculator = new TimeCalculator();
-		device = this.device;
+		this.switchingMomentCalculator = new SwitchingMomentCalculator();
+		this.device = device;
+		this.executor = executor;
+
+		List<ScheduledFuture<?>> scheduledFutures = new ArrayList<ScheduledFuture<?>>();
+		this.scheduledFutures = scheduledFutures;
 	}
 
 	// Base it on feature/example-scheduling code! Triggering at certain
@@ -46,7 +52,9 @@ public class Scheduler {
 		// Steps:
 		// Calculate the SwitchingMoments by the Calculator
 		// Use schedulingTasks to schedule them
+		logger.info("Creating switching moments out of schedules...");
 		List<SwitchingMoment> switchingMoments = this.switchingMomentCalculator.returnSwitchingMoments(device);
+		logger.info("Switching moments created! Scheduling switching moments...");
 		this.schedulingTasks(switchingMoments);
 	}
 
@@ -64,14 +72,15 @@ public class Scheduler {
 			int relayNr = switchingMoment.getRelayNr();
 			if (switchingMoment.isTriggerAction()) {
 				Runnable runOn = this.onRunnableCreator(relayNr);
-				this.executor.schedule(runOn, relativeTime, TimeUnit.SECONDS);
+				this.scheduledFutures.add(this.executor.schedule(runOn, relativeTime, TimeUnit.SECONDS));
+				logger.info("Switching Moment for On action created! Relative time: {} ", relativeTime);
 			} else {
 				Runnable runOff = this.offRunnableCreator(relayNr);
-				this.executor.schedule(runOff, relativeTime, TimeUnit.SECONDS);
+				this.scheduledFutures.add(this.executor.schedule(runOff, relativeTime, TimeUnit.SECONDS));
+				logger.info("Switching Moment for Off action created! Relative time: {} ", relativeTime);
 			}
-
 		}
-
+		logger.info("Schedules planned!");
 	}
 
 	// Runnable to turn on relay light
