@@ -97,7 +97,7 @@ public class ServerSimulator {
 		// Device initialization by copying from serverModel
 		final ServerWrapper serverWrapper = new ServerWrapper(serverSap);
 		final Device device = new Device();
-		final Scheduler scheduler = new Scheduler();
+		final Scheduler scheduler = new Scheduler(device);
 		device.initalizeDevice(serverWrapper);
 
 		logger.info("SERVER START LISTENING");
@@ -106,7 +106,7 @@ public class ServerSimulator {
 
 		// Initial schedule
 		try {
-			edl.getScheduler().switchingMomentCalculation(device);
+			edl.getScheduler().calculateTasks(device);
 		} catch (Exception e) {
 			logger.info("Initial switching moment calculation failed, try sending another schedule.");
 		}

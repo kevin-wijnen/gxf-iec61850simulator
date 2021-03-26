@@ -46,7 +46,6 @@ public class Scheduler {
 		// Steps:
 		// Calculate the SwitchingMoments by the Calculator
 		// Use schedulingTasks to schedule them
-		this.futureCheck(this.scheduledFutures);
 		List<SwitchingMoment> switchingMoments = this.switchingMomentCalculator.returnSwitchingMoments(device);
 		this.schedulingTasks(switchingMoments);
 	}
@@ -56,7 +55,7 @@ public class Scheduler {
 		// it.
 		// Calculate relative time for each task
 		// Schedule it, with future put into list
-		this.futureCheck(this.scheduledFutures);
+		this.clearFuture(this.scheduledFutures);
 		for (int i = 0; i < switchingMoments.size(); i++) {
 			SwitchingMoment switchingMoment = switchingMoments.get(i);
 			LocalDateTime currentTime = LocalDateTime.now();
@@ -66,7 +65,7 @@ public class Scheduler {
 			if (switchingMoment.isTriggerAction()) {
 				Runnable runOn = this.onRunnableCreator(relayNr);
 				this.executor.schedule(runOn, relativeTime, TimeUnit.SECONDS);
-			} else if (!switchingMoment.isTriggerAction()) {
+			} else {
 				Runnable runOff = this.offRunnableCreator(relayNr);
 				this.executor.schedule(runOff, relativeTime, TimeUnit.SECONDS);
 			}
@@ -97,7 +96,7 @@ public class Scheduler {
 		return offRun;
 	}
 
-	private void futureCheck(List<ScheduledFuture<?>> scheduledFutures) {
+	private void clearFuture(List<ScheduledFuture<?>> scheduledFutures) {
 		if (!scheduledFutures.isEmpty()) {
 			for (int i = 0; i < scheduledFutures.size(); i++) {
 				ScheduledFuture<?> future = scheduledFutures.get(i);

@@ -10,8 +10,6 @@ import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
 
 import com.beanit.openiec61850.BasicDataAttribute;
 import com.beanit.openiec61850.BdaBoolean;
@@ -333,7 +331,12 @@ class EventDataListener implements ServerEventListener {
 		// Flag for Schedule modifications
 		if (modified) {
 			logger.info("Schedules are modified! Calculate switching moments...");
-			this.scheduler.switchingMomentCalculation(this.device);
+			try {
+				this.scheduler.calculateTasks(this.device);
+			} catch (SwitchingMomentCalculationException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 
 		return null;
