@@ -4,11 +4,10 @@ import java.time.Duration;
 import java.time.LocalDateTime;
 
 public class TimeCalculator {
-	public int calculateRelativeTime(SwitchingMoment switchingMoment, LocalDateTime scheduledTime) {
-		LocalDateTime triggerTime = switchingMoment.getTriggerTime();
-		Duration relativeTime = Duration.between(scheduledTime, triggerTime);
+    public static int calculateSecondsUntil(LocalDateTime from, LocalDateTime until) {
+        Duration relativeTime = Duration.between(until, from);
 
-		return (int) relativeTime.getSeconds();
+        return (int) relativeTime.getSeconds();
 
-	}
+    }
 }

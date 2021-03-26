@@ -330,12 +330,11 @@ class EventDataListener implements ServerEventListener {
 
 		// Flag for Schedule modifications
 		if (modified) {
-			logger.info("Schedules are modified! Calculate switching moments...");
+			logger.warn("Schedules are modified! Calculate switching moments...");
 			try {
 				this.scheduler.calculateTasks(this.device);
 			} catch (SwitchingMomentCalculationException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+				logger.warn("SwitchingMomentCalculationException: ", e);
 			}
 		}
 
