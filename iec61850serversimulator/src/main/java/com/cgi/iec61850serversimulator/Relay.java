@@ -65,8 +65,8 @@ class Relay {
 
 		this.schedules = new Schedule[50];
 		for (int scheduleNr = 0; scheduleNr < 50; scheduleNr++) {
-			scheduleInfo = this.serverWrapper
-					.findModelNode(SWITCH_ROOT + (relayNr + 1) + ".Sche.sche" + (scheduleNr + 1), Fc.CF);
+			scheduleInfo = this.serverWrapper.findModelNode(SWITCH_ROOT + (relayNr) + ".Sche.sche" + (scheduleNr + 1),
+					Fc.CF);
 			this.schedules[scheduleNr] = new Schedule(scheduleInfo, scheduleNr, relayNr);
 		}
 	}
