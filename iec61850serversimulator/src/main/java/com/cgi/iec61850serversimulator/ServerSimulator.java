@@ -3,15 +3,11 @@ package com.cgi.iec61850serversimulator;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.scheduling.TaskScheduler;
-import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 
 import com.beanit.openiec61850.SclParseException;
 import com.beanit.openiec61850.SclParser;
@@ -90,10 +86,6 @@ public class ServerSimulator {
         serverModel = serverSap.getModelCopy();
         logger.debug("Model copy done!");
 
-        // Initializing Scheduler related components
-        final ScheduledExecutorService localExecutor = Executors.newSingleThreadScheduledExecutor();
-        final TaskScheduler taskScheduler = new ConcurrentTaskScheduler(localExecutor);
-
         // Device initialization by copying from serverModel
         final ServerWrapper serverWrapper = new ServerWrapper(serverSap);
         final Device device = new Device();
@@ -106,7 +98,7 @@ public class ServerSimulator {
 
         // Initial schedule
         try {
-            edl.getScheduler().calculateTasks(device);
+            scheduler.calculateTasks(device);
         } catch (Exception e) {
             logger.warn("Initial switching moment calculation failed, try sending another schedule.", e);
         }
