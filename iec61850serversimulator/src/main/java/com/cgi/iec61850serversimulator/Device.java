@@ -79,7 +79,8 @@ class Device {
 		for (int relayNr = 0; relayNr < 4; relayNr++) {
 			this.relays[relayNr] = new Relay(
 					this.serverWrapper.findModelNode(SWITCH_ROOT + (relayNr + 1) + ".Pos", Fc.CO),
-					this.serverWrapper.findModelNode(SWITCH_ROOT + (relayNr + 1) + ".Sche.sche1", Fc.CF));
+					this.serverWrapper.findModelNode(SWITCH_ROOT + (relayNr + 1) + ".Sche.sche1", Fc.CF),
+					this.serverWrapper);
 			this.enableSwitching(relayNr + 1);
 		}
 	}

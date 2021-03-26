@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory;
 
 import com.beanit.openiec61850.BasicDataAttribute;
 import com.beanit.openiec61850.BdaBoolean;
+import com.beanit.openiec61850.Fc;
 import com.beanit.openiec61850.ModelNode;
 
 /**
@@ -26,10 +27,11 @@ class Relay {
 
 	private ServerWrapper serverWrapper;
 
-	public Relay(ModelNode relayInfo, ModelNode scheduleInfo) {
+	public Relay(ModelNode relayInfo, ModelNode scheduleInfo, ServerWrapper serverSapWrapper) {
 
 		this.indexNumber = Integer.parseInt(relayInfo.getReference().toString().substring(22, 23));
 		this.scheduleInfo = scheduleInfo;
+		this.serverWrapper = serverSapWrapper;
 		List<BasicDataAttribute> bdas = relayInfo.getBasicDataAttributes();
 
 		for (BasicDataAttribute bda : bdas) {
@@ -59,8 +61,12 @@ class Relay {
 	}
 
 	public void initializeSchedules(ModelNode scheduleInfo, int relayNr) {
+		String SWITCH_ROOT = "SWDeviceGenericIO/XSWC";
+
 		this.schedules = new Schedule[50];
 		for (int scheduleNr = 0; scheduleNr < 50; scheduleNr++) {
+			scheduleInfo = this.serverWrapper
+					.findModelNode(SWITCH_ROOT + (relayNr + 1) + ".Sche.sche" + (scheduleNr + 1), Fc.CF);
 			this.schedules[scheduleNr] = new Schedule(scheduleInfo, scheduleNr, relayNr);
 		}
 	}
