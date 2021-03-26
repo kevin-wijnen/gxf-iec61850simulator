@@ -18,6 +18,7 @@ public class Scheduler {
 	private ScheduledThreadPoolExecutor executor;
 	private List<ScheduledFuture<?>> scheduledFutures;
 	private TimeCalculator timeCalculator;
+	private SwitchingMomentCalculator switchingMomentCalculator;
 	private static final Logger logger = LoggerFactory.getLogger(Scheduler.class);
 	private Device device;
 
@@ -41,6 +42,15 @@ public class Scheduler {
 	// Scheduling said tasks by calculating the relative time and using said
 	// relative time to set the task with ScheduledExecutorService from Java
 
+	public void calculateTasks(Device device) throws SwitchingMomentCalculationException {
+		// Steps:
+		// Calculate the SwitchingMoments by the Calculator
+		// Use schedulingTasks to schedule them
+		this.futureCheck(this.scheduledFutures);
+		List<SwitchingMoment> switchingMoments = this.switchingMomentCalculator.returnSwitchingMoments(device);
+		this.schedulingTasks(switchingMoments);
+	}
+
 	public void schedulingTasks(List<SwitchingMoment> switchingMoments) {
 		// Check future if it is empty. If it is not empty, then cancel > purge > clear
 		// it.
@@ -63,33 +73,6 @@ public class Scheduler {
 
 		}
 
-	}
-
-	public void switchingMomentCalculation(final Device device) {
-		logger.info("Switching moment calculation feature yet to implement.");
-
-		// Done in branch feature-78, with the SwitchingMomentCalculator class
-
-		/* @formatter:off
-		 * TODO: Switching moment calculation using schedules from device...
-		 *
-		 * Steps:
-		 * - Reading schedules from device's relays
-		 * - Determine from each schedule which switching moments are valid ((TimeOff - TimeOn) > burningMins);
-		 * - Either add converted relative time, or Switching Moment objects to array;
-		 * - (Use switchingMomentRelativeTimeConversion to convert from Switching Moment object
-		 * 	 to relative time;)
-		 * - Use relative times to schedule tasks (using ScheduledExecutorService
-		 *   or different process?)
-		 * @formatter:on
-		 */
-	}
-
-	public void switchingMomentRelativeTimeConversion() {
-		// TODO: Switching moment --> relative time conversion for scheduled trigger
-		// actions
-
-		// Done by TimeCalculator.calculateRelativeTime instead
 	}
 
 	// Runnable to turn on relay light

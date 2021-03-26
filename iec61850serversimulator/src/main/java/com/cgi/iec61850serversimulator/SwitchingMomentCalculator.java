@@ -20,7 +20,7 @@ public class SwitchingMomentCalculator {
 
 	private static final Logger logger = LoggerFactory.getLogger(SwitchingMomentCalculator.class);
 
-	public List<SwitchingMoment> calculateSwitchingMoments(Device device) throws SwitchingMomentCalculationException {
+	public List<SwitchingMoment> returnSwitchingMoments(Device device) throws SwitchingMomentCalculationException {
 		List<SwitchingMoment> switchingMoments = new ArrayList<>();
 		// Calculating switching moments for today and tomorrow
 		LocalDateTime now = LocalDateTime.now();
