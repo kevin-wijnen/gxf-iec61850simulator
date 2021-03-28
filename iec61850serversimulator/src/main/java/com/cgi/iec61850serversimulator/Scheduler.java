@@ -18,24 +18,19 @@ public class Scheduler {
 
     private ScheduledThreadPoolExecutor executor;
     private List<ScheduledFuture<?>> scheduledFutures;
-    private TimeCalculator timeCalculator;
     private SwitchingMomentCalculator switchingMomentCalculator;
     private static final Logger logger = LoggerFactory.getLogger(Scheduler.class);
     private Device device;
 
     public Scheduler(Device device) {
-        ScheduledThreadPoolExecutor executor = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(1);
+        this.executor = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(1);
 
         // Should remove cancelled futures, still included .purge when calculating new
         // switching moments
-        executor.setRemoveOnCancelPolicy(true);
-        this.timeCalculator = new TimeCalculator();
+        this.executor.setRemoveOnCancelPolicy(true);
         this.switchingMomentCalculator = new SwitchingMomentCalculator();
         this.device = device;
-        this.executor = executor;
-
-        List<ScheduledFuture<?>> scheduledFutures = new ArrayList<ScheduledFuture<?>>();
-        this.scheduledFutures = scheduledFutures;
+        this.scheduledFutures = new ArrayList<ScheduledFuture<?>>();
     }
 
     // Base it on feature/example-scheduling code! Triggering at certain
@@ -63,12 +58,12 @@ public class Scheduler {
         // it.
         // Calculate relative time for each task
         // Schedule it, with future put into list
-        this.clearFuture(this.scheduledFutures);
+        this.clearScheduledSwitchingMoments(this.scheduledFutures);
         for (int i = 0; i < switchingMoments.size(); i++) {
             SwitchingMoment switchingMoment = switchingMoments.get(i);
             LocalDateTime currentTime = LocalDateTime.now();
             // Calculate relative time
-            int relativeTime = this.timeCalculator.calculateSecondsUntil(switchingMoment.getTriggerTime(), currentTime);
+            int relativeTime = TimeCalculator.calculateSecondsUntil(currentTime, switchingMoment.getTriggerTime());
             int relayNr = switchingMoment.getRelayNr();
             if (switchingMoment.isTriggerAction()) {
                 Runnable runOn = this.onRunnableCreator(relayNr);
@@ -105,15 +100,15 @@ public class Scheduler {
         return offRun;
     }
 
-    private void clearFuture(List<ScheduledFuture<?>> scheduledFutures) {
-        if (!scheduledFutures.isEmpty()) {
-            for (int i = 0; i < scheduledFutures.size(); i++) {
-                ScheduledFuture<?> future = scheduledFutures.get(i);
+    private void clearScheduledSwitchingMoments(List<ScheduledFuture<?>> scheduledSwitchingMoments) {
+        if (!scheduledSwitchingMoments.isEmpty()) {
+            for (int i = 0; i < scheduledSwitchingMoments.size(); i++) {
+                ScheduledFuture<?> future = scheduledSwitchingMoments.get(i);
                 if (!future.isDone()) {
                     future.cancel(true);
                 }
             }
-            scheduledFutures.clear();
+            scheduledSwitchingMoments.clear();
             // To prevent memory leak: Purging executor's queue
             this.executor.purge();
         }

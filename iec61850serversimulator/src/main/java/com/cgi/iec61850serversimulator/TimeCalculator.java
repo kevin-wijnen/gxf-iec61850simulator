@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 
 public class TimeCalculator {
     public static int calculateSecondsUntil(LocalDateTime from, LocalDateTime until) {
-        Duration relativeTime = Duration.between(until, from);
+        Duration relativeTime = Duration.between(from, until);
 
         return (int) relativeTime.getSeconds();
 

@@ -10,31 +10,28 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.cgi.iec61850serversimulator.Schedule.ScheduleBuilder;
 
-class SwitchingMomentCalculatorTest {
-    /**
-     * JUnit test class which tests the various related functions of the
-     * SwitchingMomentCalculator class.
-     *
-     * This includes unique functions for mocking a relay and schedule.
-     *
-     * Tests include:
-     * <ul>
-     * <li>Checking the mocked relay
-     * <li>Checking the mocked schedule
-     * <li>Checking the generated Switching Moment made out of a mocked relay
-     * and schedule
-     * </ul>
-     */
+/**
+ * JUnit test class which tests the various related functions of the
+ * SwitchingMomentCalculator class.
+ *
+ * This includes unique functions for mocking a relay and schedule.
+ *
+ * Tests include:
+ * <ul>
+ * <li>Checking the mocked relay
+ * <li>Checking the mocked schedule
+ * <li>Checking the generated Switching Moment made out of a mocked relay and
+ * schedule
+ * </ul>
+ */
 
-    private static final Logger logger = LoggerFactory.getLogger(SwitchingMomentCalculatorTest.class);
+class SwitchingMomentCalculatorTest {
 
     // Initializing test Device
-    Device device = new Device();
+    private Device device = new Device();
 
     @Test
     public void checkMockRelay() {
@@ -60,11 +57,6 @@ class SwitchingMomentCalculatorTest {
         final boolean enabled = true;
 
         final Schedule schedule = this.builderForDefaultSchedule(scheduleNr).buildSchedule();
-
-        // Schedule schedule = this.getMockSchedule(scheduleNr - 1, relayNr,
-        // dayInt,
-        // fixedTimeInt, fixedTimeOn,
-        // fixedTimeOff, timeOn, timeOff, burningMinutes);
 
         assertEquals(scheduleNr, schedule.getIndexNumber());
         assertEquals(relayNr, schedule.getRelayNr());
@@ -111,16 +103,12 @@ class SwitchingMomentCalculatorTest {
         assertEquals(expectedAfterLunchTime, actualSwitchingMomentOff.getTriggerTime());
         assertFalse(actualSwitchingMomentOff.isTriggerAction());
 
-        final LocalDateTime expectedNextLunchTime = LocalDateTime.now()
-                .plusDays(1)
-                .truncatedTo(ChronoUnit.HOURS)
+        final LocalDateTime expectedNextLunchTime = LocalDateTime.now().plusDays(1).truncatedTo(ChronoUnit.HOURS)
                 .withHour(12);
         assertEquals(expectedNextLunchTime, actualSwitchingMomentNextDayOn.getTriggerTime());
         assertTrue(actualSwitchingMomentOn.isTriggerAction());
 
-        final LocalDateTime expectedNextAfterLunchTime = LocalDateTime.now()
-                .plusDays(1)
-                .truncatedTo(ChronoUnit.HOURS)
+        final LocalDateTime expectedNextAfterLunchTime = LocalDateTime.now().plusDays(1).truncatedTo(ChronoUnit.HOURS)
                 .withHour(13);
         assertEquals(expectedNextAfterLunchTime, actualSwitchingMomentNextDayOff.getTriggerTime());
         assertFalse(actualSwitchingMomentOff.isTriggerAction());
@@ -160,33 +148,23 @@ class SwitchingMomentCalculatorTest {
         final SwitchingMoment actualSwitchingMomentNextDayOn = switchingMoments.get(1);
         final SwitchingMoment actualSwitchingMomentNextDayOff = switchingMoments.get(3);
 
-        final LocalDateTime expectedTime = LocalDateTime.now()
-                .truncatedTo(ChronoUnit.MINUTES)
-                .withHour(timeOn.getHour())
-                .withMinute(timeOn.getMinute());
+        final LocalDateTime expectedTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES)
+                .withHour(timeOn.getHour()).withMinute(timeOn.getMinute());
         assertEquals(expectedTime, actualSwitchingMomentOn.getTriggerTime());
         assertTrue(actualSwitchingMomentOn.isTriggerAction());
 
-        final LocalDateTime expectedAfterTime = LocalDateTime.now()
-                .truncatedTo(ChronoUnit.MINUTES)
-                .withHour(timeOff.getHour())
-                .withMinute(timeOff.getMinute());
+        final LocalDateTime expectedAfterTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES)
+                .withHour(timeOff.getHour()).withMinute(timeOff.getMinute());
         assertEquals(expectedAfterTime, actualSwitchingMomentOff.getTriggerTime());
         assertFalse(actualSwitchingMomentOff.isTriggerAction());
 
-        final LocalDateTime expectedNextTime = LocalDateTime.now()
-                .plusDays(1)
-                .truncatedTo(ChronoUnit.MINUTES)
-                .withHour(timeOn.getHour())
-                .withMinute(timeOn.getMinute());
+        final LocalDateTime expectedNextTime = LocalDateTime.now().plusDays(1).truncatedTo(ChronoUnit.MINUTES)
+                .withHour(timeOn.getHour()).withMinute(timeOn.getMinute());
         assertEquals(expectedNextTime, actualSwitchingMomentNextDayOn.getTriggerTime());
         assertTrue(actualSwitchingMomentOn.isTriggerAction());
 
-        final LocalDateTime expectedNextAfterTime = LocalDateTime.now()
-                .plusDays(1)
-                .truncatedTo(ChronoUnit.MINUTES)
-                .withHour(timeOff.getHour())
-                .withMinute(timeOff.getMinute());
+        final LocalDateTime expectedNextAfterTime = LocalDateTime.now().plusDays(1).truncatedTo(ChronoUnit.MINUTES)
+                .withHour(timeOff.getHour()).withMinute(timeOff.getMinute());
         assertEquals(expectedNextAfterTime, actualSwitchingMomentNextDayOff.getTriggerTime());
         assertFalse(actualSwitchingMomentOff.isTriggerAction());
 
@@ -239,15 +217,9 @@ class SwitchingMomentCalculatorTest {
         final int burningMinutes = 30;
         final boolean enabled = true;
 
-        return new ScheduleBuilder(scheduleNr - 1).relayNr(relayNr)
-                .dayInt(dayInt)
-                .fixedTimeInt(fixedTimeInt)
-                .fixedTimeOn(fixedTimeOn)
-                .fixedTimeOff(fixedTimeOff)
-                .timeOn(timeOn)
-                .timeOff(timeOff)
-                .burningMins(burningMinutes)
-                .isEnabled(enabled);
+        return new ScheduleBuilder(scheduleNr - 1).relayNr(relayNr).dayInt(dayInt).fixedTimeInt(fixedTimeInt)
+                .fixedTimeOn(fixedTimeOn).fixedTimeOff(fixedTimeOff).timeOn(timeOn).timeOff(timeOff)
+                .burningMins(burningMinutes).isEnabled(enabled);
 
     }
 
