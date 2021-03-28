@@ -1,10 +1,6 @@
-
 package com.cgi.iec61850serversimulator;
 
 import java.time.LocalDateTime;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Class which represents a switching moment (a scheduled action based on a list
@@ -28,45 +24,43 @@ import org.slf4j.LoggerFactory;
 
 public class SwitchingMoment {
 
-	// TODO Use the class for switching moment calculations and:
-	// - have the objects in an array before conversion to relative time
-	// - put said relative time to use when creating scheduled tasks (using
-	// ScheduledExecutorService?)
+    // TODO Use the class for switching moment calculations and:
+    // - have the objects in an array before conversion to relative time
+    // - put said relative time to use when creating scheduled tasks (using
+    // ScheduledExecutorService?)
 
-	private static final Logger logger = LoggerFactory.getLogger(SwitchingMoment.class);
+    private int relayNr;
+    private LocalDateTime triggerTime;
+    private boolean triggerAction;
 
-	private int relayNr;
-	private LocalDateTime triggerTime;
-	private boolean triggerAction;
+    SwitchingMoment(int relayNr, LocalDateTime triggerTime, boolean triggerAction) {
+        this.relayNr = relayNr;
+        this.triggerTime = triggerTime;
+        this.triggerAction = triggerAction;
+    }
 
-	SwitchingMoment(int relayNr, LocalDateTime triggerTime, boolean triggerAction) {
-		this.relayNr = relayNr;
-		this.triggerTime = triggerTime;
-		this.triggerAction = triggerAction;
-	}
+    public int getRelayNr() {
+        return this.relayNr;
+    }
 
-	public int getRelayNr() {
-		return this.relayNr;
-	}
+    public void setRelayNr(int relayNr) {
+        this.relayNr = relayNr;
+    }
 
-	public void setRelayNr(int relayNr) {
-		this.relayNr = relayNr;
-	}
+    public LocalDateTime getTriggerTime() {
+        return this.triggerTime;
+    }
 
-	public LocalDateTime getTriggerTime() {
-		return this.triggerTime;
-	}
+    public void setTriggerTime(LocalDateTime triggerTime) {
+        this.triggerTime = triggerTime;
+    }
 
-	public void setTriggerTime(LocalDateTime triggerTime) {
-		this.triggerTime = triggerTime;
-	}
+    public boolean isTriggerAction() {
+        return this.triggerAction;
+    }
 
-	public boolean isTriggerAction() {
-		return this.triggerAction;
-	}
-
-	public void setTriggerAction(boolean triggerAction) {
-		this.triggerAction = triggerAction;
-	}
+    public void setTriggerAction(boolean triggerAction) {
+        this.triggerAction = triggerAction;
+    }
 
 }

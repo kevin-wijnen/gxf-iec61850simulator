@@ -1,7 +1,12 @@
 package com.cgi.iec61850serversimulator;
 
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,78 +15,102 @@ import org.slf4j.LoggerFactory;
  * Class which schedules autonomous switching moments for future activation.
  */
 public class Scheduler {
-	// Base it on feature/example-scheduling code! Triggering at certain
-	// times instead of a continuous check!
 
-	// TODO: Build switching moment calculation functionality
-	// Read schedules from device's relays (1 * 4 * 50)
-	// Checks on and off times along with burning minutes to see which switching
-	// moments should be made for X hours
-	// Scheduling said tasks by calculating the relative time and using said
-	// relative time to set the task with ScheduledExecutorService from Java
+    private ScheduledThreadPoolExecutor executor;
+    private List<ScheduledFuture<?>> scheduledFutures;
+    private SwitchingMomentCalculator switchingMomentCalculator;
+    private static final Logger logger = LoggerFactory.getLogger(Scheduler.class);
+    private Device device;
 
-	private static final Logger logger = LoggerFactory.getLogger(Scheduler.class);
+    public Scheduler(Device device) {
+        this.executor = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(1);
 
-	ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
-	// Callables declareren ivm ScheduledFuture
-	// Of toch runnables?
+        // Should remove cancelled futures, still included .purge when calculating new
+        // switching moments
+        this.executor.setRemoveOnCancelPolicy(true);
+        this.switchingMomentCalculator = new SwitchingMomentCalculator();
+        this.device = device;
+        this.scheduledFutures = new ArrayList<ScheduledFuture<?>>();
+    }
 
-	// private TaskScheduler switchingMomentScheduler;
-	// private ScheduledFuture<?> future;
+    // Base it on feature/example-scheduling code! Triggering at certain
+    // times instead of a continuous check!
 
-	/*
-	 * public ScheduledFuture<?> getFuture() { return this.future; }
-	 *
-	 * public void setFuture(ScheduledFuture<?> future) { this.future = future; }
-	 *
-	 * public Scheduler(final TaskScheduler scheduler) {
-	 * this.switchingMomentScheduler = scheduler; }
-	 */
+    // TODO: Build switching moment calculation functionality
+    // Read schedules from device's relays (1 * 4 * 50)
+    // Checks on and off times along with burning minutes to see which switching
+    // moments should be made for X hours
+    // Scheduling said tasks by calculating the relative time and using said
+    // relative time to set the task with ScheduledExecutorService from Java
 
-	public void switchingMomentCalculation(final Device device) {
-		logger.info("Switching moment calculation feature yet to implement.");
+    public void calculateTasks(Device device) throws SwitchingMomentCalculationException {
+        // Steps:
+        // Calculate the SwitchingMoments by the Calculator
+        // Use schedulingTasks to schedule them
+        logger.info("Creating switching moments out of schedules...");
+        List<SwitchingMoment> switchingMoments = this.switchingMomentCalculator.returnSwitchingMoments(device);
+        logger.info("Switching moments created! Scheduling switching moments...");
+        this.schedulingTasks(switchingMoments);
+    }
 
-		/* @formatter:off
-		 * TODO: Switching moment calculation using schedules from device...
-		 *
-		 * Steps:
-		 * - Reading schedules from device's relays
-		 * - Determine from each schedule which switching moments are valid ((TimeOff - TimeOn) > burningMins);
-		 * - Either add converted relative time, or Switching Moment objects to array;
-		 * - (Use switchingMomentRelativeTimeConversion to convert from Switching Moment object
-		 * 	 to relative time;)
-		 * - Use relative times to schedule tasks (using ScheduledExecutorService
-		 *   or different process?)
-		 * @formatter:on
-		 */
-	}
+    public void schedulingTasks(List<SwitchingMoment> switchingMoments) {
+        // Check future if it is empty. If it is not empty, then cancel > purge > clear
+        // it.
+        // Calculate relative time for each task
+        // Schedule it, with future put into list
+        this.clearScheduledSwitchingMoments(this.scheduledFutures);
+        for (int i = 0; i < switchingMoments.size(); i++) {
+            SwitchingMoment switchingMoment = switchingMoments.get(i);
+            LocalDateTime currentTime = LocalDateTime.now();
+            // Calculate relative time
+            int relativeTime = TimeCalculator.calculateSecondsUntil(currentTime, switchingMoment.getTriggerTime());
+            int relayNr = switchingMoment.getRelayNr();
+            if (switchingMoment.isTriggerAction()) {
+                Runnable runOn = this.onRunnableCreator(relayNr);
+                this.scheduledFutures.add(this.executor.schedule(runOn, relativeTime, TimeUnit.SECONDS));
+                logger.info("Switching Moment for On action created! Relative time: {} ", relativeTime);
+            } else {
+                Runnable runOff = this.offRunnableCreator(relayNr);
+                this.scheduledFutures.add(this.executor.schedule(runOff, relativeTime, TimeUnit.SECONDS));
+                logger.info("Switching Moment for Off action created! Relative time: {} ", relativeTime);
+            }
+        }
+        logger.info("Schedules planned!");
+    }
 
-	public void switchingMomentRelativeTimeConversion() {
-		// TODO: Switching moment --> relative time conversion for scheduled trigger
-		// actions
-	}
+    // Runnable to turn on relay light
+    private Runnable onRunnableCreator(final int relayNr) {
+        Runnable onRun = new Runnable() {
+            @Override
+            public void run() {
+                Scheduler.this.device.getRelay(relayNr).setLight(true);
+            }
+        };
+        return onRun;
+    }
 
-	// Voorbeeld voor On task
-	private Runnable onRunnableCreator(final int relayNr) {
-		Runnable onRun = new Runnable() {
-			@Override
-			public void run() {
-				// functie hier met parameter
-				Scheduler.this.switchingMomentRelativeTimeConversion();
-			}
-		};
-		return onRun;
-	}
+    // Runnable to turn off relay light
+    private Runnable offRunnableCreator(final int relayNr) {
+        Runnable offRun = new Runnable() {
+            @Override
+            public void run() {
+                Scheduler.this.device.getRelay(relayNr).setLight(false);
+            }
+        };
+        return offRun;
+    }
 
-	// Voorbeeld voor Off task
-	private Runnable offRunnableCreator(final int relayNr) {
-		Runnable offRun = new Runnable() {
-			@Override
-			public void run() {
-				// functie hier met parameter
-				Scheduler.this.switchingMomentRelativeTimeConversion();
-			}
-		};
-		return offRun;
-	}
+    private void clearScheduledSwitchingMoments(List<ScheduledFuture<?>> scheduledSwitchingMoments) {
+        if (!scheduledSwitchingMoments.isEmpty()) {
+            for (int i = 0; i < scheduledSwitchingMoments.size(); i++) {
+                ScheduledFuture<?> future = scheduledSwitchingMoments.get(i);
+                if (!future.isDone()) {
+                    future.cancel(true);
+                }
+            }
+            scheduledSwitchingMoments.clear();
+            // To prevent memory leak: Purging executor's queue
+            this.executor.purge();
+        }
+    }
 }
