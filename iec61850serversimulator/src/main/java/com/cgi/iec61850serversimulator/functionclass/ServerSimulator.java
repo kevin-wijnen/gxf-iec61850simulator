@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 
 import com.beanit.openiec61850.SclParseException;
 import com.beanit.openiec61850.SclParser;
@@ -23,6 +24,7 @@ import com.beanit.openiec61850.internal.cli.IntCliParameter;
 import com.beanit.openiec61850.internal.cli.StringCliParameter;
 import com.cgi.iec61850serversimulator.dataclass.Device;
 
+@EntityScan("com.cgi.iec61850serversimulator.datamodel")
 @SpringBootApplication
 public class ServerSimulator {
 
