@@ -1,4 +1,4 @@
-package com.cgi.iec61850serversimulator;
+package com.cgi.iec61850serversimulator.dataclasses;
 
 import java.util.List;
 
@@ -9,13 +9,14 @@ import com.beanit.openiec61850.BasicDataAttribute;
 import com.beanit.openiec61850.BdaBoolean;
 import com.beanit.openiec61850.Fc;
 import com.beanit.openiec61850.ModelNode;
+import com.cgi.iec61850serversimulator.functionclasses.ServerWrapper;
 
 /**
  * Class which represents a relay. It holds 50 schedules. While 64 schedules are
  * possible with IEC61850, the GXF platform only 50 of them. Hence why there are
  * only 50 schedules attached to every relay.
  */
-class Relay {
+public class Relay {
     private static final Logger logger = LoggerFactory.getLogger(Relay.class);
 
     public static final String SWITCH_ROOT = "SWDeviceGenericIO/XSWC";

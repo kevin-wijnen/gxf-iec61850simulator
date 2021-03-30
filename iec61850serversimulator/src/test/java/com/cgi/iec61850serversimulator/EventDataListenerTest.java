@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import org.junit.jupiter.api.Test;
 
 import com.beanit.openiec61850.ObjectReference;
+import com.cgi.iec61850serversimulator.functionclasses.EventDataListener;
 
 public class EventDataListenerTest {
 

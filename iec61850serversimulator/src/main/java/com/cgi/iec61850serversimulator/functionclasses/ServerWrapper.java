@@ -1,4 +1,4 @@
-package com.cgi.iec61850serversimulator;
+package com.cgi.iec61850serversimulator.functionclasses;
 
 import java.util.List;
 

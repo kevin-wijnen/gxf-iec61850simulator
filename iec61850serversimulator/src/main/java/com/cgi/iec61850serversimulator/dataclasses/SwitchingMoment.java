@@ -1,4 +1,4 @@
-package com.cgi.iec61850serversimulator;
+package com.cgi.iec61850serversimulator.dataclasses;
 
 import java.time.LocalDateTime;
 
@@ -33,7 +33,7 @@ public class SwitchingMoment {
     private LocalDateTime triggerTime;
     private boolean triggerAction;
 
-    SwitchingMoment(int relayNr, LocalDateTime triggerTime, boolean triggerAction) {
+    public SwitchingMoment(int relayNr, LocalDateTime triggerTime, boolean triggerAction) {
         this.relayNr = relayNr;
         this.triggerTime = triggerTime;
         this.triggerAction = triggerAction;

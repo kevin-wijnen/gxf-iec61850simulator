@@ -11,7 +11,13 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import com.cgi.iec61850serversimulator.Schedule.ScheduleBuilder;
+import com.cgi.iec61850serversimulator.dataclasses.Device;
+import com.cgi.iec61850serversimulator.dataclasses.Relay;
+import com.cgi.iec61850serversimulator.dataclasses.Schedule;
+import com.cgi.iec61850serversimulator.dataclasses.SwitchingMoment;
+import com.cgi.iec61850serversimulator.dataclasses.Schedule.ScheduleBuilder;
+import com.cgi.iec61850serversimulator.functionclasses.SwitchingMomentCalculationException;
+import com.cgi.iec61850serversimulator.functionclasses.SwitchingMomentCalculator;
 
 /**
  * JUnit test class which tests the various related functions of the

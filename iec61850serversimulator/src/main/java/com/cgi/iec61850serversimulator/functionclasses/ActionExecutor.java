@@ -1,4 +1,4 @@
-package com.cgi.iec61850serversimulator;
+package com.cgi.iec61850serversimulator.functionclasses;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -7,6 +7,7 @@ import com.beanit.openiec61850.ServerModel;
 import com.beanit.openiec61850.ServerSap;
 import com.beanit.openiec61850.internal.cli.ActionException;
 import com.beanit.openiec61850.internal.cli.ActionListener;
+import com.cgi.iec61850serversimulator.dataclasses.Device;
 
 /**
  * Class which takes certain button inputs for debug features during runtime.
