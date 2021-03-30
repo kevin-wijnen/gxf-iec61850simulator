@@ -1,4 +1,4 @@
-package com.cgi.iec61850serversimulator.functionclasses;
+package com.cgi.iec61850serversimulator.functionclass;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,7 +21,7 @@ import com.beanit.openiec61850.internal.cli.CliParseException;
 import com.beanit.openiec61850.internal.cli.CliParser;
 import com.beanit.openiec61850.internal.cli.IntCliParameter;
 import com.beanit.openiec61850.internal.cli.StringCliParameter;
-import com.cgi.iec61850serversimulator.dataclasses.Device;
+import com.cgi.iec61850serversimulator.dataclass.Device;
 
 @SpringBootApplication
 public class ServerSimulator {

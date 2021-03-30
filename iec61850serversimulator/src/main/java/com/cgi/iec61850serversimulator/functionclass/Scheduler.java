@@ -1,4 +1,4 @@
-package com.cgi.iec61850serversimulator.functionclasses;
+package com.cgi.iec61850serversimulator.functionclass;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -11,8 +11,8 @@ import java.util.concurrent.TimeUnit;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.cgi.iec61850serversimulator.dataclasses.Device;
-import com.cgi.iec61850serversimulator.dataclasses.SwitchingMoment;
+import com.cgi.iec61850serversimulator.dataclass.Device;
+import com.cgi.iec61850serversimulator.dataclass.SwitchingMoment;
 
 /**
  * Class which schedules autonomous switching moments for future activation.

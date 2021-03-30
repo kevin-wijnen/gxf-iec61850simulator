@@ -1,4 +1,4 @@
-package com.cgi.iec61850serversimulator.functionclasses;
+package com.cgi.iec61850serversimulator.functionclass;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
@@ -11,11 +11,11 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.cgi.iec61850serversimulator.dataclasses.Device;
-import com.cgi.iec61850serversimulator.dataclasses.Relay;
-import com.cgi.iec61850serversimulator.dataclasses.Schedule;
-import com.cgi.iec61850serversimulator.dataclasses.ScheduleDay;
-import com.cgi.iec61850serversimulator.dataclasses.SwitchingMoment;
+import com.cgi.iec61850serversimulator.dataclass.Device;
+import com.cgi.iec61850serversimulator.dataclass.Relay;
+import com.cgi.iec61850serversimulator.dataclass.Schedule;
+import com.cgi.iec61850serversimulator.dataclass.ScheduleDay;
+import com.cgi.iec61850serversimulator.dataclass.SwitchingMoment;
 
 public class SwitchingMomentCalculator {
 	// Steps:

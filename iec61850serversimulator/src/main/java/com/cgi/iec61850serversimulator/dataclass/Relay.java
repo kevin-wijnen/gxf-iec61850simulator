@@ -1,4 +1,4 @@
-package com.cgi.iec61850serversimulator.dataclasses;
+package com.cgi.iec61850serversimulator.dataclass;
 
 import java.util.List;
 
@@ -9,7 +9,7 @@ import com.beanit.openiec61850.BasicDataAttribute;
 import com.beanit.openiec61850.BdaBoolean;
 import com.beanit.openiec61850.Fc;
 import com.beanit.openiec61850.ModelNode;
-import com.cgi.iec61850serversimulator.functionclasses.ServerWrapper;
+import com.cgi.iec61850serversimulator.functionclass.ServerWrapper;
 
 /**
  * Class which represents a relay. It holds 50 schedules. While 64 schedules are

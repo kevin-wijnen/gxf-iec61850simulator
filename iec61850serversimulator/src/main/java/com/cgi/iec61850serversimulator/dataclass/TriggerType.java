@@ -1,4 +1,4 @@
-package com.cgi.iec61850serversimulator.dataclasses;
+package com.cgi.iec61850serversimulator.dataclass;
 
 import java.util.HashMap;
 import java.util.Map;

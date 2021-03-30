@@ -1,4 +1,4 @@
-package com.cgi.iec61850serversimulator.functionclasses;
+package com.cgi.iec61850serversimulator.functionclass;
 
 import java.time.Duration;
 import java.time.LocalDateTime;

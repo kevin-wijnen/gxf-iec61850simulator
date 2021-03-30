@@ -1,4 +1,4 @@
-package com.cgi.iec61850serversimulator.functionclasses;
+package com.cgi.iec61850serversimulator.functionclass;
 
 import java.nio.ByteBuffer;
 import java.time.LocalDateTime;
@@ -23,9 +23,9 @@ import com.beanit.openiec61850.ObjectReference;
 import com.beanit.openiec61850.ServerEventListener;
 import com.beanit.openiec61850.ServerSap;
 import com.beanit.openiec61850.ServiceError;
-import com.cgi.iec61850serversimulator.dataclasses.Device;
+import com.cgi.iec61850serversimulator.dataclass.Device;
 
-class EventDataListener implements ServerEventListener {
+public class EventDataListener implements ServerEventListener {
 
     private static final Logger logger = LoggerFactory.getLogger(EventDataListener.class);
 

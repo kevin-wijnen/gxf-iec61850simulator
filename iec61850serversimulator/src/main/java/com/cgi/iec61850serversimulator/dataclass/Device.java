@@ -1,4 +1,4 @@
-package com.cgi.iec61850serversimulator.dataclasses;
+package com.cgi.iec61850serversimulator.dataclass;
 
 import java.util.Arrays;
 import java.util.List;
@@ -10,7 +10,7 @@ import com.beanit.openiec61850.BasicDataAttribute;
 import com.beanit.openiec61850.BdaBoolean;
 import com.beanit.openiec61850.BdaInt8;
 import com.beanit.openiec61850.Fc;
-import com.cgi.iec61850serversimulator.functionclasses.ServerWrapper;
+import com.cgi.iec61850serversimulator.functionclass.ServerWrapper;
 
 /**
  * Class which represents a simulated device. It holds the clock and 4 relays.
