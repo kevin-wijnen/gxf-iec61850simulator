@@ -6,7 +6,9 @@ import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 
@@ -23,9 +25,12 @@ import com.beanit.openiec61850.internal.cli.CliParser;
 import com.beanit.openiec61850.internal.cli.IntCliParameter;
 import com.beanit.openiec61850.internal.cli.StringCliParameter;
 import com.cgi.iec61850serversimulator.dataclass.Device;
+import com.cgi.iec61850serversimulator.datamodel.RelayEntity;
+import com.cgi.iec61850serversimulator.datarepository.RelayRepository;
 
 @EntityScan("com.cgi.iec61850serversimulator.datamodel")
 @SpringBootApplication
+@EnableAutoConfiguration
 public class ServerSimulator {
 
     private static final Logger logger = LoggerFactory.getLogger(ServerSimulator.class);
@@ -34,6 +39,9 @@ public class ServerSimulator {
     private static final String PRINT_SERVER_MODEL_KEY_DESCRIPTION = "print server's model";
     private static final String DEVICE_SHOW_MODEL = "d";
     private static final String DEVICE_SHOW_MODEL_DESCRIPTION = "print device object";
+
+    @Autowired
+    private static RelayRepository relayRepository;
 
     private static final IntCliParameter portParam = new CliParameterBuilder("-p").setDescription(
             "The port to listen on. On unix based systems you need root privilages for ports < 1000. Default: 102")
@@ -105,6 +113,14 @@ public class ServerSimulator {
         } catch (Exception e) {
             logger.warn("Initial switching moment calculation failed, try sending another schedule.", e);
         }
+
+        // Relay entity & repository test
+        relayRepository.save(new RelayEntity(3, true));
+
+        relayRepository.findAll();
+
+        // = new RelayEntity(2, false);
+
         final ActionProcessor actionProcessor = new ActionProcessor(new ActionExecutor(serverSap, serverModel, device));
         actionProcessor.addAction(new Action(PRINT_SERVER_MODEL_KEY, PRINT_SERVER_MODEL_KEY_DESCRIPTION));
         actionProcessor.addAction(new Action(DEVICE_SHOW_MODEL, DEVICE_SHOW_MODEL_DESCRIPTION));
