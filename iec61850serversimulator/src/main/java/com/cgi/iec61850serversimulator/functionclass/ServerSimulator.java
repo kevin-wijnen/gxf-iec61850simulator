@@ -1,16 +1,17 @@
 package com.cgi.iec61850serversimulator.functionclass;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import com.beanit.openiec61850.SclParseException;
 import com.beanit.openiec61850.SclParser;
@@ -29,9 +30,10 @@ import com.cgi.iec61850serversimulator.datamodel.RelayEntity;
 import com.cgi.iec61850serversimulator.datarepository.RelayRepository;
 
 @EntityScan("com.cgi.iec61850serversimulator.datamodel")
+@EnableJpaRepositories(basePackages = "com.cgi.iec61850serversimulator.datarepository")
 @SpringBootApplication
 @EnableAutoConfiguration
-public class ServerSimulator {
+public class ServerSimulator implements CommandLineRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(ServerSimulator.class);
 
@@ -40,23 +42,27 @@ public class ServerSimulator {
     private static final String DEVICE_SHOW_MODEL = "d";
     private static final String DEVICE_SHOW_MODEL_DESCRIPTION = "print device object";
 
-    @Autowired
-    private static RelayRepository relayRepository;
-
     private static final IntCliParameter portParam = new CliParameterBuilder("-p").setDescription(
             "The port to listen on. On unix based systems you need root privilages for ports < 1000. Default: 102")
             .buildIntParameter("port", 10102);
 
     private static final StringCliParameter modelFileParam = new CliParameterBuilder("-m")
-            .setDescription("The SCL file that contains the server's information model.").setMandatory()
+            .setDescription("The SCL file that contains the server's information model.")
+            .setMandatory()
             .buildStringParameter("model-file");
 
     public static ServerModel serverModel;
     public static ServerSap serverSap = null;
 
-    public static void main(final String[] args) throws IOException {
+    @Autowired
+    private RelayRepository relayRepository;
 
+    public static void main(final String[] args) {
         SpringApplication.run(ServerSimulator.class, args);
+    }
+
+    @Override
+    public void run(final String... args) throws Exception {
         logger.info("Applicatie starten...");
 
         final List<CliParameter> cliParameters = new ArrayList<>();
@@ -104,29 +110,25 @@ public class ServerSimulator {
         device.initalizeDevice(serverWrapper);
 
         logger.info("SERVER START LISTENING");
-        EventDataListener edl = new EventDataListener(device, scheduler);
+        final EventDataListener edl = new EventDataListener(device, scheduler);
         serverSap.startListening(edl);
 
         // Initial schedule
         try {
             scheduler.calculateTasks(device);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             logger.warn("Initial switching moment calculation failed, try sending another schedule.", e);
         }
 
         // Relay entity & repository test
-        relayRepository.save(new RelayEntity(3, true));
-
-        relayRepository.findAll();
-
-        // = new RelayEntity(2, false);
+        this.relayRepository.save(new RelayEntity(3, true));
+        this.relayRepository.findAll();
 
         final ActionProcessor actionProcessor = new ActionProcessor(new ActionExecutor(serverSap, serverModel, device));
         actionProcessor.addAction(new Action(PRINT_SERVER_MODEL_KEY, PRINT_SERVER_MODEL_KEY_DESCRIPTION));
         actionProcessor.addAction(new Action(DEVICE_SHOW_MODEL, DEVICE_SHOW_MODEL_DESCRIPTION));
 
         actionProcessor.start();
-
     }
 
 }
