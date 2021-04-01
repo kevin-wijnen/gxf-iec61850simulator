@@ -128,6 +128,9 @@ public class EventDataListener implements ServerEventListener {
                 // Relay data
                 // Remember: Set CTLModel to 1, then it would work with enbOpr
                 // enabled!
+
+                // Reminder: Manually setting ctlVal with GUI client does not work with ctlVal
+                // directly. Set the value with Oper, not just ctlVal only!
                 case "ctlVal": {
                     try {
                         logger.info(referenceString);
@@ -137,10 +140,10 @@ public class EventDataListener implements ServerEventListener {
                         final boolean lightStatus = ((BdaBoolean) bda).getValue();
                         System.out.println(lightStatus);
 
-                        // OOP Class
+                        // Sends updated Relay to Relay object
                         this.device.getRelay(relayIndex).setLight(lightStatus);
 
-                        // Database
+                        // Sends updated Relay to database
                         this.databaseUtils.updateDatabaseRelay(this.device.getRelay(relayIndex));
 
                         logger.info("Relay " + relayIndex + "'s light status ON is " + lightStatus);

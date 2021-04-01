@@ -45,7 +45,7 @@ public class DatabaseUtils {
             this.updateModelRelay(relay);
         } else {
             logger.info("Relay not found in database, add it to database.");
-            this.updateDatabaseRelay(relay);
+            this.initializeDatabaseRelay(relay);
         }
     }
 
@@ -64,12 +64,23 @@ public class DatabaseUtils {
 
     }
 
-    public void updateDatabaseRelay(Relay relay) {
-        // Update relay entity in database
+    public void initializeDatabaseRelay(Relay relay) {
+        // Add missing relay to database
 
         int index_number = relay.getIndexNumber();
         boolean light_status = relay.getLight();
         RelayEntity toUpdateRelay = new RelayEntity(index_number, light_status);
+        this.relayRepository.save(toUpdateRelay);
+    }
+
+    public void updateDatabaseRelay(Relay relay) {
+        // Updating database relay
+
+        int index_number = relay.getIndexNumber();
+        boolean light_status = relay.getLight();
+        List<RelayEntity> relayEntities = this.relayRepository.findByIndexNumber(index_number);
+        RelayEntity toUpdateRelay = relayEntities.get(0);
+        toUpdateRelay.setLightStatus(light_status);
         this.relayRepository.save(toUpdateRelay);
     }
 
