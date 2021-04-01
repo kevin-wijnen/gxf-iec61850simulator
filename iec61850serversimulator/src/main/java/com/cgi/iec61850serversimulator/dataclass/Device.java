@@ -25,6 +25,7 @@ public class Device {
     private Clock clock;
     private Relay[] relays;
     private ServerWrapper serverWrapper;
+    private DatabaseUtils databaseUtils;
 
     public Relay[] getRelays() {
         return this.relays;
@@ -74,7 +75,7 @@ public class Device {
 
     public void initalizeDevice(final ServerWrapper serverSapWrapper) {
 
-        DatabaseUtils databaseUtils = new DatabaseUtils();
+        this.databaseUtils = new DatabaseUtils(serverSapWrapper);
         this.serverWrapper = serverSapWrapper;
         this.clock = new Clock();
         this.clock.initializeClock(this.serverWrapper.findModelNode("SWDeviceGenericIO/CSLC.Clock", Fc.CF));

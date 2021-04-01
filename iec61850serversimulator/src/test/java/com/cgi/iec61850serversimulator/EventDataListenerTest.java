@@ -9,7 +9,7 @@ import com.cgi.iec61850serversimulator.functionclass.EventDataListener;
 
 public class EventDataListenerTest {
 
-    private EventDataListener eventDataListener = new EventDataListener(null, null);
+    private EventDataListener eventDataListener = new EventDataListener(null, null, null);
 
     @Test
     public void extractRelaySingleDigit() {

@@ -32,15 +32,18 @@ public class EventDataListener implements ServerEventListener {
     private Device device = null;
     private Scheduler scheduler;
 
+    private DatabaseUtils databaseUtils;
+
     // private OnzeScheduleScheduler scheduler;
 
     public Scheduler getScheduler() {
         return this.scheduler;
     }
 
-    public EventDataListener(final Device device, Scheduler scheduler) {
+    public EventDataListener(final Device device, Scheduler scheduler, DatabaseUtils databaseUtils) {
         this.device = device;
         this.scheduler = scheduler;
+        this.databaseUtils = databaseUtils;
 
         // OnzeScheduleScheduler scheduler = new ...;
     }
@@ -137,8 +140,8 @@ public class EventDataListener implements ServerEventListener {
                         // OOP Class
                         this.device.getRelay(relayIndex).setLight(lightStatus);
 
-                        // Within ServerModel
-                        // this.device.setLightStatus(relayIndex, lightStatus);
+                        // Database
+                        this.databaseUtils.updateDatabaseRelay(this.device.getRelay(relayIndex));
 
                         logger.info("Relay " + relayIndex + "'s light status ON is " + lightStatus);
                     } catch (final Exception e) {

@@ -110,7 +110,7 @@ public class ServerSimulator implements CommandLineRunner {
 
         // Comparing database with model
 
-        DatabaseUtils databaseUtils = new DatabaseUtils();
+        DatabaseUtils databaseUtils = new DatabaseUtils(serverWrapper);
         databaseUtils.setRelayRepository(this.relayRepository);
         for (int i = 1; i < device.getRelays().length + 1; i++) {
             Relay relay = device.getRelay(i);
@@ -118,7 +118,7 @@ public class ServerSimulator implements CommandLineRunner {
         }
 
         logger.info("SERVER START LISTENING");
-        final EventDataListener edl = new EventDataListener(device, scheduler);
+        final EventDataListener edl = new EventDataListener(device, scheduler, databaseUtils);
         serverSap.startListening(edl);
 
         // Initial schedule
