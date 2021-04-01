@@ -1,10 +1,12 @@
 package com.cgi.iec61850serversimulator.functionclass;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.beanit.openiec61850.BasicDataAttribute;
 import com.beanit.openiec61850.BdaBoolean;
 import com.beanit.openiec61850.Fc;
 import com.cgi.iec61850serversimulator.dataclass.Relay;
@@ -49,14 +51,16 @@ public class DatabaseUtils {
 
     public void updateModelRelay(Relay relay) {
         // Update relay model with BDA
-        // Create Bda of CtlVal (only needed to sync up with, relayNr etc. is
-        // explanatory)
-        logger.info("Updating model relay  database");
+        logger.info("Updating model relay  database.");
         int relayNr = relay.getIndexNumber();
         List<RelayEntity> databaseRelay = this.relayRepository.findByIndexNumber(relayNr);
         final BdaBoolean modelRelayLightStatus = (BdaBoolean) this.serverWrapper
                 .findModelNode(SWITCH_ROOT + relayNr + ".Pos.Oper.ctlVal", Fc.CO);
         modelRelayLightStatus.setValue(databaseRelay.get(0).isLightStatus());
+        List<BasicDataAttribute> bdas = new ArrayList<BasicDataAttribute>();
+        bdas.add(modelRelayLightStatus);
+        this.serverWrapper.setValues(bdas);
+        relay.setLight(databaseRelay.get(0).isLightStatus());
 
     }
 
