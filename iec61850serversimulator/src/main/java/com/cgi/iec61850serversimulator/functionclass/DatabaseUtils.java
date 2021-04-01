@@ -68,10 +68,8 @@ public class DatabaseUtils {
         // Update relay entity in database
 
         int index_number = relay.getIndexNumber();
-        List<RelayEntity> relayEntities = this.relayRepository.findByIndexNumber(index_number);
-        RelayEntity toUpdateRelay = relayEntities.get(0);
         boolean light_status = relay.getLight();
-        toUpdateRelay.setLightStatus(light_status);
+        RelayEntity toUpdateRelay = new RelayEntity(index_number, light_status);
         this.relayRepository.save(toUpdateRelay);
     }
 
