@@ -26,7 +26,7 @@ import com.beanit.openiec61850.internal.cli.CliParser;
 import com.beanit.openiec61850.internal.cli.IntCliParameter;
 import com.beanit.openiec61850.internal.cli.StringCliParameter;
 import com.cgi.iec61850serversimulator.dataclass.Device;
-import com.cgi.iec61850serversimulator.datamodel.RelayEntity;
+import com.cgi.iec61850serversimulator.dataclass.Relay;
 import com.cgi.iec61850serversimulator.datarepository.RelayRepository;
 
 @EntityScan("com.cgi.iec61850serversimulator.datamodel")
@@ -47,8 +47,7 @@ public class ServerSimulator implements CommandLineRunner {
             .buildIntParameter("port", 10102);
 
     private static final StringCliParameter modelFileParam = new CliParameterBuilder("-m")
-            .setDescription("The SCL file that contains the server's information model.")
-            .setMandatory()
+            .setDescription("The SCL file that contains the server's information model.").setMandatory()
             .buildStringParameter("model-file");
 
     public static ServerModel serverModel;
@@ -109,6 +108,15 @@ public class ServerSimulator implements CommandLineRunner {
         final Scheduler scheduler = new Scheduler(device);
         device.initalizeDevice(serverWrapper);
 
+        // Comparing database with model
+
+        DatabaseUtils databaseUtils = new DatabaseUtils();
+        databaseUtils.setRelayRepository(this.relayRepository);
+        for (int i = 1; i < device.getRelays().length + 1; i++) {
+            Relay relay = device.getRelay(i);
+            databaseUtils.checkRelay(relay);
+        }
+
         logger.info("SERVER START LISTENING");
         final EventDataListener edl = new EventDataListener(device, scheduler);
         serverSap.startListening(edl);
@@ -121,8 +129,10 @@ public class ServerSimulator implements CommandLineRunner {
         }
 
         // Relay entity & repository test
-        this.relayRepository.save(new RelayEntity(3, true));
-        this.relayRepository.findAll();
+        // this.relayRepository.save(new RelayEntity(4, true));
+        // logger.info(this.relayRepository.findAll().toString());
+
+        // Schedule entity & repository test
 
         final ActionProcessor actionProcessor = new ActionProcessor(new ActionExecutor(serverSap, serverModel, device));
         actionProcessor.addAction(new Action(PRINT_SERVER_MODEL_KEY, PRINT_SERVER_MODEL_KEY_DESCRIPTION));
