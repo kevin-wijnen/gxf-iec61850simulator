@@ -22,9 +22,9 @@ public class ActionExecutor implements ActionListener {
     public ServerModel serverModel = null;
     public Device device = null;
 
-    public ActionExecutor(final ServerSap serverSap, final ServerModel serverModel, final Device device) {
+    public ActionExecutor(final ServerSap serverSap, final Device device) {
         this.serverSap = serverSap;
-        this.serverModel = serverModel;
+        this.serverModel = serverSap.getModelCopy();
         this.device = device;
     }
 

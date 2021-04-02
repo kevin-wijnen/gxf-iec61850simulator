@@ -86,6 +86,7 @@ public class ServerSimulator implements CommandLineRunner {
             System.out.println("Error parsing SCL/ICD file: " + e.getMessage());
             return;
         }
+
         logger.info("ServerSap aanmaken...");
         serverSap = new ServerSap(portParam.getValue(), 0, null, serverModels.get(0), null);
         logger.info("ServerSap aangemaakt met als poort: {}", portParam.getValue());
@@ -134,7 +135,7 @@ public class ServerSimulator implements CommandLineRunner {
 
         // Schedule entity & repository test
 
-        final ActionProcessor actionProcessor = new ActionProcessor(new ActionExecutor(serverSap, serverModel, device));
+        final ActionProcessor actionProcessor = new ActionProcessor(new ActionExecutor(serverSap, device));
         actionProcessor.addAction(new Action(PRINT_SERVER_MODEL_KEY, PRINT_SERVER_MODEL_KEY_DESCRIPTION));
         actionProcessor.addAction(new Action(DEVICE_SHOW_MODEL, DEVICE_SHOW_MODEL_DESCRIPTION));
 

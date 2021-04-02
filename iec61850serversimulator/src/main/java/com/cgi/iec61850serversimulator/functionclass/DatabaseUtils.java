@@ -59,8 +59,8 @@ public class DatabaseUtils {
         modelRelayLightStatus.setValue(databaseRelay.get(0).isLightStatus());
         List<BasicDataAttribute> bdas = new ArrayList<BasicDataAttribute>();
         bdas.add(modelRelayLightStatus);
-        this.serverWrapper.setValues(bdas);
         relay.setLight(databaseRelay.get(0).isLightStatus());
+        this.serverWrapper.setValues(bdas);
 
     }
 
