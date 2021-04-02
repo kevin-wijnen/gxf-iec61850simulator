@@ -34,8 +34,6 @@ public class EventDataListener implements ServerEventListener {
 
     private DatabaseUtils databaseUtils;
 
-    // private OnzeScheduleScheduler scheduler;
-
     public Scheduler getScheduler() {
         return this.scheduler;
     }
@@ -44,14 +42,10 @@ public class EventDataListener implements ServerEventListener {
         this.device = device;
         this.scheduler = scheduler;
         this.databaseUtils = databaseUtils;
-
-        // OnzeScheduleScheduler scheduler = new ...;
     }
 
     @Override
     public List<ServiceError> write(final List<BasicDataAttribute> bdas) {
-        // TODO: Fixing relayScheduleNumbers integration to not lose connection
-        // with GUI/SoapUI! Problem lies with the setters.
         logger.info("BDA write request scanning...");
         boolean modified = false;
 
@@ -111,7 +105,7 @@ public class EventDataListener implements ServerEventListener {
                     // Ruud: example to modify a light status, which is what should
                     // happen at the point in
                     // time when a schedule moment should change a light status.
-                    this.device.setLightStatus(2, newValue);
+                    // this.device.setLightStatus(2, newValue);
 
                     break;
 
@@ -168,12 +162,13 @@ public class EventDataListener implements ServerEventListener {
                     logger.info("Value to set for schedule {} of relay {}: {}", scheduleIndex, relayIndex,
                             ((BdaBoolean) bda).getValue());
                     try {
-                        // device.getSchedule(relayScheduleNumbers).setEnabled(((BdaBoolean)
-                        // bda).getValue());
 
                         // OOP Class
                         this.device.getRelay(relayIndex).getSchedule(scheduleIndex)
                                 .setEnabled(((BdaBoolean) bda).getValue());
+
+                        // Database, yet to add
+
                         modified = true;
 
                     } catch (final Exception e) {

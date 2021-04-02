@@ -160,12 +160,6 @@ public class DatabaseUtils {
         ScheduleEntity toUpdateSchedule = new ScheduleEntity(index_number, day, timeOnType, timeOffType, timeOn,
                 timeOff, burningMinutes, enabled, relayEntity);
         this.scheduleRepository.save(toUpdateSchedule);
-
-        // ScheduleEntity toUpdateSchedule = new ScheduleEntity(index_number,
-        // index_number, index_number, index_number, index_number, index_number,
-        // index_number, index_number, false)
-        // RelayEntity toUpdateRelay = new RelayEntity(index_number, light_status);
-        // this.relayRepository.save(toUpdateRelay);
     }
 
     public void updateDatabaseSchedule(Relay relay) {

@@ -25,7 +25,6 @@ public class Device {
     private Clock clock;
     private Relay[] relays;
     private ServerWrapper serverWrapper;
-    private DatabaseUtils databaseUtils;
 
     public Relay[] getRelays() {
         return this.relays;
