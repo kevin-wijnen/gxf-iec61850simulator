@@ -131,6 +131,8 @@ public class EventDataListener implements ServerEventListener {
 
                 // Reminder: Manually setting ctlVal with GUI client does not work with ctlVal
                 // directly. Set the value with Oper, not just ctlVal only!
+                // Do not use ctlVal as light status value! ctlVal changes stVal, the actual
+                // light status value!
                 case "ctlVal": {
                     try {
                         logger.info(referenceString);

@@ -1,12 +1,14 @@
 package com.cgi.iec61850serversimulator.datamodel;
 
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
@@ -24,9 +26,6 @@ public class ScheduleEntity {
     @Column(name = "day")
     private int day;
 
-    @Column(name = "timeType")
-    private int timeType;
-
     @Column(name = "timeTypeOn")
     private int timeTypeOn;
 
@@ -34,10 +33,10 @@ public class ScheduleEntity {
     private int timeTypeOff;
 
     @Column(name = "timeOn")
-    private LocalDateTime timeOn;
+    private LocalTime timeOn;
 
     @Column(name = "timeOff")
-    private LocalDateTime timeOff;
+    private LocalTime timeOff;
 
     @Column(name = "burningMinutes")
     private int burningMinutes;
@@ -45,19 +44,24 @@ public class ScheduleEntity {
     @Column(name = "enabled")
     private boolean enabled;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    private RelayEntity relay;
+
     public ScheduleEntity() {
 
     }
 
-    public ScheduleEntity(int indexNumber, int day, int timeType, int timeTypeOn, int timeTypeOff, int timeOn,
-            int timeOff, int burningMinutes, boolean enabled) {
+    public ScheduleEntity(int indexNumber, int day, int timeTypeOn, int timeTypeOff, LocalTime timeOn,
+            LocalTime timeOff, int burningMinutes, boolean enabled, RelayEntity relay) {
         this.indexNumber = indexNumber;
         this.day = day;
-        this.timeType = timeType;
         this.timeTypeOn = timeTypeOn;
         this.timeTypeOff = timeTypeOff;
+        this.timeOn = timeOn;
+        this.timeOff = timeOff;
         this.burningMinutes = burningMinutes;
         this.enabled = enabled;
+        this.relay = relay;
     }
 
     public int getIndexNumber() {
@@ -76,14 +80,6 @@ public class ScheduleEntity {
         this.day = day;
     }
 
-    public int getTimeType() {
-        return this.timeType;
-    }
-
-    public void setTimeType(int timeType) {
-        this.timeType = timeType;
-    }
-
     public int getTimeTypeOn() {
         return this.timeTypeOn;
     }
@@ -100,19 +96,19 @@ public class ScheduleEntity {
         this.timeTypeOff = timeTypeOff;
     }
 
-    public LocalDateTime getTimeOn() {
+    public LocalTime getTimeOn() {
         return this.timeOn;
     }
 
-    public void setTimeOn(LocalDateTime timeOn) {
+    public void setTimeOn(LocalTime timeOn) {
         this.timeOn = timeOn;
     }
 
-    public LocalDateTime getTimeOff() {
+    public LocalTime getTimeOff() {
         return this.timeOff;
     }
 
-    public void setTimeOff(LocalDateTime timeOff) {
+    public void setTimeOff(LocalTime timeOff) {
         this.timeOff = timeOff;
     }
 
@@ -132,12 +128,28 @@ public class ScheduleEntity {
         this.enabled = enabled;
     }
 
+    public RelayEntity getRelay() {
+        return this.relay;
+    }
+
+    public void setRelay(RelayEntity relay) {
+        this.relay = relay;
+    }
+
+    public long getId() {
+        return this.id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
+    }
+
     @Override
     public String toString() {
-        return "RelayEntity [id=" + this.id + ", indexNumber=" + this.indexNumber + ", day=" + this.day + ", timeType="
-                + this.timeType + ", timeTypeOn=" + this.timeTypeOn + ", timeTypeOff=" + this.timeTypeOff + ", timeOn="
-                + this.timeOn + ", timeOff=" + this.timeOff + ", burningMinutes=" + this.burningMinutes + ", enabled="
-                + this.enabled + "]";
+        return "RelayEntity [id=" + this.id + ", indexNumber=" + this.indexNumber + ", day=" + this.day
+                + ", timeTypeOn=" + this.timeTypeOn + ", timeTypeOff=" + this.timeTypeOff + ", timeOn=" + this.timeOn
+                + ", timeOff=" + this.timeOff + ", burningMinutes=" + this.burningMinutes + ", enabled=" + this.enabled
+                + "]";
 
     }
 }

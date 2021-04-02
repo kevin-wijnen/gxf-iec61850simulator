@@ -120,6 +120,10 @@ public class ServerSimulator implements CommandLineRunner {
         for (int i = 1; i < device.getRelays().length + 1; i++) {
             Relay relay = device.getRelay(i);
             databaseUtils.checkRelay(relay);
+            /*
+             * for (int j = 1; j < 51; j++) { Schedule schedule = relay.getSchedule(j);
+             * databaseUtils.checkSchedule(schedule, relay.getIndexNumber()); }
+             */
         }
 
         // Test: Copying ServerModel to set it again, to see if GUI client works with
