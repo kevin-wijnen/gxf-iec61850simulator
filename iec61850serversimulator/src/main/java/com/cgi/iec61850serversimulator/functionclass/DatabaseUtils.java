@@ -12,12 +12,15 @@ import com.beanit.openiec61850.Fc;
 import com.cgi.iec61850serversimulator.dataclass.Relay;
 import com.cgi.iec61850serversimulator.datamodel.RelayEntity;
 import com.cgi.iec61850serversimulator.datarepository.RelayRepository;
+import com.cgi.iec61850serversimulator.datarepository.ScheduleRepository;
 
 public class DatabaseUtils {
     private static final Logger logger = LoggerFactory.getLogger(DatabaseUtils.class);
     private static final String SWITCH_ROOT = "SWDeviceGenericIO/XSWC";
 
     private RelayRepository relayRepository;
+    private ScheduleRepository scheduleRepository;
+
     private ServerWrapper serverWrapper;
 
     public DatabaseUtils(ServerWrapper serverWrapper) {
@@ -30,6 +33,14 @@ public class DatabaseUtils {
 
     public void setRelayRepository(RelayRepository relayRepository) {
         this.relayRepository = relayRepository;
+    }
+
+    public ScheduleRepository getScheduleRepository() {
+        return this.scheduleRepository;
+    }
+
+    public void setScheduleRepository(ScheduleRepository scheduleRepository) {
+        this.scheduleRepository = scheduleRepository;
     }
 
     public void checkRelay(Relay relay) {

@@ -28,6 +28,7 @@ import com.beanit.openiec61850.internal.cli.StringCliParameter;
 import com.cgi.iec61850serversimulator.dataclass.Device;
 import com.cgi.iec61850serversimulator.dataclass.Relay;
 import com.cgi.iec61850serversimulator.datarepository.RelayRepository;
+import com.cgi.iec61850serversimulator.datarepository.ScheduleRepository;
 
 @EntityScan("com.cgi.iec61850serversimulator.datamodel")
 @EnableJpaRepositories(basePackages = "com.cgi.iec61850serversimulator.datarepository")
@@ -55,6 +56,8 @@ public class ServerSimulator implements CommandLineRunner {
 
     @Autowired
     private RelayRepository relayRepository;
+    @Autowired
+    private ScheduleRepository scheduleRepository;
 
     public static void main(final String[] args) {
         SpringApplication.run(ServerSimulator.class, args);
@@ -113,10 +116,17 @@ public class ServerSimulator implements CommandLineRunner {
 
         DatabaseUtils databaseUtils = new DatabaseUtils(serverWrapper);
         databaseUtils.setRelayRepository(this.relayRepository);
+        databaseUtils.setScheduleRepository(this.scheduleRepository);
         for (int i = 1; i < device.getRelays().length + 1; i++) {
             Relay relay = device.getRelay(i);
             databaseUtils.checkRelay(relay);
         }
+
+        // Test: Copying ServerModel to set it again, to see if GUI client works with
+        // this workaround
+        // ServerModel newServerModel = serverSap.getModelCopy();
+        // ServerSap serverSap2 = new ServerSap(portParam.getValue(), 0, null,
+        // newServerModel, null);
 
         logger.info("SERVER START LISTENING");
         final EventDataListener edl = new EventDataListener(device, scheduler, databaseUtils);
