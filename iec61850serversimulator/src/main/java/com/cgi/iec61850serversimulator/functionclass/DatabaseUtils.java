@@ -107,22 +107,28 @@ public class DatabaseUtils {
 
         // Checks if relay can be found with index number. If not found, then it will
         // copy the model's relay to the database.
-        boolean found = this.scheduleRepository.existsByIndexNumber(schedule.getIndexNumber());
+        boolean found = this.scheduleRepository.existsByIndexNumberAndRelayId(schedule.getIndexNumber(), relayNr);
 
         if (found) {
             logger.info("Schedule found in database. Updating model. NOT IMPLEMENTED AS OF NOW.");
-            // this.updateModelSchedule(schedule);
+            // this.updateModelSchedule(schedule, relayNr);
         } else {
-            logger.info("Schedule not found in database, add it to database.");
-            this.initializeDatabaseSchedule(schedule, relayNr);
+
+            if (schedule.isEnabled()) {
+                logger.info("Enabled schedule not found in database, add it to database.");
+                this.initializeDatabaseSchedule(schedule, relayNr);
+            } else {
+                logger.info("Schedule not enabled, not added to database.");
+            }
         }
     }
 
-    public void updateModelSchedule(Schedule schedule) {
+    public void updateModelSchedule(Schedule schedule, int relayNr) {
         // Update relay model with BDA
         logger.info("Updating model schedule with database.");
         int scheduleNr = schedule.getIndexNumber();
-        List<ScheduleEntity> databaseSchedule = this.scheduleRepository.findByIndexNumber(scheduleNr);
+        List<ScheduleEntity> databaseSchedule = this.scheduleRepository.findByIndexNumberAndRelayId(scheduleNr,
+                relayNr);
 
         // Creating BDAs for the values
         // final BdaBoolean modelRelayLightStatus = (BdaBoolean) this.serverWrapper

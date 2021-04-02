@@ -27,6 +27,7 @@ import com.beanit.openiec61850.internal.cli.IntCliParameter;
 import com.beanit.openiec61850.internal.cli.StringCliParameter;
 import com.cgi.iec61850serversimulator.dataclass.Device;
 import com.cgi.iec61850serversimulator.dataclass.Relay;
+import com.cgi.iec61850serversimulator.dataclass.Schedule;
 import com.cgi.iec61850serversimulator.datarepository.RelayRepository;
 import com.cgi.iec61850serversimulator.datarepository.ScheduleRepository;
 
@@ -120,17 +121,13 @@ public class ServerSimulator implements CommandLineRunner {
         for (int i = 1; i < device.getRelays().length + 1; i++) {
             Relay relay = device.getRelay(i);
             databaseUtils.checkRelay(relay);
-            /*
-             * for (int j = 1; j < 51; j++) { Schedule schedule = relay.getSchedule(j);
-             * databaseUtils.checkSchedule(schedule, relay.getIndexNumber()); }
-             */
-        }
 
-        // Test: Copying ServerModel to set it again, to see if GUI client works with
-        // this workaround
-        // ServerModel newServerModel = serverSap.getModelCopy();
-        // ServerSap serverSap2 = new ServerSap(portParam.getValue(), 0, null,
-        // newServerModel, null);
+            for (int j = 1; j < 51; j++) {
+                Schedule schedule = relay.getSchedule(j);
+                databaseUtils.checkSchedule(schedule, relay.getIndexNumber());
+            }
+
+        }
 
         logger.info("SERVER START LISTENING");
         final EventDataListener edl = new EventDataListener(device, scheduler, databaseUtils);
@@ -142,12 +139,6 @@ public class ServerSimulator implements CommandLineRunner {
         } catch (final Exception e) {
             logger.warn("Initial switching moment calculation failed, try sending another schedule.", e);
         }
-
-        // Relay entity & repository test
-        // this.relayRepository.save(new RelayEntity(4, true));
-        // logger.info(this.relayRepository.findAll().toString());
-
-        // Schedule entity & repository test
 
         final ActionProcessor actionProcessor = new ActionProcessor(new ActionExecutor(serverSap, device));
         actionProcessor.addAction(new Action(PRINT_SERVER_MODEL_KEY, PRINT_SERVER_MODEL_KEY_DESCRIPTION));
