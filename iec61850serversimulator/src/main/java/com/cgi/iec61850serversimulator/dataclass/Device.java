@@ -10,7 +10,6 @@ import com.beanit.openiec61850.BasicDataAttribute;
 import com.beanit.openiec61850.BdaBoolean;
 import com.beanit.openiec61850.BdaInt8;
 import com.beanit.openiec61850.Fc;
-import com.cgi.iec61850serversimulator.functionclass.DatabaseUtils;
 import com.cgi.iec61850serversimulator.functionclass.ServerWrapper;
 
 /**
@@ -74,7 +73,6 @@ public class Device {
 
     public void initalizeDevice(final ServerWrapper serverSapWrapper) {
 
-        this.databaseUtils = new DatabaseUtils(serverSapWrapper);
         this.serverWrapper = serverSapWrapper;
         this.clock = new Clock();
         this.clock.initializeClock(this.serverWrapper.findModelNode("SWDeviceGenericIO/CSLC.Clock", Fc.CF));
@@ -85,8 +83,6 @@ public class Device {
                     this.serverWrapper.findModelNode(SWITCH_ROOT + (relayNr + 1) + ".Pos", Fc.CO),
                     this.serverWrapper.findModelNode(SWITCH_ROOT + (relayNr + 1) + ".Sche.sche1", Fc.CF),
                     this.serverWrapper);
-            logger.info("Checking relays in database...");
-            // databaseUtils.checkRelay(this.relays[relayNr]);
             logger.info("Enable switching of relay.");
             this.enableSwitching(relayNr + 1);
 
