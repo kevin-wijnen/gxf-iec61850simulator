@@ -85,8 +85,8 @@ public class Schedule {
             return this;
         }
 
-        public ScheduleBuilder isEnabled(boolean isEnabled) {
-            this.enabled = isEnabled;
+        public ScheduleBuilder isEnabled(boolean enabled) {
+            this.enabled = enabled;
 
             return this;
         }

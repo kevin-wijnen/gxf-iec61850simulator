@@ -102,11 +102,6 @@ public class EventDataListener implements ServerEventListener {
                     final boolean newValue = ((BdaBoolean) bda).getValue();
                     this.device.getClock().setEnableNTP(newValue);
 
-                    // Ruud: example to modify a light status, which is what should
-                    // happen at the point in
-                    // time when a schedule moment should change a light status.
-                    // this.device.setLightStatus(2, newValue);
-
                     break;
 
                 case "ntpSvrA":
@@ -163,11 +158,13 @@ public class EventDataListener implements ServerEventListener {
                             ((BdaBoolean) bda).getValue());
                     try {
 
-                        // OOP Class
+                        // Sends updated Schedule to Schedule object
                         this.device.getRelay(relayIndex).getSchedule(scheduleIndex)
                                 .setEnabled(((BdaBoolean) bda).getValue());
 
-                        // Database, yet to add
+                        // Sends updated Schedule to database
+                        this.databaseUtils
+                                .updateDatabaseSchedule(this.device.getRelay(relayIndex).getSchedule(scheduleIndex));
 
                         modified = true;
 
@@ -188,6 +185,10 @@ public class EventDataListener implements ServerEventListener {
                         if (newDay != currentDay) {
                             modified = true;
                             this.device.getRelay(relayIndex).getSchedule(scheduleIndex).setDayInt(newDay);
+
+                            // Sends updated Schedule to database
+                            this.databaseUtils.updateDatabaseSchedule(
+                                    this.device.getRelay(relayIndex).getSchedule(scheduleIndex));
                         }
                         modified = true;
                     } catch (final Exception e) {
@@ -206,7 +207,13 @@ public class EventDataListener implements ServerEventListener {
                         int timeHour = timeInt / 100;
                         int timeMinute = timeInt % 100;
                         LocalTime timeLocalTime = LocalTime.of(timeHour, timeMinute);
+
                         this.device.getRelay(relayIndex).getSchedule(scheduleIndex).setTimeOn(timeLocalTime);
+
+                        // Sends updated Schedule to database
+                        this.databaseUtils
+                                .updateDatabaseSchedule(this.device.getRelay(relayIndex).getSchedule(scheduleIndex));
+
                         modified = true;
                     } catch (final Exception e) {
                         logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
@@ -221,6 +228,11 @@ public class EventDataListener implements ServerEventListener {
                     try {
                         this.device.getRelay(relayIndex).getSchedule(scheduleIndex)
                                 .setTimeOnTypeInt(((BdaInt8) bda).getValue());
+
+                        // Sends updated Schedule to database
+                        this.databaseUtils
+                                .updateDatabaseSchedule(this.device.getRelay(relayIndex).getSchedule(scheduleIndex));
+
                         modified = true;
                     } catch (final Exception e) {
                         logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
@@ -238,7 +250,13 @@ public class EventDataListener implements ServerEventListener {
                         int timeHour = timeInt / 100;
                         int timeMinute = timeInt % 100;
                         LocalTime timeLocalTime = LocalTime.of(timeHour, timeMinute);
+
                         this.device.getRelay(relayIndex).getSchedule(scheduleIndex).setTimeOff(timeLocalTime);
+
+                        // Sends updated Schedule to database
+                        this.databaseUtils
+                                .updateDatabaseSchedule(this.device.getRelay(relayIndex).getSchedule(scheduleIndex));
+
                         modified = true;
                     } catch (final Exception e) {
                         logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
@@ -253,6 +271,11 @@ public class EventDataListener implements ServerEventListener {
                     try {
                         this.device.getRelay(relayIndex).getSchedule(scheduleIndex)
                                 .setTimeOffTypeInt(((BdaInt8) bda).getValue());
+
+                        // Sends updated Schedule to database
+                        this.databaseUtils
+                                .updateDatabaseSchedule(this.device.getRelay(relayIndex).getSchedule(scheduleIndex));
+
                         modified = true;
                     } catch (final Exception e) {
                         logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
@@ -267,6 +290,11 @@ public class EventDataListener implements ServerEventListener {
                     try {
                         this.device.getRelay(relayIndex).getSchedule(scheduleIndex)
                                 .setBurningMinsOn((short) ((BdaInt16U) bda).getValue());
+
+                        // Sends updated Schedule to database
+                        this.databaseUtils
+                                .updateDatabaseSchedule(this.device.getRelay(relayIndex).getSchedule(scheduleIndex));
+
                         modified = true;
                     } catch (final Exception e) {
                         logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
@@ -281,6 +309,9 @@ public class EventDataListener implements ServerEventListener {
                     try {
                         this.device.getRelay(relayIndex).getSchedule(scheduleIndex)
                                 .setBeforeOffset((short) ((BdaInt16U) bda).getValue());
+
+                        // Not used in database
+
                         modified = true;
                     } catch (final Exception e) {
                         logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
@@ -295,6 +326,9 @@ public class EventDataListener implements ServerEventListener {
                     try {
                         this.device.getRelay(relayIndex).getSchedule(scheduleIndex)
                                 .setAfterOffset((short) ((BdaInt16U) bda).getValue());
+
+                        // Not used in database
+
                         modified = true;
                     } catch (final Exception e) {
                         logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
@@ -310,6 +344,9 @@ public class EventDataListener implements ServerEventListener {
                     try {
                         this.device.getRelay(relayIndex).getSchedule(scheduleIndex)
                                 .setDescription(((BdaVisibleString) bda).getValueString());
+
+                        // Not used in database
+
                     } catch (final Exception e) {
                         logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
                     }

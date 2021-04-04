@@ -118,12 +118,12 @@ public class ServerSimulator implements CommandLineRunner {
         DatabaseUtils databaseUtils = new DatabaseUtils(serverWrapper);
         databaseUtils.setRelayRepository(this.relayRepository);
         databaseUtils.setScheduleRepository(this.scheduleRepository);
-        for (int i = 1; i < device.getRelays().length + 1; i++) {
-            Relay relay = device.getRelay(i);
+        for (int relayNr = 1; relayNr <= device.getRelays().length; relayNr++) {
+            Relay relay = device.getRelay(relayNr);
             databaseUtils.checkRelay(relay);
 
-            for (int j = 1; j < 51; j++) {
-                Schedule schedule = relay.getSchedule(j);
+            for (int scheduleNr = 1; scheduleNr <= 50; scheduleNr++) {
+                Schedule schedule = relay.getSchedule(scheduleNr);
                 databaseUtils.checkSchedule(schedule, relay.getIndexNumber());
             }
 

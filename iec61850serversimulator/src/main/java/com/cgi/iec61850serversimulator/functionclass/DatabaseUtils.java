@@ -114,7 +114,7 @@ public class DatabaseUtils {
         boolean found = this.scheduleRepository.existsByIndexNumberAndRelayId(schedule.getIndexNumber(), relayNr);
 
         if (found) {
-            logger.info("Schedule found in database. Updating model. NOT IMPLEMENTED AS OF NOW.");
+            logger.info("Schedule found in database. Updating model.");
             this.updateModelSchedule(schedule, relayNr);
         } else {
 
@@ -202,20 +202,6 @@ public class DatabaseUtils {
         schedule.setBurningMinsOn(databaseSchedule.getBurningMinutes());
 
         this.serverWrapper.setValues(bdas);
-
-        // Creating BDAs for the values
-        // final BdaBoolean modelRelayLightStatus = (BdaBoolean) this.serverWrapper
-        // .findModelNode(SWITCH_ROOT + relayNr + ".Pos.Oper.ctlVal", Fc.CO);
-        // modelRelayLightStatus.setValue(databaseRelay.get(0).isLightStatus());
-        // List<BasicDataAttribute> bdas = new ArrayList<BasicDataAttribute>();
-        // bdas.add(modelRelayLightStatus);
-
-        // Update Schedule object
-        // schedule.setLight(databaseRelay.get(0).isLightStatus());
-
-        // Send model update
-        // this.serverWrapper.setValues(bdas);
-
     }
 
     public void initializeDatabaseSchedule(Schedule schedule, int relayNr) {
@@ -235,15 +221,24 @@ public class DatabaseUtils {
         this.scheduleRepository.save(toUpdateSchedule);
     }
 
-    public void updateDatabaseSchedule(Relay relay) {
-        // Updating database relay
+    public void updateDatabaseSchedule(Schedule schedule) {
+        // Updating database schedule
 
-        int index_number = relay.getIndexNumber();
-        boolean light_status = relay.getLight();
-        List<RelayEntity> relayEntities = this.relayRepository.findByIndexNumber(index_number);
-        RelayEntity toUpdateRelay = relayEntities.get(0);
-        toUpdateRelay.setLightStatus(light_status);
-        this.relayRepository.save(toUpdateRelay);
+        int index_number = schedule.getIndexNumber();
+        int relayNr = schedule.getRelayNr();
+
+        List<ScheduleEntity> scheduleEntities = this.scheduleRepository.findByIndexNumberAndRelayId(index_number,
+                relayNr);
+        ScheduleEntity toUpdateSchedule = scheduleEntities.get(0);
+        toUpdateSchedule.setEnabled(schedule.isEnabled());
+        toUpdateSchedule.setDay(schedule.getDayInt());
+        toUpdateSchedule.setTimeOn(schedule.getTimeOn());
+        toUpdateSchedule.setTimeTypeOn(schedule.getTimeOnTypeInt());
+        toUpdateSchedule.setTimeOff(schedule.getTimeOff());
+        toUpdateSchedule.setTimeTypeOff(schedule.getTimeOffTypeInt());
+        toUpdateSchedule.setBurningMinutes(schedule.getBurningMinsOn());
+
+        this.scheduleRepository.save(toUpdateSchedule);
     }
 
 }

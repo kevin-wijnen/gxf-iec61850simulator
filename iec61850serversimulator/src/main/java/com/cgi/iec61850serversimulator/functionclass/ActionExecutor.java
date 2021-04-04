@@ -3,7 +3,6 @@ package com.cgi.iec61850serversimulator.functionclass;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.beanit.openiec61850.ServerModel;
 import com.beanit.openiec61850.ServerSap;
 import com.beanit.openiec61850.internal.cli.ActionException;
 import com.beanit.openiec61850.internal.cli.ActionListener;
@@ -18,13 +17,11 @@ public class ActionExecutor implements ActionListener {
     private static final Logger logger = LoggerFactory.getLogger(ServerSimulator.class);
     private static final String PRINT_SERVER_MODEL_KEY = "p";
     private static final String DEVICE_SHOW_MODEL = "d";
-    public ServerSap serverSap = null;
-    public ServerModel serverModel = null;
-    public Device device = null;
+    private ServerSap serverSap = null;
+    private Device device = null;
 
     public ActionExecutor(final ServerSap serverSap, final Device device) {
         this.serverSap = serverSap;
-        this.serverModel = serverSap.getModelCopy();
         this.device = device;
     }
 
@@ -34,7 +31,7 @@ public class ActionExecutor implements ActionListener {
             switch (actionKey) {
             case PRINT_SERVER_MODEL_KEY:
                 logger.info("** Printing model.");
-                logger.info("Server model:" + this.serverModel);
+                logger.info("Server model:" + this.serverSap.getModelCopy());
                 break;
 
             case DEVICE_SHOW_MODEL:
