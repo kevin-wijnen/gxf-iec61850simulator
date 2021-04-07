@@ -15,6 +15,75 @@ import javax.persistence.Table;
 @Table(name = "schedule")
 public class ScheduleEntity {
 
+    public static class ScheduleEntityBuilder {
+
+        private int indexNumber;
+        private int day;
+        private int timeTypeOn;
+        private int timeTypeOff;
+        private LocalTime timeOn;
+        private LocalTime timeOff;
+        private int burningMinutes;
+        private boolean enabled;
+        private RelayEntity relayEntity;
+
+        public ScheduleEntityBuilder(int scheduleNr, RelayEntity relayEntity) {
+            this.indexNumber = scheduleNr;
+            this.relayEntity = relayEntity;
+        }
+
+        public void setIndexNumber(int indexNumber) {
+            this.indexNumber = indexNumber;
+        }
+
+        public void setDay(int day) {
+            this.day = day;
+        }
+
+        public void setTimeTypeOn(int timeTypeOn) {
+            this.timeTypeOn = timeTypeOn;
+        }
+
+        public void setTimeTypeOff(int timeTypeOff) {
+            this.timeTypeOff = timeTypeOff;
+        }
+
+        public void setTimeOn(LocalTime timeOn) {
+            this.timeOn = timeOn;
+        }
+
+        public void setTimeOff(LocalTime timeOff) {
+            this.timeOff = timeOff;
+        }
+
+        public void setBurningMinutes(int burningMinutes) {
+            this.burningMinutes = burningMinutes;
+        }
+
+        public void setEnabled(boolean enabled) {
+            this.enabled = enabled;
+        }
+
+        public void setRelayEntity(RelayEntity relayEntity) {
+            this.relayEntity = relayEntity;
+        }
+
+        public ScheduleEntity buildScheduleEntity() {
+            ScheduleEntity scheduleEntity = new ScheduleEntity();
+            scheduleEntity.indexNumber = this.indexNumber;
+            scheduleEntity.day = this.day;
+            scheduleEntity.timeTypeOn = this.timeTypeOn;
+            scheduleEntity.timeTypeOff = this.timeTypeOff;
+            scheduleEntity.timeOn = this.timeOn;
+            scheduleEntity.timeOff = this.timeOff;
+            scheduleEntity.burningMinutes = this.burningMinutes;
+            scheduleEntity.enabled = this.enabled;
+            scheduleEntity.relay = this.relayEntity;
+
+            return scheduleEntity;
+        }
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;

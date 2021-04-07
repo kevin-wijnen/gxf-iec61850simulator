@@ -18,6 +18,7 @@ import com.cgi.iec61850serversimulator.dataclass.Relay;
 import com.cgi.iec61850serversimulator.dataclass.Schedule;
 import com.cgi.iec61850serversimulator.datamodel.RelayEntity;
 import com.cgi.iec61850serversimulator.datamodel.ScheduleEntity;
+import com.cgi.iec61850serversimulator.datamodel.ScheduleEntity.ScheduleEntityBuilder;
 import com.cgi.iec61850serversimulator.datarepository.RelayRepository;
 import com.cgi.iec61850serversimulator.datarepository.ScheduleRepository;
 
@@ -216,7 +217,7 @@ public class DatabaseUtils {
     public void createDatabaseSchedule(Schedule schedule, int relayNr) {
         // Add missing schedule to database
 
-        int index_number = schedule.getIndexNumber();
+        int indexNumber = schedule.getIndexNumber();
         int day = schedule.getDayInt();
         int timeOnType = schedule.getTimeOnTypeInt();
         int timeOffType = schedule.getTimeOffTypeInt();
@@ -225,8 +226,23 @@ public class DatabaseUtils {
         int burningMinutes = schedule.getBurningMinsOn();
         boolean enabled = schedule.isEnabled();
         RelayEntity relayEntity = this.relayRepository.findByIndexNumber(relayNr).get(0);
-        ScheduleEntity toUpdateSchedule = new ScheduleEntity(index_number, day, timeOnType, timeOffType, timeOn,
-                timeOff, burningMinutes, enabled, relayEntity);
+
+        // Builder
+        ScheduleEntityBuilder scheduleBuilder = new ScheduleEntityBuilder(indexNumber, relayEntity);
+        scheduleBuilder.setDay(day);
+        scheduleBuilder.setTimeTypeOn(timeOnType);
+        scheduleBuilder.setTimeTypeOff(timeOffType);
+        scheduleBuilder.setTimeOn(timeOn);
+        scheduleBuilder.setTimeOff(timeOff);
+        scheduleBuilder.setBurningMinutes(burningMinutes);
+        scheduleBuilder.setEnabled(enabled);
+        ScheduleEntity toUpdateSchedule = scheduleBuilder.buildScheduleEntity();
+
+        /*
+         * ScheduleEntity toUpdateSchedule = new ScheduleEntity(indexNumber, day,
+         * timeOnType, timeOffType, timeOn, timeOff, burningMinutes, enabled,
+         * relayEntity);
+         */
         this.scheduleRepository.save(toUpdateSchedule);
     }
 
