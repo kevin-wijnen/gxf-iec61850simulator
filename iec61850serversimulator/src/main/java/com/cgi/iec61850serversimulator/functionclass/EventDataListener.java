@@ -53,10 +53,9 @@ public class EventDataListener implements ServerEventListener {
             for (final BasicDataAttribute bda : bdas) {
                 final String dataAttribute = bda.getName();
                 final String referenceString = bda.getReference().toString();
-                logger.info(dataAttribute);
-                logger.info("Bda Type: " + bda.getBasicType());
-                // System.out.println("Relay array created." +
-                // relayScheduleNumbers);
+                // logger.info(dataAttribute);
+                // logger.info("Bda Type: " + bda.getBasicType());
+
                 switch (dataAttribute) {
 
                 // Clock data
@@ -149,213 +148,241 @@ public class EventDataListener implements ServerEventListener {
                 // Schedule data
 
                 case "enable": {
-                    logger.info("Schedule Enabled Status found.");
-                    // TODO: Why is the previous instance out of scope?
                     final int relayIndex = this.extractRelayIndex(bda.getReference());
                     final int scheduleIndex = this.extractScheduleIndex(bda.getReference());
 
-                    logger.info("Value to set for schedule {} of relay {}: {}", scheduleIndex, relayIndex,
-                            ((BdaBoolean) bda).getValue());
-                    try {
+                    if (scheduleIndex <= 50) {
+                        logger.info("Schedule Enabled Status found.");
+                        logger.info("Value to set for schedule {} of relay {}: {}", scheduleIndex, relayIndex,
+                                ((BdaBoolean) bda).getValue());
+                        try {
 
-                        // Sends updated Schedule to Schedule object
-                        this.device.getRelay(relayIndex).getSchedule(scheduleIndex)
-                                .setEnabled(((BdaBoolean) bda).getValue());
+                            // Sends updated Schedule to Schedule object
+                            this.device.getRelay(relayIndex).getSchedule(scheduleIndex)
+                                    .setEnabled(((BdaBoolean) bda).getValue());
 
-                        // Sends updated Schedule to database
-                        this.databaseUtils
-                                .updateDatabaseSchedule(this.device.getRelay(relayIndex).getSchedule(scheduleIndex));
+                            // Sends updated Schedule to database
+                            this.databaseUtils.updateDatabaseSchedule(
+                                    this.device.getRelay(relayIndex).getSchedule(scheduleIndex));
 
-                        modified = true;
+                            modified = true;
 
-                    } catch (final Exception e) {
-                        logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
+                        } catch (final Exception e) {
+                            logger.warn("Schedule exception: ", e);
+                        }
                     }
                     break;
                 }
 
                 case "day": {
-                    logger.info("Day found.");
                     final int relayIndex = this.extractRelayIndex(bda.getReference());
                     final int scheduleIndex = this.extractScheduleIndex(bda.getReference());
 
-                    try {
-                        int newDay = ((BdaInt32) bda).getValue();
-                        int currentDay = this.device.getRelay(relayIndex).getSchedule(scheduleIndex).getDayInt();
-                        if (newDay != currentDay) {
-                            modified = true;
-                            this.device.getRelay(relayIndex).getSchedule(scheduleIndex).setDayInt(newDay);
+                    if (scheduleIndex <= 50) {
 
-                            // Sends updated Schedule to database
-                            this.databaseUtils.updateDatabaseSchedule(
-                                    this.device.getRelay(relayIndex).getSchedule(scheduleIndex));
+                        try {
+                            logger.info("Day found.");
+                            int newDay = ((BdaInt32) bda).getValue();
+                            int currentDay = this.device.getRelay(relayIndex).getSchedule(scheduleIndex).getDayInt();
+                            if (newDay != currentDay) {
+                                modified = true;
+                                this.device.getRelay(relayIndex).getSchedule(scheduleIndex).setDayInt(newDay);
+
+                                // Sends updated Schedule to database
+                                this.databaseUtils.updateDatabaseSchedule(
+                                        this.device.getRelay(relayIndex).getSchedule(scheduleIndex));
+                            }
+                            modified = true;
+                        } catch (final Exception e) {
+                            logger.warn("Schedule exception: ", e);
                         }
-                        modified = true;
-                    } catch (final Exception e) {
-                        logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
                     }
                     break;
                 }
 
                 case "tOn": {
-                    logger.info("Time On found.");
                     final int relayIndex = this.extractRelayIndex(bda.getReference());
                     final int scheduleIndex = this.extractScheduleIndex(bda.getReference());
-                    try {
-                        this.device.getRelay(relayIndex).getSchedule(scheduleIndex);
-                        int timeInt = (((BdaInt32) bda).getValue());
-                        int timeHour = timeInt / 100;
-                        int timeMinute = timeInt % 100;
-                        LocalTime timeLocalTime = LocalTime.of(timeHour, timeMinute);
 
-                        this.device.getRelay(relayIndex).getSchedule(scheduleIndex).setTimeOn(timeLocalTime);
+                    if (scheduleIndex <= 50) {
+                        try {
+                            logger.info("Time On found.");
+                            this.device.getRelay(relayIndex).getSchedule(scheduleIndex);
+                            int timeInt = (((BdaInt32) bda).getValue());
+                            int timeHour = timeInt / 100;
+                            int timeMinute = timeInt % 100;
+                            LocalTime timeLocalTime = LocalTime.of(timeHour, timeMinute);
 
-                        // Sends updated Schedule to database
-                        this.databaseUtils
-                                .updateDatabaseSchedule(this.device.getRelay(relayIndex).getSchedule(scheduleIndex));
+                            this.device.getRelay(relayIndex).getSchedule(scheduleIndex).setTimeOn(timeLocalTime);
 
-                        modified = true;
-                    } catch (final Exception e) {
-                        logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
+                            // Sends updated Schedule to database
+                            this.databaseUtils.updateDatabaseSchedule(
+                                    this.device.getRelay(relayIndex).getSchedule(scheduleIndex));
+
+                            modified = true;
+                        } catch (final Exception e) {
+                            logger.warn("Schedule exception: ", e);
+                        }
                     }
                     break;
                 }
 
                 case "tOnT": {
-                    logger.info("Time On Type found.");
                     final int relayIndex = this.extractRelayIndex(bda.getReference());
                     final int scheduleIndex = this.extractScheduleIndex(bda.getReference());
-                    try {
-                        this.device.getRelay(relayIndex).getSchedule(scheduleIndex)
-                                .setTimeOnTypeInt(((BdaInt8) bda).getValue());
 
-                        // Sends updated Schedule to database
-                        this.databaseUtils
-                                .updateDatabaseSchedule(this.device.getRelay(relayIndex).getSchedule(scheduleIndex));
+                    if (scheduleIndex <= 50) {
+                        logger.info("Time On Type found.");
+                        try {
+                            this.device.getRelay(relayIndex).getSchedule(scheduleIndex)
+                                    .setTimeOnTypeInt(((BdaInt8) bda).getValue());
 
-                        modified = true;
-                    } catch (final Exception e) {
-                        logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
+                            // Sends updated Schedule to database
+                            this.databaseUtils.updateDatabaseSchedule(
+                                    this.device.getRelay(relayIndex).getSchedule(scheduleIndex));
+
+                            modified = true;
+                        } catch (final Exception e) {
+                            logger.warn("Schedule exception: ", e);
+                        }
                     }
                     break;
                 }
 
                 case "tOff": {
-                    logger.info("Time Off found.");
                     final int relayIndex = this.extractRelayIndex(bda.getReference());
                     final int scheduleIndex = this.extractScheduleIndex(bda.getReference());
-                    try {
-                        this.device.getRelay(relayIndex).getSchedule(scheduleIndex);
-                        int timeInt = (((BdaInt32) bda).getValue());
-                        int timeHour = timeInt / 100;
-                        int timeMinute = timeInt % 100;
-                        LocalTime timeLocalTime = LocalTime.of(timeHour, timeMinute);
 
-                        this.device.getRelay(relayIndex).getSchedule(scheduleIndex).setTimeOff(timeLocalTime);
+                    if (scheduleIndex <= 50) {
+                        logger.info("Time Off found.");
+                        try {
+                            this.device.getRelay(relayIndex).getSchedule(scheduleIndex);
+                            int timeInt = (((BdaInt32) bda).getValue());
+                            int timeHour = timeInt / 100;
+                            int timeMinute = timeInt % 100;
+                            LocalTime timeLocalTime = LocalTime.of(timeHour, timeMinute);
 
-                        // Sends updated Schedule to database
-                        this.databaseUtils
-                                .updateDatabaseSchedule(this.device.getRelay(relayIndex).getSchedule(scheduleIndex));
+                            this.device.getRelay(relayIndex).getSchedule(scheduleIndex).setTimeOff(timeLocalTime);
 
-                        modified = true;
-                    } catch (final Exception e) {
-                        logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
+                            // Sends updated Schedule to database
+                            this.databaseUtils.updateDatabaseSchedule(
+                                    this.device.getRelay(relayIndex).getSchedule(scheduleIndex));
+
+                            modified = true;
+                        } catch (final Exception e) {
+                            logger.warn("Schedule exception: ", e);
+                        }
                     }
                     break;
                 }
 
                 case "tOffT": {
-                    logger.info("Time Off Type found.");
                     final int relayIndex = this.extractRelayIndex(bda.getReference());
                     final int scheduleIndex = this.extractScheduleIndex(bda.getReference());
-                    try {
-                        this.device.getRelay(relayIndex).getSchedule(scheduleIndex)
-                                .setTimeOffTypeInt(((BdaInt8) bda).getValue());
 
-                        // Sends updated Schedule to database
-                        this.databaseUtils
-                                .updateDatabaseSchedule(this.device.getRelay(relayIndex).getSchedule(scheduleIndex));
+                    if (scheduleIndex <= 50) {
+                        logger.info("Time Off Type found.");
+                        try {
+                            this.device.getRelay(relayIndex).getSchedule(scheduleIndex)
+                                    .setTimeOffTypeInt(((BdaInt8) bda).getValue());
 
-                        modified = true;
-                    } catch (final Exception e) {
-                        logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
+                            // Sends updated Schedule to database
+                            this.databaseUtils.updateDatabaseSchedule(
+                                    this.device.getRelay(relayIndex).getSchedule(scheduleIndex));
+
+                            modified = true;
+                        } catch (final Exception e) {
+                            logger.warn("Schedule exception: ", e);
+                        }
                     }
                     break;
                 }
 
                 case "minOnPer": {
-                    logger.info("Burning Minutes found.");
                     final int relayIndex = this.extractRelayIndex(bda.getReference());
                     final int scheduleIndex = this.extractScheduleIndex(bda.getReference());
-                    try {
-                        this.device.getRelay(relayIndex).getSchedule(scheduleIndex)
-                                .setBurningMinsOn((short) ((BdaInt16U) bda).getValue());
 
-                        // Sends updated Schedule to database
-                        this.databaseUtils
-                                .updateDatabaseSchedule(this.device.getRelay(relayIndex).getSchedule(scheduleIndex));
+                    if (scheduleIndex <= 50) {
+                        logger.info("Burning Minutes found.");
+                        try {
+                            this.device.getRelay(relayIndex).getSchedule(scheduleIndex)
+                                    .setBurningMinsOn((short) ((BdaInt16U) bda).getValue());
 
-                        modified = true;
-                    } catch (final Exception e) {
-                        logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
+                            // Sends updated Schedule to database
+                            this.databaseUtils.updateDatabaseSchedule(
+                                    this.device.getRelay(relayIndex).getSchedule(scheduleIndex));
+
+                            modified = true;
+                        } catch (final Exception e) {
+                            logger.warn("Schedule exception: ", e);
+                        }
                     }
                     break;
                 }
 
                 case "srBefWd": {
-                    logger.info("Before Astronomical Time Offset found.");
                     final int relayIndex = this.extractRelayIndex(bda.getReference());
                     final int scheduleIndex = this.extractScheduleIndex(bda.getReference());
-                    try {
-                        this.device.getRelay(relayIndex).getSchedule(scheduleIndex)
-                                .setBeforeOffset((short) ((BdaInt16U) bda).getValue());
 
-                        // Not used in database
+                    if (scheduleIndex <= 50) {
+                        logger.info("Before Astronomical Time Offset found.");
+                        try {
+                            this.device.getRelay(relayIndex).getSchedule(scheduleIndex)
+                                    .setBeforeOffset((short) ((BdaInt16U) bda).getValue());
 
-                        modified = true;
-                    } catch (final Exception e) {
-                        logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
+                            // Not used in database
+
+                            modified = true;
+                        } catch (final Exception e) {
+                            logger.warn("Schedule exception: ", e);
+                        }
+                        break;
                     }
-                    break;
                 }
 
                 case "srAftWd": {
-                    logger.info("After Astronomical Time Offset found.");
                     final int relayIndex = this.extractRelayIndex(bda.getReference());
                     final int scheduleIndex = this.extractScheduleIndex(bda.getReference());
-                    try {
-                        this.device.getRelay(relayIndex).getSchedule(scheduleIndex)
-                                .setAfterOffset((short) ((BdaInt16U) bda).getValue());
 
-                        // Not used in database
+                    if (scheduleIndex <= 50) {
+                        logger.info("After Astronomical Time Offset found.");
+                        try {
+                            this.device.getRelay(relayIndex).getSchedule(scheduleIndex)
+                                    .setAfterOffset((short) ((BdaInt16U) bda).getValue());
 
-                        modified = true;
-                    } catch (final Exception e) {
-                        logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
+                            // Not used in database
+
+                            modified = true;
+                        } catch (final Exception e) {
+                            logger.warn("Schedule exception: ", e);
+                        }
                     }
                     break;
                 }
 
                 case "Descr": {
-                    logger.info("Description found.");
-                    System.out.println(referenceString);
                     final int relayIndex = this.extractRelayIndex(bda.getReference());
                     final int scheduleIndex = this.extractScheduleIndex(bda.getReference());
-                    try {
-                        this.device.getRelay(relayIndex).getSchedule(scheduleIndex)
-                                .setDescription(((BdaVisibleString) bda).getValueString());
 
-                        // Not used in database
+                    if (scheduleIndex <= 50) {
+                        logger.info("Description found.");
+                        try {
+                            this.device.getRelay(relayIndex).getSchedule(scheduleIndex)
+                                    .setDescription(((BdaVisibleString) bda).getValueString());
 
-                    } catch (final Exception e) {
-                        logger.info("Schedules above 50 are not implemented in the GXF platform. Skip ...");
+                            // Not used in database
+
+                        } catch (final Exception e) {
+                            logger.warn("Schedule exception: ", e);
+                        }
                     }
                     break;
                 }
 
                 default:
                     // When BDA is not used in a class
-                    logger.info("Unimplemented value found, " + "'" + dataAttribute + "'" + ", skipped.");
+                    // logger.info("Unimplemented value found, " + "'" + dataAttribute + "'" + ",
+                    // skipped.");
                     break;
                 }
             }

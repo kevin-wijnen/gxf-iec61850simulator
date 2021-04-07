@@ -86,9 +86,9 @@ public class DatabaseUtils {
     public void initializeDatabaseRelay(Relay relay) {
         // Add missing relay to database
 
-        int index_number = relay.getIndexNumber();
+        int indexNumber = relay.getIndexNumber();
         boolean light_status = relay.getLight();
-        RelayEntity toUpdateRelay = new RelayEntity(index_number, light_status);
+        RelayEntity toUpdateRelay = new RelayEntity(indexNumber, light_status);
         this.relayRepository.save(toUpdateRelay);
     }
 
@@ -229,6 +229,7 @@ public class DatabaseUtils {
 
         List<ScheduleEntity> scheduleEntities = this.scheduleRepository.findByIndexNumberAndRelayId(index_number,
                 relayNr);
+        logger.info(scheduleEntities.toString());
         ScheduleEntity toUpdateSchedule = scheduleEntities.get(0);
         toUpdateSchedule.setEnabled(schedule.isEnabled());
         toUpdateSchedule.setDay(schedule.getDayInt());
