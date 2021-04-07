@@ -140,7 +140,7 @@ public class ServerSimulator implements CommandLineRunner {
             logger.warn("Initial switching moment calculation failed, try sending another schedule.", e);
         }
 
-        final ActionProcessor actionProcessor = new ActionProcessor(new ActionExecutor(serverSap, device));
+        final ActionProcessor actionProcessor = new ActionProcessor(new ActionExecutor(serverSap, device, scheduler));
         actionProcessor.addAction(new Action(PRINT_SERVER_MODEL_KEY, PRINT_SERVER_MODEL_KEY_DESCRIPTION));
         actionProcessor.addAction(new Action(DEVICE_SHOW_MODEL, DEVICE_SHOW_MODEL_DESCRIPTION));
 

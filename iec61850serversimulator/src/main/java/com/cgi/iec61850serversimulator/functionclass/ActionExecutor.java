@@ -19,10 +19,12 @@ public class ActionExecutor implements ActionListener {
     private static final String DEVICE_SHOW_MODEL = "d";
     private ServerSap serverSap = null;
     private Device device = null;
+    private Scheduler scheduler = null;
 
-    public ActionExecutor(final ServerSap serverSap, final Device device) {
+    public ActionExecutor(final ServerSap serverSap, final Device device, Scheduler scheduler) {
         this.serverSap = serverSap;
         this.device = device;
+        this.scheduler = scheduler;
     }
 
     @Override
@@ -48,6 +50,7 @@ public class ActionExecutor implements ActionListener {
     public void quit() {
         logger.info("Shutting down application...");
         this.serverSap.stop();
+        this.scheduler.shutdownScheduler();
         return;
 
     }

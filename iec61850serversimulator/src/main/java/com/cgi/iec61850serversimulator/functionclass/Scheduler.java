@@ -116,4 +116,8 @@ public class Scheduler {
             this.executor.purge();
         }
     }
+
+    public void shutdownScheduler() {
+        this.executor.shutdownNow();
+    }
 }

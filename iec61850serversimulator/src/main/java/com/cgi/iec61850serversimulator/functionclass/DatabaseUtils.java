@@ -64,7 +64,7 @@ public class DatabaseUtils {
             this.updateModelRelay(relay);
         } else {
             logger.info("Relay not found in database, add it to database.");
-            this.initializeDatabaseRelay(relay);
+            this.createDatabaseRelay(relay);
         }
     }
 
@@ -83,23 +83,23 @@ public class DatabaseUtils {
 
     }
 
-    public void initializeDatabaseRelay(Relay relay) {
+    public void createDatabaseRelay(Relay relay) {
         // Add missing relay to database
 
         int indexNumber = relay.getIndexNumber();
-        boolean light_status = relay.getLight();
-        RelayEntity toUpdateRelay = new RelayEntity(indexNumber, light_status);
+        boolean lightStatus = relay.getLight();
+        RelayEntity toUpdateRelay = new RelayEntity(indexNumber, lightStatus);
         this.relayRepository.save(toUpdateRelay);
     }
 
     public void updateDatabaseRelay(Relay relay) {
         // Updating database relay
 
-        int index_number = relay.getIndexNumber();
-        boolean light_status = relay.getLight();
-        List<RelayEntity> relayEntities = this.relayRepository.findByIndexNumber(index_number);
+        int indexNumber = relay.getIndexNumber();
+        boolean lightStatus = relay.getLight();
+        List<RelayEntity> relayEntities = this.relayRepository.findByIndexNumber(indexNumber);
         RelayEntity toUpdateRelay = relayEntities.get(0);
-        toUpdateRelay.setLightStatus(light_status);
+        toUpdateRelay.setLightStatus(lightStatus);
         this.relayRepository.save(toUpdateRelay);
     }
 
@@ -111,7 +111,11 @@ public class DatabaseUtils {
 
         // Checks if relay can be found with index number. If not found, then it will
         // copy the model's relay to the database.
-        boolean found = this.scheduleRepository.existsByIndexNumberAndRelayId(schedule.getIndexNumber(), relayNr);
+
+        List<RelayEntity> relayEntities = this.relayRepository.findByIndexNumber(relayNr);
+        RelayEntity relayEntity = relayEntities.get(0);
+        long relayId = relayEntity.getId();
+        boolean found = this.scheduleRepository.existsByIndexNumberAndRelayId(schedule.getIndexNumber(), relayId);
 
         if (found) {
             logger.info("Schedule found in database. Updating model.");
@@ -120,7 +124,7 @@ public class DatabaseUtils {
 
             if (schedule.isEnabled()) {
                 logger.info("Enabled schedule not found in database, add it to database.");
-                this.initializeDatabaseSchedule(schedule, relayNr);
+                this.createDatabaseSchedule(schedule, relayNr);
             } else {
                 logger.info("Schedule not enabled, not added to database.");
             }
@@ -130,10 +134,15 @@ public class DatabaseUtils {
     public void updateModelSchedule(Schedule schedule, int relayNr) {
         // Update relay model with BDA
         logger.info("Updating model schedule with database.");
+
+        List<RelayEntity> relayEntities = this.relayRepository.findByIndexNumber(relayNr);
+        RelayEntity relayEntity = relayEntities.get(0);
+        long relayId = relayEntity.getId();
+
         int scheduleNr = schedule.getIndexNumber();
         String scheduleRoot = SWITCH_ROOT + relayNr + ".Sche.sche" + scheduleNr;
         List<ScheduleEntity> databaseSchedules = this.scheduleRepository.findByIndexNumberAndRelayId(scheduleNr,
-                relayNr);
+                relayId);
         ScheduleEntity databaseSchedule = databaseSchedules.get(0);
         BdaBoolean modelScheduleEnabled = (BdaBoolean) this.serverWrapper.findModelNode(scheduleRoot + ".enable",
                 Fc.CF);
@@ -204,7 +213,7 @@ public class DatabaseUtils {
         this.serverWrapper.setValues(bdas);
     }
 
-    public void initializeDatabaseSchedule(Schedule schedule, int relayNr) {
+    public void createDatabaseSchedule(Schedule schedule, int relayNr) {
         // Add missing schedule to database
 
         int index_number = schedule.getIndexNumber();
@@ -224,22 +233,31 @@ public class DatabaseUtils {
     public void updateDatabaseSchedule(Schedule schedule) {
         // Updating database schedule
 
-        int index_number = schedule.getIndexNumber();
+        int indexNumber = schedule.getIndexNumber();
         int relayNr = schedule.getRelayNr();
+        boolean found = this.scheduleRepository.existsByIndexNumberAndRelayId(schedule.getIndexNumber(), relayNr);
 
-        List<ScheduleEntity> scheduleEntities = this.scheduleRepository.findByIndexNumberAndRelayId(index_number,
-                relayNr);
-        logger.info(scheduleEntities.toString());
-        ScheduleEntity toUpdateSchedule = scheduleEntities.get(0);
-        toUpdateSchedule.setEnabled(schedule.isEnabled());
-        toUpdateSchedule.setDay(schedule.getDayInt());
-        toUpdateSchedule.setTimeOn(schedule.getTimeOn());
-        toUpdateSchedule.setTimeTypeOn(schedule.getTimeOnTypeInt());
-        toUpdateSchedule.setTimeOff(schedule.getTimeOff());
-        toUpdateSchedule.setTimeTypeOff(schedule.getTimeOffTypeInt());
-        toUpdateSchedule.setBurningMinutes(schedule.getBurningMinsOn());
+        if (found) {
+            List<ScheduleEntity> scheduleEntities = this.scheduleRepository.findByIndexNumberAndRelayId(indexNumber,
+                    relayNr);
 
-        this.scheduleRepository.save(toUpdateSchedule);
+            logger.info(scheduleEntities.toString());
+            ScheduleEntity toUpdateSchedule = scheduleEntities.get(0);
+            toUpdateSchedule.setEnabled(schedule.isEnabled());
+            toUpdateSchedule.setDay(schedule.getDayInt());
+            toUpdateSchedule.setTimeOn(schedule.getTimeOn());
+            toUpdateSchedule.setTimeTypeOn(schedule.getTimeOnTypeInt());
+            toUpdateSchedule.setTimeOff(schedule.getTimeOff());
+            toUpdateSchedule.setTimeTypeOff(schedule.getTimeOffTypeInt());
+            toUpdateSchedule.setBurningMinutes(schedule.getBurningMinsOn());
+
+            this.scheduleRepository.save(toUpdateSchedule);
+        } else {
+            if (schedule.isEnabled()) {
+                logger.info("Schedule not in database, adding to it...");
+                this.createDatabaseSchedule(schedule, relayNr);
+            }
+        }
     }
 
 }
