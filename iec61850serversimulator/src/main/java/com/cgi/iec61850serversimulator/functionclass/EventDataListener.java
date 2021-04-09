@@ -53,8 +53,6 @@ public class EventDataListener implements ServerEventListener {
             for (final BasicDataAttribute bda : bdas) {
                 final String dataAttribute = bda.getName();
                 final String referenceString = bda.getReference().toString();
-                // logger.info(dataAttribute);
-                // logger.info("Bda Type: " + bda.getBasicType());
 
                 switch (dataAttribute) {
 
@@ -381,8 +379,6 @@ public class EventDataListener implements ServerEventListener {
 
                 default:
                     // When BDA is not used in a class
-                    // logger.info("Unimplemented value found, " + "'" + dataAttribute + "'" + ",
-                    // skipped.");
                     break;
                 }
             }
@@ -427,8 +423,6 @@ public class EventDataListener implements ServerEventListener {
 
     public int extractScheduleIndex(final ObjectReference reference) {
         final String referenceString = reference.toString();
-        // int scheduleIndex =
-        // Integer.parseInt(Character.toString(referenceString.charAt(33)));
 
         final int[] regexResults = new int[2];
         final Pattern numberPattern = Pattern.compile("[0-9]{1,}");

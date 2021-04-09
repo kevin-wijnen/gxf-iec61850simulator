@@ -94,7 +94,6 @@ public class DatabaseUtils {
     }
 
     public void updateDatabaseRelay(Relay relay) {
-        // Updating database relay
 
         int indexNumber = relay.getIndexNumber();
         boolean lightStatus = relay.getLight();
@@ -107,11 +106,7 @@ public class DatabaseUtils {
     // Schedule functions
 
     public void checkSchedule(Schedule schedule, int relayNr) {
-        // Check database if schedule exists
         // Make sure relayNr is 1, 2, 3, 4; not 0, 1, 2, 3!
-
-        // Checks if relay can be found with index number. If not found, then it will
-        // copy the model's relay to the database.
 
         List<RelayEntity> relayEntities = this.relayRepository.findByIndexNumber(relayNr);
         RelayEntity relayEntity = relayEntities.get(0);
@@ -229,7 +224,7 @@ public class DatabaseUtils {
 
         // Builder
         ScheduleEntityBuilder scheduleBuilder = new ScheduleEntityBuilder(indexNumber, relayEntity);
-        scheduleBuilder.setDay(day);
+        scheduleBuilder.withDay(day);
         scheduleBuilder.setTimeTypeOn(timeOnType);
         scheduleBuilder.setTimeTypeOff(timeOffType);
         scheduleBuilder.setTimeOn(timeOn);
@@ -238,11 +233,6 @@ public class DatabaseUtils {
         scheduleBuilder.setEnabled(enabled);
         ScheduleEntity toUpdateSchedule = scheduleBuilder.buildScheduleEntity();
 
-        /*
-         * ScheduleEntity toUpdateSchedule = new ScheduleEntity(indexNumber, day,
-         * timeOnType, timeOffType, timeOn, timeOff, burningMinutes, enabled,
-         * relayEntity);
-         */
         this.scheduleRepository.save(toUpdateSchedule);
     }
 

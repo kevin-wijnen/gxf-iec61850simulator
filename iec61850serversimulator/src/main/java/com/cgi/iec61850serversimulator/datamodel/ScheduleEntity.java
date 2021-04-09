@@ -27,16 +27,12 @@ public class ScheduleEntity {
         private boolean enabled;
         private RelayEntity relayEntity;
 
-        public ScheduleEntityBuilder(int scheduleNr, RelayEntity relayEntity) {
-            this.indexNumber = scheduleNr;
+        public ScheduleEntityBuilder(int indexNumber, RelayEntity relayEntity) {
+            this.indexNumber = indexNumber;
             this.relayEntity = relayEntity;
         }
 
-        public void setIndexNumber(int indexNumber) {
-            this.indexNumber = indexNumber;
-        }
-
-        public void setDay(int day) {
+        public void withDay(int day) {
             this.day = day;
         }
 
