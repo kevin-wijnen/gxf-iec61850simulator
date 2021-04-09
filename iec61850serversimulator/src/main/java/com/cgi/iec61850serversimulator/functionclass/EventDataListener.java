@@ -53,334 +53,269 @@ public class EventDataListener implements ServerEventListener {
             for (final BasicDataAttribute bda : bdas) {
                 final String dataAttribute = bda.getName();
                 final String referenceString = bda.getReference().toString();
-                logger.info(referenceString);
 
-                switch (dataAttribute) {
+                // Initializing relay and schedule numbers. 0 = unused
+                int relayNr = 0;
+                int scheduleNr = 0;
 
-                // Clock data
-                case "curT":
-                    logger.info("Current Time value found.");
+                if (referenceString.contains("XSWC")) {
+                    relayNr = this.extractRelayIndex(bda.getReference());
 
-                    // For native time stamp: Epoch/UNIX time stamp format is used,
-                    // from second on. Convert to native time stamp!.
-                    final byte[] bytesEpochTime = ((BdaTimestamp) bda).getValue();
-                    final ByteBuffer wrappedTime = ByteBuffer.wrap(bytesEpochTime);
-                    final long longTime = wrappedTime.getLong();
-                    this.device.getClock()
-                            .setCurrentTime(LocalDateTime.ofEpochSecond(longTime, 0, ZoneOffset.ofHours(1)));
-                    break;
-
-                case "tZ":
-                    logger.info("Time Zone value found. (Offset in minutes from UTC!)");
-                    this.device.getClock().setTimeZoneOffset(((BdaInt16) bda).getValue());
-                    break;
-
-                case "dstBegT":
-                    logger.info("Daylight Saving Time Start Date value found.");
-                    this.device.getClock().setBeginDateDST(((BdaVisibleString) bda).getValueString());
-                    break;
-
-                case "dstEndT":
-                    logger.info("Daylight Saving Time Start Date value found.");
-                    this.device.getClock().setEndDateDST(((BdaVisibleString) bda).getValueString());
-                    break;
-
-                case "dvt":
-                    logger.info("Daylight Saving Time Deviation value found.");
-                    this.device.getClock().setDeviationDST(((BdaInt16) bda).getValue());
-                    break;
-
-                case "enbDst":
-                    logger.info("Daylight Saving Time Status value found.");
-                    this.device.getClock().setEnableDST(((BdaBoolean) bda).getValue());
-                    break;
-
-                case "enbNtpC":
-                    logger.info("NTP Client Enabled value found.");
-                    final boolean newValue = ((BdaBoolean) bda).getValue();
-                    this.device.getClock().setEnableNTP(newValue);
-
-                    break;
-
-                case "ntpSvrA":
-                    logger.info("NTP Server IP Address value found.");
-                    this.device.getClock().setIpAddressNTP(((BdaVisibleString) bda).getValueString());
-                    break;
-
-                case "syncPer":
-                    logger.info("Time Sync Interval (in minutes) value found.");
-                    this.device.getClock().setTimeSyncInterval(((BdaInt16U) bda).getValue());
-                    break;
-
-                // Relay data
-                // Remember: Set CTLModel to 1, then it would work with enbOpr
-                // enabled!
-
-                // Reminder: Manually setting ctlVal with GUI client does not work with ctlVal
-                // directly. Set the value with Oper, not just ctlVal only!
-                // Do not use ctlVal as light status value! ctlVal changes stVal, the actual
-                // light status value!
-                case "ctlVal": {
-                    try {
-                        logger.info(referenceString);
-                        final int relayIndex = this.extractRelayIndex(bda.getReference());
-                        logger.info("{}", relayIndex);
-
-                        final boolean lightStatus = ((BdaBoolean) bda).getValue();
-                        System.out.println(lightStatus);
-
-                        // Sends updated Relay to Relay object
-                        this.device.getRelay(relayIndex).setLight(lightStatus);
-
-                        // Sends updated Relay to database
-                        this.databaseUtils.updateDatabaseRelay(this.device.getRelay(relayIndex));
-
-                        logger.info("Relay " + relayIndex + "'s light status ON is " + lightStatus);
-                    } catch (final Exception e) {
-                        logger.info("Something went terribly wrong!");
-                        logger.info(e.toString());
-
-                    }
-                    break;
+                }
+                if (referenceString.contains(".Sche.")) {
+                    scheduleNr = this.extractScheduleIndex(bda.getReference());
                 }
 
-                // Schedule data
+                // Schedules above 50 are not accepted by GXF, thus they will be skipped.
+                if (scheduleNr <= 50) {
 
-                case "enable": {
-                    final int relayIndex = this.extractRelayIndex(bda.getReference());
-                    final int scheduleIndex = this.extractScheduleIndex(bda.getReference());
+                    switch (dataAttribute) {
 
-                    if (scheduleIndex <= 50) {
-                        logger.info("Schedule Enabled Status found.");
-                        logger.info("Value to set for schedule {} of relay {}: {}", scheduleIndex, relayIndex,
-                                ((BdaBoolean) bda).getValue());
+                    // Clock data
+                    case "curT":
+                        logger.info("Current Time value found.");
+
+                        // For native time stamp: Epoch/UNIX time stamp format is used,
+                        // from second on. Convert to native time stamp!.
+                        final byte[] bytesEpochTime = ((BdaTimestamp) bda).getValue();
+                        final ByteBuffer wrappedTime = ByteBuffer.wrap(bytesEpochTime);
+                        final long longTime = wrappedTime.getLong();
+                        this.device.getClock()
+                                .setCurrentTime(LocalDateTime.ofEpochSecond(longTime, 0, ZoneOffset.ofHours(1)));
+                        break;
+
+                    case "tZ":
+                        logger.info("Time Zone value found. (Offset in minutes from UTC!)");
+                        this.device.getClock().setTimeZoneOffset(((BdaInt16) bda).getValue());
+                        break;
+
+                    case "dstBegT":
+                        logger.info("Daylight Saving Time Start Date value found.");
+                        this.device.getClock().setBeginDateDST(((BdaVisibleString) bda).getValueString());
+                        break;
+
+                    case "dstEndT":
+                        logger.info("Daylight Saving Time Start Date value found.");
+                        this.device.getClock().setEndDateDST(((BdaVisibleString) bda).getValueString());
+                        break;
+
+                    case "dvt":
+                        logger.info("Daylight Saving Time Deviation value found.");
+                        this.device.getClock().setDeviationDST(((BdaInt16) bda).getValue());
+                        break;
+
+                    case "enbDst":
+                        logger.info("Daylight Saving Time Status value found.");
+                        this.device.getClock().setEnableDST(((BdaBoolean) bda).getValue());
+                        break;
+
+                    case "enbNtpC":
+                        logger.info("NTP Client Enabled value found.");
+                        final boolean newValue = ((BdaBoolean) bda).getValue();
+                        this.device.getClock().setEnableNTP(newValue);
+
+                        break;
+
+                    case "ntpSvrA":
+                        logger.info("NTP Server IP Address value found.");
+                        this.device.getClock().setIpAddressNTP(((BdaVisibleString) bda).getValueString());
+                        break;
+
+                    case "syncPer":
+                        logger.info("Time Sync Interval (in minutes) value found.");
+                        this.device.getClock().setTimeSyncInterval(((BdaInt16U) bda).getValue());
+                        break;
+
+                    // Relay data
+                    // Remember: Set CTLModel to 1, then it would work with enbOpr
+                    // enabled!
+
+                    // Reminder: Manually setting ctlVal with GUI client does not work with ctlVal
+                    // directly. Set the value with Oper, not just ctlVal only!
+                    // Do not use ctlVal as light status value! ctlVal changes stVal, the actual
+                    // light status value!
+                    case "ctlVal": {
                         try {
+                            logger.info(referenceString);
+                            logger.info("{}", relayNr);
 
-                            // Sends updated Schedule to Schedule object
-                            this.device.getRelay(relayIndex).getSchedule(scheduleIndex)
-                                    .setEnabled(((BdaBoolean) bda).getValue());
+                            final boolean lightStatus = ((BdaBoolean) bda).getValue();
+                            System.out.println(lightStatus);
 
-                            // Sends updated Schedule to database
-                            this.databaseUtils.updateDatabaseSchedule(
-                                    this.device.getRelay(relayIndex).getSchedule(scheduleIndex));
+                            // Sends updated Relay to Relay object
+                            this.device.getRelay(relayNr).setLight(lightStatus);
 
-                            modified = true;
+                            // Sends updated Relay to database
+                            this.databaseUtils.updateDatabaseRelay(this.device.getRelay(relayNr));
 
+                            logger.info("Relay " + relayNr + "'s light status ON is " + lightStatus);
                         } catch (final Exception e) {
-                            logger.warn("Schedule exception: ", e);
-                        }
-                    }
-                    break;
-                }
+                            logger.info("Something went terribly wrong!");
+                            logger.info(e.toString());
 
-                case "day": {
-                    final int relayIndex = this.extractRelayIndex(bda.getReference());
-                    final int scheduleIndex = this.extractScheduleIndex(bda.getReference());
-
-                    if (scheduleIndex <= 50) {
-
-                        try {
-                            logger.info("Day found.");
-                            int newDay = ((BdaInt32) bda).getValue();
-                            int currentDay = this.device.getRelay(relayIndex).getSchedule(scheduleIndex).getDayInt();
-                            if (newDay != currentDay) {
-                                modified = true;
-                                this.device.getRelay(relayIndex).getSchedule(scheduleIndex).setDayInt(newDay);
-
-                                // Sends updated Schedule to database
-                                this.databaseUtils.updateDatabaseSchedule(
-                                        this.device.getRelay(relayIndex).getSchedule(scheduleIndex));
-                            }
-                            modified = true;
-                        } catch (final Exception e) {
-                            logger.warn("Schedule exception: ", e);
-                        }
-                    }
-                    break;
-                }
-
-                case "tOn": {
-                    final int relayIndex = this.extractRelayIndex(bda.getReference());
-                    final int scheduleIndex = this.extractScheduleIndex(bda.getReference());
-
-                    if (scheduleIndex <= 50) {
-                        try {
-                            logger.info("Time On found.");
-                            this.device.getRelay(relayIndex).getSchedule(scheduleIndex);
-                            int timeInt = (((BdaInt32) bda).getValue());
-                            int timeHour = timeInt / 100;
-                            int timeMinute = timeInt % 100;
-                            LocalTime timeLocalTime = LocalTime.of(timeHour, timeMinute);
-
-                            this.device.getRelay(relayIndex).getSchedule(scheduleIndex).setTimeOn(timeLocalTime);
-
-                            // Sends updated Schedule to database
-                            this.databaseUtils.updateDatabaseSchedule(
-                                    this.device.getRelay(relayIndex).getSchedule(scheduleIndex));
-
-                            modified = true;
-                        } catch (final Exception e) {
-                            logger.warn("Schedule exception: ", e);
-                        }
-                    }
-                    break;
-                }
-
-                case "tOnT": {
-                    final int relayIndex = this.extractRelayIndex(bda.getReference());
-                    final int scheduleIndex = this.extractScheduleIndex(bda.getReference());
-
-                    if (scheduleIndex <= 50) {
-                        logger.info("Time On Type found.");
-                        try {
-                            this.device.getRelay(relayIndex).getSchedule(scheduleIndex)
-                                    .setTimeOnTypeInt(((BdaInt8) bda).getValue());
-
-                            // Sends updated Schedule to database
-                            this.databaseUtils.updateDatabaseSchedule(
-                                    this.device.getRelay(relayIndex).getSchedule(scheduleIndex));
-
-                            modified = true;
-                        } catch (final Exception e) {
-                            logger.warn("Schedule exception: ", e);
-                        }
-                    }
-                    break;
-                }
-
-                case "tOff": {
-                    final int relayIndex = this.extractRelayIndex(bda.getReference());
-                    final int scheduleIndex = this.extractScheduleIndex(bda.getReference());
-
-                    if (scheduleIndex <= 50) {
-                        logger.info("Time Off found.");
-                        try {
-                            this.device.getRelay(relayIndex).getSchedule(scheduleIndex);
-                            int timeInt = (((BdaInt32) bda).getValue());
-                            int timeHour = timeInt / 100;
-                            int timeMinute = timeInt % 100;
-                            LocalTime timeLocalTime = LocalTime.of(timeHour, timeMinute);
-
-                            this.device.getRelay(relayIndex).getSchedule(scheduleIndex).setTimeOff(timeLocalTime);
-
-                            // Sends updated Schedule to database
-                            this.databaseUtils.updateDatabaseSchedule(
-                                    this.device.getRelay(relayIndex).getSchedule(scheduleIndex));
-
-                            modified = true;
-                        } catch (final Exception e) {
-                            logger.warn("Schedule exception: ", e);
-                        }
-                    }
-                    break;
-                }
-
-                case "tOffT": {
-                    final int relayIndex = this.extractRelayIndex(bda.getReference());
-                    final int scheduleIndex = this.extractScheduleIndex(bda.getReference());
-
-                    if (scheduleIndex <= 50) {
-                        logger.info("Time Off Type found.");
-                        try {
-                            this.device.getRelay(relayIndex).getSchedule(scheduleIndex)
-                                    .setTimeOffTypeInt(((BdaInt8) bda).getValue());
-
-                            // Sends updated Schedule to database
-                            this.databaseUtils.updateDatabaseSchedule(
-                                    this.device.getRelay(relayIndex).getSchedule(scheduleIndex));
-
-                            modified = true;
-                        } catch (final Exception e) {
-                            logger.warn("Schedule exception: ", e);
-                        }
-                    }
-                    break;
-                }
-
-                case "minOnPer": {
-                    final int relayIndex = this.extractRelayIndex(bda.getReference());
-                    final int scheduleIndex = this.extractScheduleIndex(bda.getReference());
-
-                    if (scheduleIndex <= 50) {
-                        logger.info("Burning Minutes found.");
-                        try {
-                            this.device.getRelay(relayIndex).getSchedule(scheduleIndex)
-                                    .setBurningMinsOn((short) ((BdaInt16U) bda).getValue());
-
-                            // Sends updated Schedule to database
-                            this.databaseUtils.updateDatabaseSchedule(
-                                    this.device.getRelay(relayIndex).getSchedule(scheduleIndex));
-
-                            modified = true;
-                        } catch (final Exception e) {
-                            logger.warn("Schedule exception: ", e);
-                        }
-                    }
-                    break;
-                }
-
-                case "srBefWd": {
-                    final int relayIndex = this.extractRelayIndex(bda.getReference());
-                    final int scheduleIndex = this.extractScheduleIndex(bda.getReference());
-
-                    if (scheduleIndex <= 50) {
-                        logger.info("Before Astronomical Time Offset found.");
-                        try {
-                            this.device.getRelay(relayIndex).getSchedule(scheduleIndex)
-                                    .setBeforeOffset((short) ((BdaInt16U) bda).getValue());
-
-                            // Not used in database
-
-                            modified = true;
-                        } catch (final Exception e) {
-                            logger.warn("Schedule exception: ", e);
                         }
                         break;
                     }
-                }
 
-                case "srAftWd": {
-                    final int relayIndex = this.extractRelayIndex(bda.getReference());
-                    final int scheduleIndex = this.extractScheduleIndex(bda.getReference());
+                    // Schedule data
 
-                    if (scheduleIndex <= 50) {
-                        logger.info("After Astronomical Time Offset found.");
-                        try {
-                            this.device.getRelay(relayIndex).getSchedule(scheduleIndex)
-                                    .setAfterOffset((short) ((BdaInt16U) bda).getValue());
+                    case "enable": {
 
-                            // Not used in database
+                        logger.info("Schedule Enabled Status found.");
+                        logger.info("Value to set for schedule {} of relay {}: {}", scheduleNr, relayNr,
+                                ((BdaBoolean) bda).getValue());
 
+                        // Sends updated Schedule to Schedule object
+                        this.device.getRelay(relayNr).getSchedule(scheduleNr).setEnabled(((BdaBoolean) bda).getValue());
+
+                        // Sends updated Schedule to database
+                        this.databaseUtils
+                                .updateDatabaseSchedule(this.device.getRelay(relayNr).getSchedule(scheduleNr));
+
+                        modified = true;
+                        break;
+                    }
+
+                    case "day": {
+
+                        logger.info("Day found.");
+                        int newDay = ((BdaInt32) bda).getValue();
+                        int currentDay = this.device.getRelay(relayNr).getSchedule(scheduleNr).getDayInt();
+                        if (newDay != currentDay) {
                             modified = true;
-                        } catch (final Exception e) {
-                            logger.warn("Schedule exception: ", e);
+                            this.device.getRelay(relayNr).getSchedule(scheduleNr).setDayInt(newDay);
+
+                            // Sends updated Schedule to database
+                            this.databaseUtils
+                                    .updateDatabaseSchedule(this.device.getRelay(relayNr).getSchedule(scheduleNr));
+                            modified = true;
                         }
+                        break;
                     }
-                    break;
-                }
 
-                case "Descr": {
-                    final int relayIndex = this.extractRelayIndex(bda.getReference());
-                    final int scheduleIndex = this.extractScheduleIndex(bda.getReference());
+                    case "tOn": {
 
-                    if (scheduleIndex <= 50) {
+                        logger.info("Time On found.");
+                        this.device.getRelay(relayNr).getSchedule(scheduleNr);
+                        int timeInt = (((BdaInt32) bda).getValue());
+                        int timeHour = timeInt / 100;
+                        int timeMinute = timeInt % 100;
+                        LocalTime timeLocalTime = LocalTime.of(timeHour, timeMinute);
+
+                        this.device.getRelay(relayNr).getSchedule(scheduleNr).setTimeOn(timeLocalTime);
+
+                        // Sends updated Schedule to database
+                        this.databaseUtils
+                                .updateDatabaseSchedule(this.device.getRelay(relayNr).getSchedule(scheduleNr));
+
+                        modified = true;
+                        break;
+                    }
+
+                    case "tOnT": {
+
+                        logger.info("Time On Type found.");
+                        this.device.getRelay(relayNr).getSchedule(scheduleNr)
+                                .setTimeOnTypeInt(((BdaInt8) bda).getValue());
+
+                        // Sends updated Schedule to database
+                        this.databaseUtils
+                                .updateDatabaseSchedule(this.device.getRelay(relayNr).getSchedule(scheduleNr));
+
+                        modified = true;
+
+                        break;
+                    }
+
+                    case "tOff": {
+
+                        logger.info("Time Off found.");
+                        this.device.getRelay(relayNr).getSchedule(scheduleNr);
+                        int timeInt = (((BdaInt32) bda).getValue());
+                        int timeHour = timeInt / 100;
+                        int timeMinute = timeInt % 100;
+                        LocalTime timeLocalTime = LocalTime.of(timeHour, timeMinute);
+
+                        this.device.getRelay(relayNr).getSchedule(scheduleNr).setTimeOff(timeLocalTime);
+
+                        // Sends updated Schedule to database
+                        this.databaseUtils
+                                .updateDatabaseSchedule(this.device.getRelay(relayNr).getSchedule(scheduleNr));
+
+                        modified = true;
+
+                        break;
+                    }
+
+                    case "tOffT": {
+
+                        logger.info("Time Off Type found.");
+                        this.device.getRelay(relayNr).getSchedule(scheduleNr)
+                                .setTimeOffTypeInt(((BdaInt8) bda).getValue());
+
+                        // Sends updated Schedule to database
+                        this.databaseUtils
+                                .updateDatabaseSchedule(this.device.getRelay(relayNr).getSchedule(scheduleNr));
+
+                        modified = true;
+                        break;
+                    }
+
+                    case "minOnPer": {
+
+                        logger.info("Burning Minutes found.");
+                        this.device.getRelay(relayNr).getSchedule(scheduleNr)
+                                .setBurningMinsOn((short) ((BdaInt16U) bda).getValue());
+
+                        // Sends updated Schedule to database
+                        this.databaseUtils
+                                .updateDatabaseSchedule(this.device.getRelay(relayNr).getSchedule(scheduleNr));
+
+                        modified = true;
+                        break;
+                    }
+
+                    case "srBefWd": {
+
+                        logger.info("Before Astronomical Time Offset found.");
+                        this.device.getRelay(relayNr).getSchedule(scheduleNr)
+                                .setBeforeOffset((short) ((BdaInt16U) bda).getValue());
+
+                        // Not used in database
+
+                        modified = true;
+
+                        break;
+                    }
+
+                    case "srAftWd": {
+
+                        logger.info("After Astronomical Time Offset found.");
+                        this.device.getRelay(relayNr).getSchedule(scheduleNr)
+                                .setAfterOffset((short) ((BdaInt16U) bda).getValue());
+
+                        // Not used in database
+
+                        modified = true;
+
+                        break;
+                    }
+
+                    case "Descr": {
+
                         logger.info("Description found.");
-                        try {
-                            this.device.getRelay(relayIndex).getSchedule(scheduleIndex)
-                                    .setDescription(((BdaVisibleString) bda).getValueString());
+                        this.device.getRelay(relayNr).getSchedule(scheduleNr)
+                                .setDescription(((BdaVisibleString) bda).getValueString());
 
-                            // Not used in database
+                        // Not used in database
 
-                        } catch (final Exception e) {
-                            logger.warn("Schedule exception: ", e);
-                        }
+                        break;
                     }
-                    break;
-                }
 
-                default:
-                    // When BDA is not used in a class
-                    break;
+                    default:
+                        // When BDA is not used in a class
+                        break;
+                    }
                 }
             }
         } catch (Exception e) {
