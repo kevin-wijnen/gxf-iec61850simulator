@@ -65,17 +65,21 @@ public class Scheduler {
         for (int i = 0; i < switchingMoments.size(); i++) {
             SwitchingMoment switchingMoment = switchingMoments.get(i);
             LocalDateTime currentTime = LocalDateTime.now();
+
             // Calculate relative time
             int relativeTime = TimeCalculator.calculateSecondsUntil(currentTime, switchingMoment.getTriggerTime());
-            int relayNr = switchingMoment.getRelayNr();
-            if (switchingMoment.isTriggerAction()) {
-                Runnable runOn = this.onRunnableCreator(relayNr);
-                this.scheduledFutures.add(this.executor.schedule(runOn, relativeTime, TimeUnit.SECONDS));
-                logger.info("Switching Moment for On action created! Relative time: {} ", relativeTime);
-            } else {
-                Runnable runOff = this.offRunnableCreator(relayNr);
-                this.scheduledFutures.add(this.executor.schedule(runOff, relativeTime, TimeUnit.SECONDS));
-                logger.info("Switching Moment for Off action created! Relative time: {} ", relativeTime);
+
+            if (relativeTime > 0) {
+                int relayNr = switchingMoment.getRelayNr();
+                if (switchingMoment.isTriggerAction()) {
+                    Runnable runOn = this.onRunnableCreator(relayNr);
+                    this.scheduledFutures.add(this.executor.schedule(runOn, relativeTime, TimeUnit.SECONDS));
+                    logger.info("Switching Moment for On action created! Relative time: {} ", relativeTime);
+                } else {
+                    Runnable runOff = this.offRunnableCreator(relayNr);
+                    this.scheduledFutures.add(this.executor.schedule(runOff, relativeTime, TimeUnit.SECONDS));
+                    logger.info("Switching Moment for Off action created! Relative time: {} ", relativeTime);
+                }
             }
         }
         logger.info("Schedules planned!");
