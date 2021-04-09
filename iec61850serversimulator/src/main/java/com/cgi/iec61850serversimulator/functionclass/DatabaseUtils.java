@@ -242,15 +242,25 @@ public class DatabaseUtils {
 
             logger.info(scheduleEntities.toString());
             ScheduleEntity toUpdateSchedule = scheduleEntities.get(0);
-            toUpdateSchedule.setEnabled(schedule.isEnabled());
-            toUpdateSchedule.setDay(schedule.getDayInt());
-            toUpdateSchedule.setTimeOn(schedule.getTimeOn());
-            toUpdateSchedule.setTimeTypeOn(schedule.getTimeOnTypeInt());
-            toUpdateSchedule.setTimeOff(schedule.getTimeOff());
-            toUpdateSchedule.setTimeTypeOff(schedule.getTimeOffTypeInt());
-            toUpdateSchedule.setBurningMinutes(schedule.getBurningMinsOn());
 
-            this.scheduleRepository.save(toUpdateSchedule);
+            // Deletes disabled schedules to keep database cleans
+            if (!toUpdateSchedule.isEnabled()) {
+                logger.info("Deleting disabled schedule from database.");
+                this.scheduleRepository.delete(toUpdateSchedule);
+            }
+
+            else {
+                toUpdateSchedule.setEnabled(schedule.isEnabled());
+                toUpdateSchedule.setDay(schedule.getDayInt());
+                toUpdateSchedule.setTimeOn(schedule.getTimeOn());
+                toUpdateSchedule.setTimeTypeOn(schedule.getTimeOnTypeInt());
+                toUpdateSchedule.setTimeOff(schedule.getTimeOff());
+                toUpdateSchedule.setTimeTypeOff(schedule.getTimeOffTypeInt());
+                toUpdateSchedule.setBurningMinutes(schedule.getBurningMinsOn());
+
+                this.scheduleRepository.save(toUpdateSchedule);
+            }
+
         } else {
             if (schedule.isEnabled()) {
                 logger.info("Schedule not in database, adding to it...");
