@@ -15,71 +15,6 @@ import javax.persistence.Table;
 @Table(name = "schedule")
 public class ScheduleEntity {
 
-    public static class ScheduleEntityBuilder {
-
-        private int indexNumber;
-        private int day;
-        private int timeTypeOn;
-        private int timeTypeOff;
-        private LocalTime timeOn;
-        private LocalTime timeOff;
-        private int burningMinutes;
-        private boolean enabled;
-        private RelayEntity relayEntity;
-
-        public ScheduleEntityBuilder(int indexNumber, RelayEntity relayEntity) {
-            this.indexNumber = indexNumber;
-            this.relayEntity = relayEntity;
-        }
-
-        public void withDay(int day) {
-            this.day = day;
-        }
-
-        public void setTimeTypeOn(int timeTypeOn) {
-            this.timeTypeOn = timeTypeOn;
-        }
-
-        public void setTimeTypeOff(int timeTypeOff) {
-            this.timeTypeOff = timeTypeOff;
-        }
-
-        public void setTimeOn(LocalTime timeOn) {
-            this.timeOn = timeOn;
-        }
-
-        public void setTimeOff(LocalTime timeOff) {
-            this.timeOff = timeOff;
-        }
-
-        public void setBurningMinutes(int burningMinutes) {
-            this.burningMinutes = burningMinutes;
-        }
-
-        public void setEnabled(boolean enabled) {
-            this.enabled = enabled;
-        }
-
-        public void setRelayEntity(RelayEntity relayEntity) {
-            this.relayEntity = relayEntity;
-        }
-
-        public ScheduleEntity buildScheduleEntity() {
-            ScheduleEntity scheduleEntity = new ScheduleEntity();
-            scheduleEntity.indexNumber = this.indexNumber;
-            scheduleEntity.day = this.day;
-            scheduleEntity.timeTypeOn = this.timeTypeOn;
-            scheduleEntity.timeTypeOff = this.timeTypeOff;
-            scheduleEntity.timeOn = this.timeOn;
-            scheduleEntity.timeOff = this.timeOff;
-            scheduleEntity.burningMinutes = this.burningMinutes;
-            scheduleEntity.enabled = this.enabled;
-            scheduleEntity.relay = this.relayEntity;
-
-            return scheduleEntity;
-        }
-    }
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -216,5 +151,86 @@ public class ScheduleEntity {
                 + ", timeOff=" + this.timeOff + ", burningMinutes=" + this.burningMinutes + ", enabled=" + this.enabled
                 + "]";
 
+    }
+
+    public static class ScheduleEntityBuilder {
+
+        private int indexNumber;
+        private int day;
+        private int timeTypeOn;
+        private int timeTypeOff;
+        private LocalTime timeOn;
+        private LocalTime timeOff;
+        private int burningMinutes;
+        private boolean enabled;
+        private RelayEntity relayEntity;
+
+        public ScheduleEntityBuilder(int indexNumber, RelayEntity relayEntity) {
+            this.indexNumber = indexNumber;
+            this.relayEntity = relayEntity;
+        }
+
+        public ScheduleEntityBuilder withDay(int day) {
+            this.day = day;
+
+            return this;
+        }
+
+        public ScheduleEntityBuilder withTimeTypeOn(int timeTypeOn) {
+            this.timeTypeOn = timeTypeOn;
+
+            return this;
+        }
+
+        public ScheduleEntityBuilder withTimeTypeOff(int timeTypeOff) {
+            this.timeTypeOff = timeTypeOff;
+
+            return this;
+        }
+
+        public ScheduleEntityBuilder withTimeOn(LocalTime timeOn) {
+            this.timeOn = timeOn;
+
+            return this;
+        }
+
+        public ScheduleEntityBuilder withTimeOff(LocalTime timeOff) {
+            this.timeOff = timeOff;
+
+            return this;
+        }
+
+        public ScheduleEntityBuilder withBurningMinutes(int burningMinutes) {
+            this.burningMinutes = burningMinutes;
+
+            return this;
+        }
+
+        public ScheduleEntityBuilder withEnabled(boolean enabled) {
+            this.enabled = enabled;
+
+            return this;
+        }
+
+        public ScheduleEntityBuilder withRelayEntity(RelayEntity relayEntity) {
+            this.relayEntity = relayEntity;
+
+            return this;
+        }
+
+        public ScheduleEntity buildScheduleEntity() {
+            ScheduleEntity scheduleEntity = new ScheduleEntity();
+            scheduleEntity.indexNumber = this.indexNumber;
+            scheduleEntity.day = this.day;
+            scheduleEntity.timeTypeOn = this.timeTypeOn;
+            scheduleEntity.timeTypeOff = this.timeTypeOff;
+            scheduleEntity.timeOn = this.timeOn;
+            scheduleEntity.timeOff = this.timeOff;
+            scheduleEntity.burningMinutes = this.burningMinutes;
+            scheduleEntity.enabled = this.enabled;
+            scheduleEntity.relay = this.relayEntity;
+
+            return scheduleEntity;
+        }
     }
 }

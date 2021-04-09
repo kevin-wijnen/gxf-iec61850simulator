@@ -53,6 +53,7 @@ public class EventDataListener implements ServerEventListener {
             for (final BasicDataAttribute bda : bdas) {
                 final String dataAttribute = bda.getName();
                 final String referenceString = bda.getReference().toString();
+                logger.info(referenceString);
 
                 switch (dataAttribute) {
 

@@ -222,16 +222,9 @@ public class DatabaseUtils {
         boolean enabled = schedule.isEnabled();
         RelayEntity relayEntity = this.relayRepository.findByIndexNumber(relayNr).get(0);
 
-        // Builder
-        ScheduleEntityBuilder scheduleBuilder = new ScheduleEntityBuilder(indexNumber, relayEntity);
-        scheduleBuilder.withDay(day);
-        scheduleBuilder.setTimeTypeOn(timeOnType);
-        scheduleBuilder.setTimeTypeOff(timeOffType);
-        scheduleBuilder.setTimeOn(timeOn);
-        scheduleBuilder.setTimeOff(timeOff);
-        scheduleBuilder.setBurningMinutes(burningMinutes);
-        scheduleBuilder.setEnabled(enabled);
-        ScheduleEntity toUpdateSchedule = scheduleBuilder.buildScheduleEntity();
+        ScheduleEntity toUpdateSchedule = new ScheduleEntityBuilder(indexNumber, relayEntity).withDay(day)
+                .withTimeTypeOn(timeOnType).withTimeTypeOff(timeOffType).withTimeOn(timeOn).withTimeOff(timeOff)
+                .withBurningMinutes(burningMinutes).withEnabled(enabled).buildScheduleEntity();
 
         this.scheduleRepository.save(toUpdateSchedule);
     }
