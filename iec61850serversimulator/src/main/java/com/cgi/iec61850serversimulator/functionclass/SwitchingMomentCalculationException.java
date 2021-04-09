@@ -1,4 +1,4 @@
-package com.cgi.iec61850serversimulator;
+package com.cgi.iec61850serversimulator.functionclass;
 
 public class SwitchingMomentCalculationException extends Exception {
 

@@ -6,6 +6,8 @@ import java.time.LocalDateTime;
 
 import org.junit.jupiter.api.Test;
 
+import com.cgi.iec61850serversimulator.functionclass.TimeCalculator;
+
 /**
  * JUnit test class which tests the time calculation function.
  */

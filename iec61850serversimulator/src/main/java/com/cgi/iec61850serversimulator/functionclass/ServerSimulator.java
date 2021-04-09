@@ -1,13 +1,17 @@
-package com.cgi.iec61850serversimulator;
+package com.cgi.iec61850serversimulator.functionclass;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import com.beanit.openiec61850.SclParseException;
 import com.beanit.openiec61850.SclParser;
@@ -21,9 +25,17 @@ import com.beanit.openiec61850.internal.cli.CliParseException;
 import com.beanit.openiec61850.internal.cli.CliParser;
 import com.beanit.openiec61850.internal.cli.IntCliParameter;
 import com.beanit.openiec61850.internal.cli.StringCliParameter;
+import com.cgi.iec61850serversimulator.dataclass.Device;
+import com.cgi.iec61850serversimulator.dataclass.Relay;
+import com.cgi.iec61850serversimulator.dataclass.Schedule;
+import com.cgi.iec61850serversimulator.datarepository.RelayRepository;
+import com.cgi.iec61850serversimulator.datarepository.ScheduleRepository;
 
+@EntityScan("com.cgi.iec61850serversimulator.datamodel")
+@EnableJpaRepositories(basePackages = "com.cgi.iec61850serversimulator.datarepository")
 @SpringBootApplication
-public class ServerSimulator {
+@EnableAutoConfiguration
+public class ServerSimulator implements CommandLineRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(ServerSimulator.class);
 
@@ -43,9 +55,17 @@ public class ServerSimulator {
     public static ServerModel serverModel;
     public static ServerSap serverSap = null;
 
-    public static void main(final String[] args) throws IOException {
+    @Autowired
+    private RelayRepository relayRepository;
+    @Autowired
+    private ScheduleRepository scheduleRepository;
 
+    public static void main(final String[] args) {
         SpringApplication.run(ServerSimulator.class, args);
+    }
+
+    @Override
+    public void run(final String... args) throws Exception {
         logger.info("Applicatie starten...");
 
         final List<CliParameter> cliParameters = new ArrayList<>();
@@ -70,6 +90,7 @@ public class ServerSimulator {
             System.out.println("Error parsing SCL/ICD file: " + e.getMessage());
             return;
         }
+
         logger.info("ServerSap aanmaken...");
         serverSap = new ServerSap(portParam.getValue(), 0, null, serverModels.get(0), null);
         logger.info("ServerSap aangemaakt met als poort: {}", portParam.getValue());
@@ -92,22 +113,38 @@ public class ServerSimulator {
         final Scheduler scheduler = new Scheduler(device);
         device.initalizeDevice(serverWrapper);
 
+        // Comparing database with model
+
+        DatabaseUtils databaseUtils = new DatabaseUtils(serverWrapper);
+        databaseUtils.setRelayRepository(this.relayRepository);
+        databaseUtils.setScheduleRepository(this.scheduleRepository);
+        for (int relayNr = 1; relayNr <= device.getRelays().length; relayNr++) {
+            Relay relay = device.getRelay(relayNr);
+            databaseUtils.checkRelay(relay);
+
+            for (int scheduleNr = 1; scheduleNr <= 50; scheduleNr++) {
+                Schedule schedule = relay.getSchedule(scheduleNr);
+                databaseUtils.checkSchedule(schedule, relay.getIndexNumber());
+            }
+
+        }
+
         logger.info("SERVER START LISTENING");
-        EventDataListener edl = new EventDataListener(device, scheduler);
+        final EventDataListener edl = new EventDataListener(device, scheduler, databaseUtils);
         serverSap.startListening(edl);
 
         // Initial schedule
         try {
             scheduler.calculateTasks(device);
-        } catch (Exception e) {
+        } catch (final Exception e) {
             logger.warn("Initial switching moment calculation failed, try sending another schedule.", e);
         }
-        final ActionProcessor actionProcessor = new ActionProcessor(new ActionExecutor(serverSap, serverModel, device));
+
+        final ActionProcessor actionProcessor = new ActionProcessor(new ActionExecutor(serverSap, device, scheduler));
         actionProcessor.addAction(new Action(PRINT_SERVER_MODEL_KEY, PRINT_SERVER_MODEL_KEY_DESCRIPTION));
         actionProcessor.addAction(new Action(DEVICE_SHOW_MODEL, DEVICE_SHOW_MODEL_DESCRIPTION));
 
         actionProcessor.start();
-
     }
 
 }

@@ -1,4 +1,4 @@
-package com.cgi.iec61850serversimulator;
+package com.cgi.iec61850serversimulator.functionclass;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -10,6 +10,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.cgi.iec61850serversimulator.dataclass.Device;
+import com.cgi.iec61850serversimulator.dataclass.SwitchingMoment;
 
 /**
  * Class which schedules autonomous switching moments for future activation.
@@ -62,17 +65,21 @@ public class Scheduler {
         for (int i = 0; i < switchingMoments.size(); i++) {
             SwitchingMoment switchingMoment = switchingMoments.get(i);
             LocalDateTime currentTime = LocalDateTime.now();
+
             // Calculate relative time
             int relativeTime = TimeCalculator.calculateSecondsUntil(currentTime, switchingMoment.getTriggerTime());
-            int relayNr = switchingMoment.getRelayNr();
-            if (switchingMoment.isTriggerAction()) {
-                Runnable runOn = this.onRunnableCreator(relayNr);
-                this.scheduledFutures.add(this.executor.schedule(runOn, relativeTime, TimeUnit.SECONDS));
-                logger.info("Switching Moment for On action created! Relative time: {} ", relativeTime);
-            } else {
-                Runnable runOff = this.offRunnableCreator(relayNr);
-                this.scheduledFutures.add(this.executor.schedule(runOff, relativeTime, TimeUnit.SECONDS));
-                logger.info("Switching Moment for Off action created! Relative time: {} ", relativeTime);
+
+            if (relativeTime > 0) {
+                int relayNr = switchingMoment.getRelayNr();
+                if (switchingMoment.isTriggerAction()) {
+                    Runnable runOn = this.onRunnableCreator(relayNr);
+                    this.scheduledFutures.add(this.executor.schedule(runOn, relativeTime, TimeUnit.SECONDS));
+                    logger.info("Switching Moment for On action created! Relative time: {} ", relativeTime);
+                } else {
+                    Runnable runOff = this.offRunnableCreator(relayNr);
+                    this.scheduledFutures.add(this.executor.schedule(runOff, relativeTime, TimeUnit.SECONDS));
+                    logger.info("Switching Moment for Off action created! Relative time: {} ", relativeTime);
+                }
             }
         }
         logger.info("Schedules planned!");
@@ -112,5 +119,9 @@ public class Scheduler {
             // To prevent memory leak: Purging executor's queue
             this.executor.purge();
         }
+    }
+
+    public void shutdownScheduler() {
+        this.executor.shutdownNow();
     }
 }
