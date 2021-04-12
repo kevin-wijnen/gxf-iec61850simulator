@@ -55,6 +55,14 @@
 		    <version>1.12.0</version>
 		</dependency>
 		
+		<!-- https://mvnrepository.com/artifact/com.luckycatlabs/SunriseSunsetCalculator -->
+        <dependency>
+            <groupId>com.luckycatlabs</groupId>
+            <artifactId>SunriseSunsetCalculator</artifactId>    
+            <version>1.2</version>
+        </dependency>
+		
+		
 	</dependencies>
 
 	<build>
