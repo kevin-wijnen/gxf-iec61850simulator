@@ -48,10 +48,10 @@ public class SchedulerTest {
         Mockito.when(this.calculator.returnSwitchingMoments(Mockito.any(), Mockito.any())).thenReturn(switchingMoments);
 
         // Calculate the switching moments
-        final LocalDateTime scheduleForDateTime = LocalDateTime.of(2021, 4, 11, 21, 00);
+        final LocalDateTime dateTimeAtScheduling = LocalDateTime.of(2021, 4, 11, 21, 00);
         // Note: an additional parameter was added to the original
         // "calculateTasks" method, to make testing easier.
-        scheduler.calculateTasksForDateTime(device, scheduleForDateTime);
+        scheduler.calculateTasksForDateTime(device, dateTimeAtScheduling);
 
         // The actual check: did the calculation trigger exactly one call to the
         // executor? And were the expected arguments passed to the executor?
