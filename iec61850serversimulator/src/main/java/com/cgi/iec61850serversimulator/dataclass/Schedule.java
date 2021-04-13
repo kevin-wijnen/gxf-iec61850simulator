@@ -214,7 +214,8 @@ public class Schedule {
         scheduleStringBuilder.append("Schedule " + this.indexNumber + ":\n")
                 .append("Is it enabled? " + this.enabled + '\n').append("Description: " + this.description + '\n')
                 .append("Day: " + this.dayInt + '\n').append("Time On: " + this.timeOn + '\n')
-                .append("Time On type: " + this.timeOnTypeInt + '\n').append("Time Off: " + this.timeOffTypeInt + '\n')
+                .append("Time On type: " + this.timeOnTypeInt + '\n').append("Time Off: " + this.timeOff + '\n')
+                .append("Time Off type: " + this.timeOffTypeInt + '\n')
                 .append("Burning Minutes On: " + this.burningMinsOn + '\n')
                 .append("Offset (Before): " + this.beforeOffset + '\n')
                 .append("Offset (After): " + this.afterOffset + '\n');

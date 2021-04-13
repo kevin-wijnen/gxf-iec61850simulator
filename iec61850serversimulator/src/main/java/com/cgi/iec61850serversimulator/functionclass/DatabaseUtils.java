@@ -234,17 +234,20 @@ public class DatabaseUtils {
 
         int indexNumber = schedule.getIndexNumber();
         int relayNr = schedule.getRelayNr();
-        boolean found = this.scheduleRepository.existsByIndexNumberAndRelayId(schedule.getIndexNumber(), relayNr);
+        List<RelayEntity> relayEntities = this.relayRepository.findByIndexNumber(relayNr);
+        RelayEntity relayEntity = relayEntities.get(0);
+        long relayId = relayEntity.getId();
+        boolean found = this.scheduleRepository.existsByIndexNumberAndRelayId(schedule.getIndexNumber(), relayId);
 
         if (found) {
             List<ScheduleEntity> scheduleEntities = this.scheduleRepository.findByIndexNumberAndRelayId(indexNumber,
-                    relayNr);
+                    relayId);
 
             logger.info(scheduleEntities.toString());
             ScheduleEntity toUpdateSchedule = scheduleEntities.get(0);
 
             // Deletes disabled schedules to keep database cleans
-            if (!toUpdateSchedule.isEnabled()) {
+            if (!schedule.isEnabled()) {
                 logger.info("Deleting disabled schedule from database.");
                 this.scheduleRepository.delete(toUpdateSchedule);
             }
