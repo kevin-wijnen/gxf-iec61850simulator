@@ -38,7 +38,7 @@ public class EventDataListener implements ServerEventListener {
         return this.scheduler;
     }
 
-    public EventDataListener(final Device device, Scheduler scheduler, DatabaseUtils databaseUtils) {
+    public EventDataListener(final Device device, final Scheduler scheduler, final DatabaseUtils databaseUtils) {
         this.device = device;
         this.scheduler = scheduler;
         this.databaseUtils = databaseUtils;
@@ -66,7 +66,8 @@ public class EventDataListener implements ServerEventListener {
                     scheduleNr = this.extractScheduleIndex(bda.getReference());
                 }
 
-                // Schedules above 50 are not accepted by GXF, thus they will be skipped.
+                // Schedules above 50 are not accepted by GXF, thus they will be
+                // skipped.
                 if (scheduleNr <= 50) {
 
                     switch (dataAttribute) {
@@ -75,7 +76,8 @@ public class EventDataListener implements ServerEventListener {
                     case "curT":
                         logger.info("Current Time value found.");
 
-                        // For native time stamp: Epoch/UNIX time stamp format is used,
+                        // For native time stamp: Epoch/UNIX time stamp format
+                        // is used,
                         // from second on. Convert to native time stamp!.
                         final byte[] bytesEpochTime = ((BdaTimestamp) bda).getValue();
                         final ByteBuffer wrappedTime = ByteBuffer.wrap(bytesEpochTime);
@@ -127,12 +129,15 @@ public class EventDataListener implements ServerEventListener {
                         break;
 
                     // Relay data
-                    // Remember: Set CTLModel to 1, then it would work with enbOpr
+                    // Remember: Set CTLModel to 1, then it would work with
+                    // enbOpr
                     // enabled!
 
-                    // Reminder: Manually setting ctlVal with GUI client does not work with ctlVal
+                    // Reminder: Manually setting ctlVal with GUI client does
+                    // not work with ctlVal
                     // directly. Set the value with Oper, not just ctlVal only!
-                    // Do not use ctlVal as light status value! ctlVal changes stVal, the actual
+                    // Do not use ctlVal as light status value! ctlVal changes
+                    // stVal, the actual
                     // light status value!
                     case "ctlVal": {
                         try {
@@ -179,8 +184,8 @@ public class EventDataListener implements ServerEventListener {
                     case "day": {
 
                         logger.info("Day found.");
-                        int newDay = ((BdaInt32) bda).getValue();
-                        int currentDay = this.device.getRelay(relayNr).getSchedule(scheduleNr).getDayInt();
+                        final int newDay = ((BdaInt32) bda).getValue();
+                        final int currentDay = this.device.getRelay(relayNr).getSchedule(scheduleNr).getDayInt();
                         if (newDay != currentDay) {
                             modified = true;
                             this.device.getRelay(relayNr).getSchedule(scheduleNr).setDayInt(newDay);
@@ -197,10 +202,10 @@ public class EventDataListener implements ServerEventListener {
 
                         logger.info("Time On found.");
                         this.device.getRelay(relayNr).getSchedule(scheduleNr);
-                        int timeInt = (((BdaInt32) bda).getValue());
-                        int timeHour = timeInt / 100;
-                        int timeMinute = timeInt % 100;
-                        LocalTime timeLocalTime = LocalTime.of(timeHour, timeMinute);
+                        final int timeInt = (((BdaInt32) bda).getValue());
+                        final int timeHour = timeInt / 100;
+                        final int timeMinute = timeInt % 100;
+                        final LocalTime timeLocalTime = LocalTime.of(timeHour, timeMinute);
 
                         this.device.getRelay(relayNr).getSchedule(scheduleNr).setTimeOn(timeLocalTime);
 
@@ -215,7 +220,8 @@ public class EventDataListener implements ServerEventListener {
                     case "tOnT": {
 
                         logger.info("Time On Type found.");
-                        this.device.getRelay(relayNr).getSchedule(scheduleNr)
+                        this.device.getRelay(relayNr)
+                                .getSchedule(scheduleNr)
                                 .setTimeOnTypeInt(((BdaInt8) bda).getValue());
 
                         // Sends updated Schedule to database
@@ -231,10 +237,10 @@ public class EventDataListener implements ServerEventListener {
 
                         logger.info("Time Off found.");
                         this.device.getRelay(relayNr).getSchedule(scheduleNr);
-                        int timeInt = (((BdaInt32) bda).getValue());
-                        int timeHour = timeInt / 100;
-                        int timeMinute = timeInt % 100;
-                        LocalTime timeLocalTime = LocalTime.of(timeHour, timeMinute);
+                        final int timeInt = (((BdaInt32) bda).getValue());
+                        final int timeHour = timeInt / 100;
+                        final int timeMinute = timeInt % 100;
+                        final LocalTime timeLocalTime = LocalTime.of(timeHour, timeMinute);
 
                         this.device.getRelay(relayNr).getSchedule(scheduleNr).setTimeOff(timeLocalTime);
 
@@ -250,7 +256,8 @@ public class EventDataListener implements ServerEventListener {
                     case "tOffT": {
 
                         logger.info("Time Off Type found.");
-                        this.device.getRelay(relayNr).getSchedule(scheduleNr)
+                        this.device.getRelay(relayNr)
+                                .getSchedule(scheduleNr)
                                 .setTimeOffTypeInt(((BdaInt8) bda).getValue());
 
                         // Sends updated Schedule to database
@@ -264,7 +271,8 @@ public class EventDataListener implements ServerEventListener {
                     case "minOnPer": {
 
                         logger.info("Burning Minutes found.");
-                        this.device.getRelay(relayNr).getSchedule(scheduleNr)
+                        this.device.getRelay(relayNr)
+                                .getSchedule(scheduleNr)
                                 .setBurningMinsOn((short) ((BdaInt16U) bda).getValue());
 
                         // Sends updated Schedule to database
@@ -278,7 +286,8 @@ public class EventDataListener implements ServerEventListener {
                     case "srBefWd": {
 
                         logger.info("Before Astronomical Time Offset found.");
-                        this.device.getRelay(relayNr).getSchedule(scheduleNr)
+                        this.device.getRelay(relayNr)
+                                .getSchedule(scheduleNr)
                                 .setBeforeOffset((short) ((BdaInt16U) bda).getValue());
 
                         // Not used in database
@@ -291,7 +300,8 @@ public class EventDataListener implements ServerEventListener {
                     case "srAftWd": {
 
                         logger.info("After Astronomical Time Offset found.");
-                        this.device.getRelay(relayNr).getSchedule(scheduleNr)
+                        this.device.getRelay(relayNr)
+                                .getSchedule(scheduleNr)
                                 .setAfterOffset((short) ((BdaInt16U) bda).getValue());
 
                         // Not used in database
@@ -304,7 +314,8 @@ public class EventDataListener implements ServerEventListener {
                     case "Descr": {
 
                         logger.info("Description found.");
-                        this.device.getRelay(relayNr).getSchedule(scheduleNr)
+                        this.device.getRelay(relayNr)
+                                .getSchedule(scheduleNr)
                                 .setDescription(((BdaVisibleString) bda).getValueString());
 
                         // Not used in database
@@ -318,7 +329,7 @@ public class EventDataListener implements ServerEventListener {
                     }
                 }
             }
-        } catch (Exception e) {
+        } catch (final Exception e) {
             logger.warn("Exception EventDataListener loop", e);
         }
 
@@ -328,8 +339,8 @@ public class EventDataListener implements ServerEventListener {
         if (modified) {
             logger.warn("Schedules are modified! Calculate switching moments...");
             try {
-                this.scheduler.calculateTasks(this.device);
-            } catch (SwitchingMomentCalculationException e) {
+                this.scheduler.calculateTasksForDateTime(this.device, LocalDateTime.now());
+            } catch (final SwitchingMomentCalculationException e) {
                 logger.warn("SwitchingMomentCalculationException: ", e);
             }
         }

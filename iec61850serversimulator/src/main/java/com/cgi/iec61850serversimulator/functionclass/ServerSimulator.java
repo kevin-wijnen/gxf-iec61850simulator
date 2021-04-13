@@ -1,7 +1,10 @@
 package com.cgi.iec61850serversimulator.functionclass;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,11 +52,11 @@ public class ServerSimulator implements CommandLineRunner {
             .buildIntParameter("port", 10102);
 
     private static final StringCliParameter modelFileParam = new CliParameterBuilder("-m")
-            .setDescription("The SCL file that contains the server's information model.").setMandatory()
+            .setDescription("The SCL file that contains the server's information model.")
+            .setMandatory()
             .buildStringParameter("model-file");
 
-    public static ServerModel serverModel;
-    public static ServerSap serverSap = null;
+    private ServerSap serverSap = null;
 
     @Autowired
     private RelayRepository relayRepository;
@@ -78,7 +81,7 @@ public class ServerSimulator implements CommandLineRunner {
         try {
             cliParser.parseArguments(args);
         } catch (final CliParseException e1) {
-            logger.error("Error parsing command line parameters: " + e1.getMessage());
+            logger.error("Error parsing command line parameters {}", e1.getMessage());
             logger.info(cliParser.getUsageString());
             System.exit(1);
         }
@@ -87,43 +90,43 @@ public class ServerSimulator implements CommandLineRunner {
         try {
             serverModels = SclParser.parse(modelFileParam.getValue());
         } catch (final SclParseException e) {
-            System.out.println("Error parsing SCL/ICD file: " + e.getMessage());
+            logger.error("Error parsing SCL/ICD file", e);
             return;
         }
 
         logger.info("ServerSap aanmaken...");
-        serverSap = new ServerSap(portParam.getValue(), 0, null, serverModels.get(0), null);
+        this.serverSap = new ServerSap(portParam.getValue(), 0, null, serverModels.get(0), null);
         logger.info("ServerSap aangemaakt met als poort: {}", portParam.getValue());
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
-                if (serverSap != null) {
-                    serverSap.stop();
+                if (ServerSimulator.this.serverSap != null) {
+                    ServerSimulator.this.serverSap.stop();
                 }
-                System.out.println("Server was stopped.");
+                logger.info("Server was stopped.");
             }
         });
-        logger.debug("Model copy gestart");
-        serverModel = serverSap.getModelCopy();
-        logger.debug("Model copy done!");
 
         // Device initialization by copying from serverModel
-        final ServerWrapper serverWrapper = new ServerWrapper(serverSap);
+        final ServerWrapper serverWrapper = new ServerWrapper(this.serverSap);
         final Device device = new Device();
-        final Scheduler scheduler = new Scheduler(device);
+
+        final Scheduler scheduler = new Scheduler(device, new SwitchingMomentCalculator(),
+                (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(1));
+
         device.initalizeDevice(serverWrapper);
 
         // Comparing database with model
 
-        DatabaseUtils databaseUtils = new DatabaseUtils(serverWrapper);
+        final DatabaseUtils databaseUtils = new DatabaseUtils(serverWrapper);
         databaseUtils.setRelayRepository(this.relayRepository);
         databaseUtils.setScheduleRepository(this.scheduleRepository);
         for (int relayNr = 1; relayNr <= device.getRelays().length; relayNr++) {
-            Relay relay = device.getRelay(relayNr);
+            final Relay relay = device.getRelay(relayNr);
             databaseUtils.checkRelay(relay);
 
             for (int scheduleNr = 1; scheduleNr <= 50; scheduleNr++) {
-                Schedule schedule = relay.getSchedule(scheduleNr);
+                final Schedule schedule = relay.getSchedule(scheduleNr);
                 databaseUtils.checkSchedule(schedule, relay.getIndexNumber());
             }
 
@@ -131,16 +134,17 @@ public class ServerSimulator implements CommandLineRunner {
 
         logger.info("SERVER START LISTENING");
         final EventDataListener edl = new EventDataListener(device, scheduler, databaseUtils);
-        serverSap.startListening(edl);
+        this.serverSap.startListening(edl);
 
         // Initial schedule
         try {
-            scheduler.calculateTasks(device);
+            scheduler.calculateTasksForDateTime(device, LocalDateTime.now());
         } catch (final Exception e) {
             logger.warn("Initial switching moment calculation failed, try sending another schedule.", e);
         }
 
-        final ActionProcessor actionProcessor = new ActionProcessor(new ActionExecutor(serverSap, device, scheduler));
+        final ActionProcessor actionProcessor = new ActionProcessor(
+                new ActionExecutor(this.serverSap, device, scheduler));
         actionProcessor.addAction(new Action(PRINT_SERVER_MODEL_KEY, PRINT_SERVER_MODEL_KEY_DESCRIPTION));
         actionProcessor.addAction(new Action(DEVICE_SHOW_MODEL, DEVICE_SHOW_MODEL_DESCRIPTION));
 

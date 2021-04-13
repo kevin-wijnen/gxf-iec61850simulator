@@ -14,8 +14,8 @@ import org.junit.jupiter.api.Test;
 import com.cgi.iec61850serversimulator.dataclass.Device;
 import com.cgi.iec61850serversimulator.dataclass.Relay;
 import com.cgi.iec61850serversimulator.dataclass.Schedule;
-import com.cgi.iec61850serversimulator.dataclass.SwitchingMoment;
 import com.cgi.iec61850serversimulator.dataclass.Schedule.ScheduleBuilder;
+import com.cgi.iec61850serversimulator.dataclass.SwitchingMoment;
 import com.cgi.iec61850serversimulator.functionclass.SwitchingMomentCalculationException;
 import com.cgi.iec61850serversimulator.functionclass.SwitchingMomentCalculator;
 
@@ -92,7 +92,8 @@ class SwitchingMomentCalculatorTest {
         // Calculating switching moment
 
         final SwitchingMomentCalculator calculator = new SwitchingMomentCalculator();
-        final List<SwitchingMoment> switchingMoments = calculator.returnSwitchingMoments(this.device);
+        final List<SwitchingMoment> switchingMoments = calculator.returnSwitchingMoments(this.device,
+                LocalDateTime.now());
 
         // Tests
 
@@ -109,12 +110,16 @@ class SwitchingMomentCalculatorTest {
         assertEquals(expectedAfterLunchTime, actualSwitchingMomentOff.getTriggerTime());
         assertFalse(actualSwitchingMomentOff.isTriggerAction());
 
-        final LocalDateTime expectedNextLunchTime = LocalDateTime.now().plusDays(1).truncatedTo(ChronoUnit.HOURS)
+        final LocalDateTime expectedNextLunchTime = LocalDateTime.now()
+                .plusDays(1)
+                .truncatedTo(ChronoUnit.HOURS)
                 .withHour(12);
         assertEquals(expectedNextLunchTime, actualSwitchingMomentNextDayOn.getTriggerTime());
         assertTrue(actualSwitchingMomentOn.isTriggerAction());
 
-        final LocalDateTime expectedNextAfterLunchTime = LocalDateTime.now().plusDays(1).truncatedTo(ChronoUnit.HOURS)
+        final LocalDateTime expectedNextAfterLunchTime = LocalDateTime.now()
+                .plusDays(1)
+                .truncatedTo(ChronoUnit.HOURS)
                 .withHour(13);
         assertEquals(expectedNextAfterLunchTime, actualSwitchingMomentNextDayOff.getTriggerTime());
         assertFalse(actualSwitchingMomentOff.isTriggerAction());
@@ -145,7 +150,8 @@ class SwitchingMomentCalculatorTest {
         // Calculating switching moment
 
         final SwitchingMomentCalculator calculator = new SwitchingMomentCalculator();
-        final List<SwitchingMoment> switchingMoments = calculator.returnSwitchingMoments(this.device);
+        final List<SwitchingMoment> switchingMoments = calculator.returnSwitchingMoments(this.device,
+                LocalDateTime.now());
 
         // Tests
 
@@ -154,23 +160,33 @@ class SwitchingMomentCalculatorTest {
         final SwitchingMoment actualSwitchingMomentNextDayOn = switchingMoments.get(1);
         final SwitchingMoment actualSwitchingMomentNextDayOff = switchingMoments.get(3);
 
-        final LocalDateTime expectedTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES)
-                .withHour(timeOn.getHour()).withMinute(timeOn.getMinute());
+        final LocalDateTime expectedTime = LocalDateTime.now()
+                .truncatedTo(ChronoUnit.MINUTES)
+                .withHour(timeOn.getHour())
+                .withMinute(timeOn.getMinute());
         assertEquals(expectedTime, actualSwitchingMomentOn.getTriggerTime());
         assertTrue(actualSwitchingMomentOn.isTriggerAction());
 
-        final LocalDateTime expectedAfterTime = LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES)
-                .withHour(timeOff.getHour()).withMinute(timeOff.getMinute());
+        final LocalDateTime expectedAfterTime = LocalDateTime.now()
+                .truncatedTo(ChronoUnit.MINUTES)
+                .withHour(timeOff.getHour())
+                .withMinute(timeOff.getMinute());
         assertEquals(expectedAfterTime, actualSwitchingMomentOff.getTriggerTime());
         assertFalse(actualSwitchingMomentOff.isTriggerAction());
 
-        final LocalDateTime expectedNextTime = LocalDateTime.now().plusDays(1).truncatedTo(ChronoUnit.MINUTES)
-                .withHour(timeOn.getHour()).withMinute(timeOn.getMinute());
+        final LocalDateTime expectedNextTime = LocalDateTime.now()
+                .plusDays(1)
+                .truncatedTo(ChronoUnit.MINUTES)
+                .withHour(timeOn.getHour())
+                .withMinute(timeOn.getMinute());
         assertEquals(expectedNextTime, actualSwitchingMomentNextDayOn.getTriggerTime());
         assertTrue(actualSwitchingMomentOn.isTriggerAction());
 
-        final LocalDateTime expectedNextAfterTime = LocalDateTime.now().plusDays(1).truncatedTo(ChronoUnit.MINUTES)
-                .withHour(timeOff.getHour()).withMinute(timeOff.getMinute());
+        final LocalDateTime expectedNextAfterTime = LocalDateTime.now()
+                .plusDays(1)
+                .truncatedTo(ChronoUnit.MINUTES)
+                .withHour(timeOff.getHour())
+                .withMinute(timeOff.getMinute());
         assertEquals(expectedNextAfterTime, actualSwitchingMomentNextDayOff.getTriggerTime());
         assertFalse(actualSwitchingMomentOff.isTriggerAction());
 
@@ -223,9 +239,15 @@ class SwitchingMomentCalculatorTest {
         final int burningMinutes = 30;
         final boolean enabled = true;
 
-        return new ScheduleBuilder(scheduleNr - 1).relayNr(relayNr).dayInt(dayInt).fixedTimeInt(fixedTimeInt)
-                .fixedTimeOn(fixedTimeOn).fixedTimeOff(fixedTimeOff).timeOn(timeOn).timeOff(timeOff)
-                .burningMins(burningMinutes).isEnabled(enabled);
+        return new ScheduleBuilder(scheduleNr - 1).relayNr(relayNr)
+                .dayInt(dayInt)
+                .fixedTimeInt(fixedTimeInt)
+                .fixedTimeOn(fixedTimeOn)
+                .fixedTimeOff(fixedTimeOff)
+                .timeOn(timeOn)
+                .timeOff(timeOff)
+                .burningMins(burningMinutes)
+                .isEnabled(enabled);
 
     }
 
