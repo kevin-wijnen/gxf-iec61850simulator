@@ -7,7 +7,6 @@ import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -184,7 +183,7 @@ public class EventDataListener implements ServerEventListener {
                                 ((BdaBoolean) bda).getValue());
 
                         // Sends updated Schedule to Schedule object
-                        this.device.getRelay(relayNr).getSchedule(scheduleNr).setEnabled(((BdaBoolean) bda).getValue());
+                        scheduleToUpdate.setEnabled(((BdaBoolean) bda).getValue());
 
                         // Puts to update schedule in HashMap
                         schedulesToUpdate.put(relaySchedulePair, scheduleToUpdate);
@@ -197,10 +196,10 @@ public class EventDataListener implements ServerEventListener {
 
                         logger.info("Day found.");
                         final int newDay = ((BdaInt32) bda).getValue();
-                        final int currentDay = this.device.getRelay(relayNr).getSchedule(scheduleNr).getDayInt();
+                        final int currentDay = scheduleToUpdate.getDayInt();
                         if (newDay != currentDay) {
                             modified = true;
-                            this.device.getRelay(relayNr).getSchedule(scheduleNr).setDayInt(newDay);
+                            scheduleToUpdate.setDayInt(newDay);
 
                             // Puts to update schedule in HashMap
                             schedulesToUpdate.put(relaySchedulePair, scheduleToUpdate);
@@ -213,13 +212,12 @@ public class EventDataListener implements ServerEventListener {
                     case "tOn": {
 
                         logger.info("Time On found.");
-                        this.device.getRelay(relayNr).getSchedule(scheduleNr);
                         final int timeInt = (((BdaInt32) bda).getValue());
                         final int timeHour = timeInt / 100;
                         final int timeMinute = timeInt % 100;
                         final LocalTime timeLocalTime = LocalTime.of(timeHour, timeMinute);
 
-                        this.device.getRelay(relayNr).getSchedule(scheduleNr).setTimeOn(timeLocalTime);
+                        scheduleToUpdate.setTimeOn(timeLocalTime);
 
                         // Puts to update schedule in HashMap
                         schedulesToUpdate.put(relaySchedulePair, scheduleToUpdate);
@@ -231,8 +229,7 @@ public class EventDataListener implements ServerEventListener {
                     case "tOnT": {
 
                         logger.info("Time On Type found.");
-                        this.device.getRelay(relayNr).getSchedule(scheduleNr)
-                                .setTimeOnTypeInt(((BdaInt8) bda).getValue());
+                        scheduleToUpdate.setTimeOnTypeInt(((BdaInt8) bda).getValue());
 
                         // Puts to update schedule in HashMap
                         schedulesToUpdate.put(relaySchedulePair, scheduleToUpdate);
@@ -245,13 +242,12 @@ public class EventDataListener implements ServerEventListener {
                     case "tOff": {
 
                         logger.info("Time Off found.");
-                        this.device.getRelay(relayNr).getSchedule(scheduleNr);
                         final int timeInt = (((BdaInt32) bda).getValue());
                         final int timeHour = timeInt / 100;
                         final int timeMinute = timeInt % 100;
                         final LocalTime timeLocalTime = LocalTime.of(timeHour, timeMinute);
 
-                        this.device.getRelay(relayNr).getSchedule(scheduleNr).setTimeOff(timeLocalTime);
+                        scheduleToUpdate.setTimeOff(timeLocalTime);
 
                         // Puts to update schedule in HashMap
                         schedulesToUpdate.put(relaySchedulePair, scheduleToUpdate);
@@ -264,8 +260,7 @@ public class EventDataListener implements ServerEventListener {
                     case "tOffT": {
 
                         logger.info("Time Off Type found.");
-                        this.device.getRelay(relayNr).getSchedule(scheduleNr)
-                                .setTimeOffTypeInt(((BdaInt8) bda).getValue());
+                        scheduleToUpdate.setTimeOffTypeInt(((BdaInt8) bda).getValue());
 
                         // Puts to update schedule in HashMap
                         schedulesToUpdate.put(relaySchedulePair, scheduleToUpdate);
@@ -277,8 +272,7 @@ public class EventDataListener implements ServerEventListener {
                     case "minOnPer": {
 
                         logger.info("Burning Minutes found.");
-                        this.device.getRelay(relayNr).getSchedule(scheduleNr)
-                                .setBurningMinsOn((short) ((BdaInt16U) bda).getValue());
+                        scheduleToUpdate.setBurningMinsOn((short) ((BdaInt16U) bda).getValue());
 
                         // Puts to update schedule in HashMap
                         schedulesToUpdate.put(relaySchedulePair, scheduleToUpdate);
@@ -290,8 +284,7 @@ public class EventDataListener implements ServerEventListener {
                     case "srBefWd": {
 
                         logger.info("Before Astronomical Time Offset found.");
-                        this.device.getRelay(relayNr).getSchedule(scheduleNr)
-                                .setBeforeOffset((short) ((BdaInt16U) bda).getValue());
+                        scheduleToUpdate.setBeforeOffset((short) ((BdaInt16U) bda).getValue());
 
                         // Not used in database
 
@@ -303,8 +296,7 @@ public class EventDataListener implements ServerEventListener {
                     case "srAftWd": {
 
                         logger.info("After Astronomical Time Offset found.");
-                        this.device.getRelay(relayNr).getSchedule(scheduleNr)
-                                .setAfterOffset((short) ((BdaInt16U) bda).getValue());
+                        scheduleToUpdate.setAfterOffset((short) ((BdaInt16U) bda).getValue());
 
                         // Not used in database
 
@@ -316,8 +308,7 @@ public class EventDataListener implements ServerEventListener {
                     case "Descr": {
 
                         logger.info("Description found.");
-                        this.device.getRelay(relayNr).getSchedule(scheduleNr)
-                                .setDescription(((BdaVisibleString) bda).getValueString());
+                        scheduleToUpdate.setDescription(((BdaVisibleString) bda).getValueString());
 
                         // Not used in database
 
@@ -330,10 +321,8 @@ public class EventDataListener implements ServerEventListener {
                     }
                 }
             }
-            // Iterate through toUpdateSchedules to update the schedules
-            for (Entry<RelaySchedulePair, Schedule> relaySchedulePair : schedulesToUpdate.entrySet()) {
-
-                this.databaseUtils.updateDatabaseSchedule(relaySchedulePair.getValue());
+            for (Schedule scheduleToUpdate : schedulesToUpdate.values()) {
+                this.databaseUtils.updateDatabaseSchedule(scheduleToUpdate);
 
             }
         } catch (final Exception e) {
