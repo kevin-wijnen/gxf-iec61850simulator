@@ -1,10 +1,10 @@
 package com.cgi.iec61850serversimulator.dataclass;
 
+/**
+ * Class to store relay numbers and schedule numbers into a single object for
+ * EventDataListener HashMap and general refactoring of code
+ */
 public class RelaySchedulePair {
-    /**
-     * Class to store relay numbers and schedule numbers into a single object for
-     * EventDataListener HashMap and general refactoring of code
-     */
 
     private int relayNr;
     private int scheduleNr;
@@ -18,16 +18,8 @@ public class RelaySchedulePair {
         return this.relayNr;
     }
 
-    public void setRelayNr(int relayNr) {
-        this.relayNr = relayNr;
-    }
-
     public int getScheduleNr() {
         return this.scheduleNr;
-    }
-
-    public void setScheduleNr(int scheduleNr) {
-        this.scheduleNr = scheduleNr;
     }
 
     @Override

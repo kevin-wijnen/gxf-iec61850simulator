@@ -6,6 +6,7 @@ import java.time.LocalTime;
 import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -52,7 +53,7 @@ public class EventDataListener implements ServerEventListener {
     public List<ServiceError> write(final List<BasicDataAttribute> bdas) {
         logger.info("BDA write request scanning...");
         boolean modified = false;
-        HashMap<RelaySchedulePair, Schedule> toUpdateSchedules = new HashMap<RelaySchedulePair, Schedule>();
+        Map<RelaySchedulePair, Schedule> schedulesToUpdate = new HashMap<>();
 
         try {
             for (final BasicDataAttribute bda : bdas) {
@@ -62,6 +63,7 @@ public class EventDataListener implements ServerEventListener {
                 // Initializing relay and schedule numbers. 0 = unused
                 int relayNr = 0;
                 int scheduleNr = 0;
+                Schedule scheduleToUpdate = null;
 
                 if (referenceString.contains("XSWC")) {
                     relayNr = this.extractRelayIndex(bda.getReference());
@@ -71,7 +73,11 @@ public class EventDataListener implements ServerEventListener {
                     scheduleNr = this.extractScheduleIndex(bda.getReference());
                 }
 
-                RelaySchedulePair relaySchedulePairs = new RelaySchedulePair(relayNr, scheduleNr);
+                if (relayNr > 0 && scheduleNr > 0) {
+                    scheduleToUpdate = this.device.getRelay(relayNr).getSchedule(scheduleNr);
+                }
+
+                RelaySchedulePair relaySchedulePair = new RelaySchedulePair(relayNr, scheduleNr);
 
                 // Schedules above 50 are not accepted by GXF, thus they will be
                 // skipped.
@@ -181,8 +187,7 @@ public class EventDataListener implements ServerEventListener {
                         this.device.getRelay(relayNr).getSchedule(scheduleNr).setEnabled(((BdaBoolean) bda).getValue());
 
                         // Puts to update schedule in HashMap
-                        toUpdateSchedules.put(relaySchedulePairs,
-                                this.device.getRelay(relayNr).getSchedule(scheduleNr));
+                        schedulesToUpdate.put(relaySchedulePair, scheduleToUpdate);
 
                         modified = true;
                         break;
@@ -198,8 +203,7 @@ public class EventDataListener implements ServerEventListener {
                             this.device.getRelay(relayNr).getSchedule(scheduleNr).setDayInt(newDay);
 
                             // Puts to update schedule in HashMap
-                            toUpdateSchedules.put(relaySchedulePairs,
-                                    this.device.getRelay(relayNr).getSchedule(scheduleNr));
+                            schedulesToUpdate.put(relaySchedulePair, scheduleToUpdate);
 
                             modified = true;
                         }
@@ -218,8 +222,7 @@ public class EventDataListener implements ServerEventListener {
                         this.device.getRelay(relayNr).getSchedule(scheduleNr).setTimeOn(timeLocalTime);
 
                         // Puts to update schedule in HashMap
-                        toUpdateSchedules.put(relaySchedulePairs,
-                                this.device.getRelay(relayNr).getSchedule(scheduleNr));
+                        schedulesToUpdate.put(relaySchedulePair, scheduleToUpdate);
 
                         modified = true;
                         break;
@@ -232,8 +235,7 @@ public class EventDataListener implements ServerEventListener {
                                 .setTimeOnTypeInt(((BdaInt8) bda).getValue());
 
                         // Puts to update schedule in HashMap
-                        toUpdateSchedules.put(relaySchedulePairs,
-                                this.device.getRelay(relayNr).getSchedule(scheduleNr));
+                        schedulesToUpdate.put(relaySchedulePair, scheduleToUpdate);
 
                         modified = true;
 
@@ -252,8 +254,7 @@ public class EventDataListener implements ServerEventListener {
                         this.device.getRelay(relayNr).getSchedule(scheduleNr).setTimeOff(timeLocalTime);
 
                         // Puts to update schedule in HashMap
-                        toUpdateSchedules.put(relaySchedulePairs,
-                                this.device.getRelay(relayNr).getSchedule(scheduleNr));
+                        schedulesToUpdate.put(relaySchedulePair, scheduleToUpdate);
 
                         modified = true;
 
@@ -267,8 +268,7 @@ public class EventDataListener implements ServerEventListener {
                                 .setTimeOffTypeInt(((BdaInt8) bda).getValue());
 
                         // Puts to update schedule in HashMap
-                        toUpdateSchedules.put(relaySchedulePairs,
-                                this.device.getRelay(relayNr).getSchedule(scheduleNr));
+                        schedulesToUpdate.put(relaySchedulePair, scheduleToUpdate);
 
                         modified = true;
                         break;
@@ -281,8 +281,7 @@ public class EventDataListener implements ServerEventListener {
                                 .setBurningMinsOn((short) ((BdaInt16U) bda).getValue());
 
                         // Puts to update schedule in HashMap
-                        toUpdateSchedules.put(relaySchedulePairs,
-                                this.device.getRelay(relayNr).getSchedule(scheduleNr));
+                        schedulesToUpdate.put(relaySchedulePair, scheduleToUpdate);
 
                         modified = true;
                         break;
@@ -332,13 +331,9 @@ public class EventDataListener implements ServerEventListener {
                 }
             }
             // Iterate through toUpdateSchedules to update the schedules
-            for (Entry<RelaySchedulePair, Schedule> entry : toUpdateSchedules.entrySet()) {
-                RelaySchedulePair key = entry.getKey();
-                int relayNr = key.getRelayNr();
-                Schedule value = entry.getValue();
-                int scheduleNr = value.getIndexNumber();
+            for (Entry<RelaySchedulePair, Schedule> relaySchedulePair : schedulesToUpdate.entrySet()) {
 
-                this.databaseUtils.updateDatabaseSchedule(this.device.getRelay(relayNr).getSchedule(scheduleNr));
+                this.databaseUtils.updateDatabaseSchedule(relaySchedulePair.getValue());
 
             }
         } catch (final Exception e) {
