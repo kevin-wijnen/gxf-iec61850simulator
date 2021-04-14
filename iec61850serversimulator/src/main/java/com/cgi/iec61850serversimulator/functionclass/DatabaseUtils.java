@@ -107,7 +107,7 @@ public class DatabaseUtils {
 
     public void checkSchedule(Schedule schedule, int relayNr) {
         // Make sure relayNr is 1, 2, 3, 4; not 0, 1, 2, 3!
-        long relayId = this.findRelayEntityByRelayNr(relayNr);
+        long relayId = this.findRelayIdByRelayNr(relayNr);
         boolean found = this.scheduleRepository.existsByIndexNumberAndRelayId(schedule.getIndexNumber(), relayId);
 
         if (found) {
@@ -128,7 +128,7 @@ public class DatabaseUtils {
         // Update relay model with BDA
         logger.info("Updating model schedule with database.");
         int scheduleNr = schedule.getIndexNumber();
-        long relayId = this.findRelayEntityByRelayNr(relayNr);
+        long relayId = this.findRelayIdByRelayNr(relayNr);
 
         String scheduleRoot = SWITCH_ROOT + relayNr + ".Sche.sche" + scheduleNr;
         List<ScheduleEntity> databaseSchedules = this.scheduleRepository.findByIndexNumberAndRelayId(scheduleNr,
@@ -228,7 +228,7 @@ public class DatabaseUtils {
 
         int scheduleNr = schedule.getIndexNumber();
         int relayNr = schedule.getRelayNr();
-        long relayId = this.findRelayEntityByRelayNr(relayNr);
+        long relayId = this.findRelayIdByRelayNr(relayNr);
         boolean found = this.scheduleRepository.existsByIndexNumberAndRelayId(scheduleNr, relayId);
 
         if (found) {
@@ -264,7 +264,7 @@ public class DatabaseUtils {
         }
     }
 
-    public long findRelayEntityByRelayNr(int relayNr) {
+    public long findRelayIdByRelayNr(int relayNr) {
         List<RelayEntity> relayEntities = this.relayRepository.findByIndexNumber(relayNr);
         RelayEntity relayEntity = relayEntities.get(0);
 
