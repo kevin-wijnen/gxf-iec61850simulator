@@ -42,7 +42,7 @@ public class SchedulerTest {
         // Part 3: create a schedule and put a mock (= fake) calculator and
         // executor in it
         final Device device = null;
-        final Scheduler scheduler = new Scheduler(device, this.calculator, this.executor);
+        final Scheduler scheduler = new Scheduler(device, this.calculator, this.executor, null);
 
         // Tell the make calculator what to return
         Mockito.when(this.calculator.returnSwitchingMoments(Mockito.any(), Mockito.any())).thenReturn(switchingMoments);
@@ -60,9 +60,8 @@ public class SchedulerTest {
         // "calculateTasksForDateTime" enables us to calculate exactly how many
         // seconds in the future the switching moment should happen.
         final long expectedSwitchingAfterSeconds = 1 * 3600 + 27 * 60;
-        Mockito.verify(this.executor, Mockito.times(1))
-                .schedule(Mockito.any(Runnable.class), Mockito.eq(expectedSwitchingAfterSeconds),
-                        Mockito.eq(TimeUnit.SECONDS));
+        Mockito.verify(this.executor, Mockito.times(1)).schedule(Mockito.any(Runnable.class),
+                Mockito.eq(expectedSwitchingAfterSeconds), Mockito.eq(TimeUnit.SECONDS));
     }
 
 }

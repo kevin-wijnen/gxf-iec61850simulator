@@ -52,8 +52,7 @@ public class ServerSimulator implements CommandLineRunner {
             .buildIntParameter("port", 10102);
 
     private static final StringCliParameter modelFileParam = new CliParameterBuilder("-m")
-            .setDescription("The SCL file that contains the server's information model.")
-            .setMandatory()
+            .setDescription("The SCL file that contains the server's information model.").setMandatory()
             .buildStringParameter("model-file");
 
     private ServerSap serverSap = null;
@@ -111,9 +110,6 @@ public class ServerSimulator implements CommandLineRunner {
         final ServerWrapper serverWrapper = new ServerWrapper(this.serverSap);
         final Device device = new Device();
 
-        final Scheduler scheduler = new Scheduler(device, new SwitchingMomentCalculator(),
-                (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(1));
-
         device.initalizeDevice(serverWrapper);
 
         // Comparing database with model
@@ -131,6 +127,9 @@ public class ServerSimulator implements CommandLineRunner {
             }
 
         }
+
+        final Scheduler scheduler = new Scheduler(device, new SwitchingMomentCalculator(),
+                (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(1), databaseUtils);
 
         logger.info("SERVER START LISTENING");
         final EventDataListener edl = new EventDataListener(device, scheduler, databaseUtils);

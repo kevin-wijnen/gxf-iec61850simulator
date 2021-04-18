@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.cgi.iec61850serversimulator.dataclass.Device;
+import com.cgi.iec61850serversimulator.dataclass.Relay;
 import com.cgi.iec61850serversimulator.dataclass.SwitchingMoment;
 
 /**
@@ -23,9 +24,10 @@ public class Scheduler {
     private SwitchingMomentCalculator switchingMomentCalculator;
     private static final Logger logger = LoggerFactory.getLogger(Scheduler.class);
     private Device device;
+    private DatabaseUtils databaseUtils;
 
     public Scheduler(final Device device, final SwitchingMomentCalculator switchingMomentCalculator,
-            final ScheduledThreadPoolExecutor executor) {
+            final ScheduledThreadPoolExecutor executor, DatabaseUtils databaseUtils) {
         this.executor = executor;
 
         // Should remove cancelled futures, still included .purge when
@@ -35,6 +37,7 @@ public class Scheduler {
         this.switchingMomentCalculator = switchingMomentCalculator;
         this.device = device;
         this.scheduledFutures = new ArrayList<>();
+        this.databaseUtils = databaseUtils;
     }
 
     // Base it on feature/example-scheduling code! Triggering at certain
@@ -92,6 +95,8 @@ public class Scheduler {
         return () -> {
             logger.info("Switching relay {} to {}", relayNr, switchOn ? "on" : "off");
             Scheduler.this.device.getRelay(relayNr).setLight(switchOn);
+            Relay updatedRelay = Scheduler.this.device.getRelay(relayNr);
+            Scheduler.this.databaseUtils.updateDatabaseRelay(updatedRelay);
         };
     }
 
